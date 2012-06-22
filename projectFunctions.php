@@ -323,16 +323,6 @@ function session_resign_in($keepPost) {                        //requires person
 //    header("refresh:0;url=/login/reSignIn.php"); //redirect to resign in and exit
 //    exit;
 }
-/* Functions urlsafe_b64encode and urlsafe_b64decode posted on
- * <https://www.php.net/manual/en/function.mcrypt-generic.php#71135>
- * by  tmacedo@linux.ime.usp.br (tmacedo at linux dot ime dot usp dot br)
- * 
- */
-function urlsafe_b64encode($string) {
-    $data = base64_encode($string);
-    $data = str_replace(array('+', '/', '='), array('-', '_', '.'), $data);
-    return $data;
-}
 function aes_Encrypt_Encode($password, $input) {
     $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, "", "ecb", "");
     $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_DEV_URANDOM);
@@ -352,14 +342,6 @@ function aes_Decrypt_Encode($password, $input) {
     mcrypt_generic_deinit($td);
     mcrypt_module_close($td);
     return $decrypted;
-}
-function urlsafe_b64decode($string) {
-    $data = str_replace(array('-', '_', '.'), array('+', '/', '='), $string);
-    $mod4 = strlen($data) % 4;
-    if ($mod4) {
-        $data .= substr('====', $mod4);
-    }
-    return base64_decode($data);
 }
 function enterDate($sameLine = true, $append = null, DateTime $default = null) {
     $months = monthArray();
