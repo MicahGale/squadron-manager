@@ -50,7 +50,15 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 <input type="checkbox" name="attend"/>Would you like to enter attendance to this event after creating it? 
                 <br>
                 <br>
-                <input type="submit" value="create event"/>
+                <?php
+                for($i=0;$i<10;$i++) {                 //create 10 dropDowns for the subevents
+                    //todo check that the query is right
+                    dropDownMenu('SELECT SUBEVENT_CODE, SUBEVENT_NAME FROM SUBEVENTS',"SubEvent$i",$ident,true,null,true);
+                    echo"<br>";
+                }
+                ?>
+                <br>
+                <input type="submit" value="create event"/><input tyep="submit" name="sub" value="Add More Subevents"/>
             </form>
             <?php
         } else if(!isset($_POST['other'])){         //start processing input if not other input specified
@@ -167,6 +175,17 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
 //               echo "<meta http-equiv=\"REFRESH\" content=\"0;url=/loging/attendance/add.php?eCode=$event_code\">";
            }
         }
-        ?>
+        function parse_Sub_events(array $input, $count=10) {
+            $parsed=array();
+            for($i=0;$i<$count;$i++) {
+                //TODO double check length
+                array_push($parsed, cleanInputString($input["subEvent$i"], 3, "subevnet$i",true));
+            }
+            return $parsed;
+         }
+         function insert_Subevents($event_Code, array $subEvents) {
+             //TODO do query
+         }
+        ?> 
     </body>
 </html>
