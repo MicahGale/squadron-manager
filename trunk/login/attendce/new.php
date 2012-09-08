@@ -53,7 +53,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 <?php
                 for($i=0;$i<10;$i++) {                 //create 10 dropDowns for the subevents
                     //todo check that the query is right
-                    dropDownMenu('SELECT SUBEVENT_CODE, SUBEVENT_NAME FROM SUBEVENTS',"SubEvent$i",$ident,true,null,true);
+                    dropDownMenu('SELECT SUBEVENT_TYPE, SUBEVENT_NAME FROM SUBEVENT_TYPE',"SubEvent$i",$ident,true,null,true);
                     echo"<br>";
                 }
                 ?>
