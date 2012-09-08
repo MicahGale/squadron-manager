@@ -1,0 +1,12 @@
+#summary Information for Developers about developing philosophy
+
+= Introduction =
+
+Thank you for your help with developing this project, before you begin please familiarize yourself with this.  This will introduce you to our project's developing philosophy, and also has links to important information, such as the file hierarchy, and the database structure.
+
+
+= Development Philosophy =
+
+== Security First ==
+
+Our product, Squadron Manager, is trusted by many people to hold their personal information, and keep it secure.  Since we have this great responsibility all of our code must be created with security first in mind.
