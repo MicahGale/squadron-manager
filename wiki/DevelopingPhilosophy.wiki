@@ -1,4 +1,5 @@
 #summary Information for Developers about developing philosophy
+#labels Phase-Implementation
 
 = Introduction =
 
@@ -21,4 +22,8 @@ Our product, Squadron Manager, is trusted by many people to hold their personal 
 
 == Portability ==
 
-The 
+Squadron Manager is meant to be able to be used by as many Squadrons as possible.  for this reason it should be portable to any hardware configuration or software configuration.  Since PHP is an interpreted language, the only software portability that is of concern is working with multiple DBMS's, so all database calls are done through internal functions (better explained in the next section).  So to port to a different DBMS than the initial one (MYSQL) the database functions just need to be changed.
+
+== API == 
+
+All of the functions in this project that need to be used multiple times are kept in one file called projectFunctions.php.  This file contains all commonly used functions, database calls, and processes, and any objects that are used by the project.
