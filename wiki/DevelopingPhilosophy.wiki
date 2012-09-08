@@ -30,4 +30,4 @@ All of the functions in this project that need to be used multiple times are kep
 
 ==Contributing==
 
-If you would like to contribute, just email the current project Owner, and they will add you.  The current owner is Micah Gale (<a href="mailto:Micah.Gale@gmail.com">Micah.Gale@gmail.com</a>).  Also if you make a contribution please add your name and email to the contributors table in authors.html.
+If you would like to contribute, just email the current project Owner, and they will add you.  The current owner is Micah Gale (<a href="mailto:Micah.Gale@gmail.com">Micah.Gale@gmail.com</a>).  Also if you make a contribution please add your name and email to the contributors table in authors.php.
