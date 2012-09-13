@@ -22,3 +22,16 @@ Here are all the tables used and a brief description of what they are used for.
 ||DISCIPLINE_OFFFENSES||The type of offense that disciplinary action was given for (i.e. Disrespectful behavior)||
 ||DISCIPLINE_TYPE||The type of Discipline Action given (i.e. verbal warning)||
 ||EMERGENCY_CONTACT||Holds emergency contact information for members||
+||EVENT||Holds the Events that members sign into||
+||EVENT_LOCATION||The location the events are held at||
+||EVENT_TYPES||The type of the event (i.e. meeting, volunteering)||
+||FLIGHTS||Your flights in your squadron||
+||GRADE|| The various Ranks||
+||INTRUSION_TYPE||The type of audit-able event for AUDIT_LOG||
+||LOGIN_LOG||Logs all login attempts to prevent brute force attacks||
+||MEMBER||Holds the information for the Actual Members (their names)||
+||MEMBERSHIP_TYPES||The types of membership (i.e. cadet, senior member, etc)||
+||NEW_MEMBER||Sign-in for perspective members who don't have CAPIDS||
+||NEXT_VISIT||Pages in /login that can be accessed based upon the page they were just on||
+||PHASES||The various phases for promotions (i.e. Phase I C/AB-C/ssgt)||
+||PROMOTION_BOARD||Tracks all promotion boards given||
