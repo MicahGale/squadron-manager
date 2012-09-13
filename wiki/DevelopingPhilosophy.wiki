@@ -10,6 +10,8 @@ Thank you for your help with developing this project, before you begin please fa
 
 == Security First ==
 
+We do not believe in _"Security through obscurity"_, the only true way to make something secure is to make a program that has complete code transparency, and still has no exploits.
+
 Our product, Squadron Manager, is trusted by many people to hold their personal information, and keep it secure.  Since we have this great responsibility all of our code must be created with security first in mind.  Also to ensure this security all updates and releases must survive intensive penetration testing, before we will as a community endorse that version.  We have many software practices that helps ensure this security, which are listed below.  However this does not prevent all threats, and server administrators are strongly urged to follow _*this guide*_ on hardware/server specific security.
 
 === Security Features ===
