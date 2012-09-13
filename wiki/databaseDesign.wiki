@@ -3,7 +3,22 @@
 
 = Introduction =
 
-This describes all the tables used by this project, all of their columns, what data they hold, and their relations.
+This describes all the tables used by this project, all of their columns, what data they hold, and their relations. Currently the name for the default database is SQUADRON_INFO.
 
 
 =Tables=
+Here are all the tables used and a brief description of what they are used for.
+||ACCOUNT_LOCKS||Is used to store information about a login being locked for a set time||
+||ACHIEVEMENT||Holds all of the possible promotions and their associated rank||
+||ATTENDANCE||Holds who attended what events||
+||AUDIT_DUMP||Holds any variables that are relevant to an audit-able event||
+||AUDIT_LOG||Holds the basic info for audit-able events such as an attempted security exploit, or a DB error||
+||CAP_UNIT||Holds all the CAP units that have signed into your squadron||
+||CHAIN_OF_COMMAND||Tells what staff position is under what other staff position _is position dependent *not* people dependent_||
+||CONTACT_RELATIONS||All the various relations an emergency contact can have with a member (i.e. Mother, Brother)||
+||CPFT_REQUIREMENTS||The Requirements for all of the CPFTs||
+||CPFT_TEST_TYPES||The various tests for CPFT's (i.e. Shuttle Run)||
+||DISCIPLINE_LOG||Logs all discipline action given to Members||
+||DISCIPLINE_OFFFENSES||The type of offense that disciplinary action was given for (i.e. Disrespectful behavior)||
+||DISCIPLINE_TYPE||The type of Discipline Action given (i.e. verbal warning)||
+||EMERGENCY_CONTACT||Holds emergency contact information for members||
