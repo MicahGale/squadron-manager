@@ -1,0 +1,9 @@
+#summary The structure of the Data base
+#labels Phase-Implementation
+
+= Introduction =
+
+This describes all the tables used by this project, all of their columns, what data they hold, and their relations.
+
+
+=Tables=
