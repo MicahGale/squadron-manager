@@ -50,6 +50,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 <input type="checkbox" name="attend"/>Would you like to enter attendance to this event after creating it? 
                 <br>
                 <br>
+                Please enter any sub-events:<br>
                 <?php
                 for($i=0;$i<10;$i++) {                 //create 10 dropDowns for the subevents
                     //todo check that the query is right
@@ -58,7 +59,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 }
                 ?>
                 <br>
-                <input type="submit" value="create event"/><input tyep="submit" name="sub" value="Add More Subevents"/>
+                <input type="submit" value="create event"/><input type="submit" name="sub" value="Add More Subevents"/>
             </form>
             <?php
         } else if(!isset($_POST['other'])){         //start processing input if not other input specified
@@ -184,7 +185,15 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             return $parsed;
          }
          function insert_Subevents($event_Code, array $subEvents) {
-             //TODO do query
+             global $ident;
+             $stmt=prepare_statement($ident,"INSERT INTO SUBEVENT(PARENT_EVENT_CODE, SUBEVENT_CODE)
+                 VALUES('$event_Code','?'");   //prepare a statement to do a mass insert
+             $size=count($subEvents);
+             for($i=0;$i<$size;$i++) {      //bind and execute all the inputs
+                 bind($stmt,"s",$subEvents[$i]);  //binds info
+                 execute($stmt);
+             }
+             close_stmt($stmt);
          }
         ?> 
     </body>
