@@ -55,6 +55,7 @@
  * prepare_statement
  * bind
  * execute
+ * close_stmt
  * auditLog - query
  * auditDump- query
  */
@@ -294,6 +295,9 @@ function execute($ident) {
         }
         return $result;
     }
+}
+function close_stmt($stmt) {
+    mysqli_stmt_close($stmt);                 //closes the prepared statement
 }
 function cleanInputInt($input, $length, $fieldName) {
     $link = mysqli_connect();
