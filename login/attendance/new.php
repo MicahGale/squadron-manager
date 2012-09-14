@@ -68,6 +68,11 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             $endDate = "null";
             $startDate= parse_date_input($_POST,"start");
             $needsOther= false;                                        //says if needs to get input for other, and delays insert
+            $subEvents= array();
+            $subEvents = parse_Sub_events($_POST);
+            for($i=0;$i<count($subEvents);$i++) {  //cycle trough subevents array and make sure there are no others or nulls
+                
+            }
             if(isset($_POST['dayend'])&&$_POST['dayend']!="")                        //if end date is given then parse
                 $endDate=  parse_date_input ($_POST,'end');
             $type= cleanInputString($_POST['type'],5,'event Type',false);
