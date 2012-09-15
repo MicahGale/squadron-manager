@@ -13,7 +13,7 @@ Here are all the tables used and a brief description of what they are used for.
 ||ATTENDANCE||Holds who attended what events||
 ||AUDIT_DUMP||Holds any variables that are relevant to an audit-able event||
 ||AUDIT_LOG||Holds the basic info for audit-able events such as an attempted security exploit, or a DB error||
-||CAP_UNIT||Holds all the CAP units that have signed into your squadron||
+||[#CAP_UNIT CAP_UNIT]||Holds all the CAP units that have signed into your squadron||
 ||CHAIN_OF_COMMAND||Tells what staff position is under what other staff position _is position dependent *not* people dependent_||
 ||CONTACT_RELATIONS||All the various relations an emergency contact can have with a member (i.e. Mother, Brother)||
 ||CPFT_REQUIREMENTS||The Requirements for all of the CPFTs||
@@ -35,3 +35,11 @@ Here are all the tables used and a brief description of what they are used for.
 ||NEXT_VISIT||Pages in /login that can be accessed based upon the page they were just on||
 ||PHASES||The various phases for promotions (i.e. Phase I C/AB-C/ssgt)||
 ||PROMOTION_BOARD||Tracks all promotion boards given||
+||PROMOTION_RECORD||Holds the record of each promotion||
+||PROMOTION_SIGN_UP||Holds requests to promote||
+||REGION||Holds all the CAP regions for use with the CAP Units||
+||REQUIREMENTS_PASSED||All the promotion requirements that have been passed (i.e. Passing the written Wright Brothers test)||
+||REQUIREMENT_TYPE||The types of promotion requirements (i.e. CPFTs Drill Tests)||
+||RIBBON||Holds all the ribbons you can be awarded||
+
+==CAP_UNIT==
