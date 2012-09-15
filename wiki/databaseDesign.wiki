@@ -41,5 +41,15 @@ Here are all the tables used and a brief description of what they are used for.
 ||REQUIREMENTS_PASSED||All the promotion requirements that have been passed (i.e. Passing the written Wright Brothers test)||
 ||REQUIREMENT_TYPE||The types of promotion requirements (i.e. CPFTs Drill Tests)||
 ||RIBBON||Holds all the ribbons you can be awarded||
-
+||RIBBON_REQUEST||Holds all the requests for receiving a ribbon, *note* requests do not need to be approved, because only staff can enter the requests||
+||SPECIAL_PERMISSION||Holds extra task permissions granted to staff, that is not included with their staff position||
+||STAFF_PERMISSIONS||Task Permissions specific to that Staff Position (i.e. CDC's can edit member information)||
+||STAFF_POSITIONS_HELD||Tells who has what job (i.e. who is the CDC)||
+||SUBEVENT||Tells what sub-events happened at an event (i.e. having a Safety class at a meeting)||
+||SUBEVENT_TYPE||The various sub-events||
+||TASKS||The actual thing staff have permission to do, gives the URL||
+||TASK_TYPE||The type of the task (i.e. member management)||
+||TESTING_SIGN_UP||Sign up for taking tests||
+||TEXT_SET||The various textbook sets (i.e. Leadership for the 21st Century or Learn to Lead||
+||WING||All the CAP Wings for the Units||
 ==CAP_UNIT==
