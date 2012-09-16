@@ -3,42 +3,42 @@
 
 = Introduction =
 
-This describes all the tables used by this project, all of their columns, what data they hold, and their relations. Currently the name for the default database is SQUADRON_INFO.
+This describes all the tables used by this project, all of their columns, what data they hold, and their relations. Currently the name for the default database is SQUADRON_INFO. *Note:* In mysql this all must be handled by INNODB.
 
 
 =Tables=
 Here are all the tables used and a brief description of what they are used for.
-||ACCOUNT_LOCKS||Is used to store information about a login being locked for a set time||
-||ACHIEVEMENT||Holds all of the possible promotions and their associated rank||
-||ATTENDANCE||Holds who attended what events||
-||AUDIT_DUMP||Holds any variables that are relevant to an audit-able event||
-||AUDIT_LOG||Holds the basic info for audit-able events such as an attempted security exploit, or a DB error||
+||[#ACCOUNT_LOCKS ACCOUNT_LOCKS]||Is used to store information about a login being locked for a set time||
+||[#ACHIEVEMENT ACHIEVEMENT]||Holds all of the possible promotions and their associated rank||
+||[#ATTENDANCE ATTENDANCE]||Holds who attended what events||
+||[#AUDIT_DUMP AUDIT_DUMP]||Holds any variables that are relevant to an audit-able event||
+||[#AUDIT_LOG AUDIT_LOG]||Holds the basic info for audit-able events such as an attempted security exploit, or a DB error||
 ||[#CAP_UNIT CAP_UNIT]||Holds all the CAP units that have signed into your squadron||
-||CHAIN_OF_COMMAND||Tells what staff position is under what other staff position _is position dependent *not* people dependent_||
-||CONTACT_RELATIONS||All the various relations an emergency contact can have with a member (i.e. Mother, Brother)||
-||CPFT_REQUIREMENTS||The Requirements for all of the CPFTs||
-||CPFT_TEST_TYPES||The various tests for CPFT's (i.e. Shuttle Run)||
-||DISCIPLINE_LOG||Logs all discipline action given to Members||
-||DISCIPLINE_OFFFENSES||The type of offense that disciplinary action was given for (i.e. Disrespectful behavior)||
-||DISCIPLINE_TYPE||The type of Discipline Action given (i.e. verbal warning)||
-||EMERGENCY_CONTACT||Holds emergency contact information for members||
-||EVENT||Holds the Events that members sign into||
-||EVENT_LOCATION||The location the events are held at||
-||EVENT_TYPES||The type of the event (i.e. meeting, volunteering)||
-||FLIGHTS||Your flights in your squadron||
-||GRADE|| The various Ranks||
-||INTRUSION_TYPE||The type of audit-able event for AUDIT_LOG||
-||LOGIN_LOG||Logs all login attempts to prevent brute force attacks||
-||MEMBER||Holds the information for the Actual Members (their names)||
-||MEMBERSHIP_TYPES||The types of membership (i.e. cadet, senior member, etc)||
-||NEW_MEMBER||Sign-in for perspective members who don't have CAPIDS||
-||NEXT_VISIT||Pages in /login that can be accessed based upon the page they were just on||
-||PHASES||The various phases for promotions (i.e. Phase I C/AB-C/ssgt)||
-||PROMOTION_BOARD||Tracks all promotion boards given||
-||PROMOTION_RECORD||Holds the record of each promotion||
-||PROMOTION_SIGN_UP||Holds requests to promote||
-||REGION||Holds all the CAP regions for use with the CAP Units||
-||REQUIREMENTS_PASSED||All the promotion requirements that have been passed (i.e. Passing the written Wright Brothers test)||
+||[#CHAIN_OF_COMMAND CHAIN_OF_COMMAND]||Tells what staff position is under what other staff position _is position dependent *not* people dependent_||
+||[#CONTACT_RELATIONS CONTACT_RELATIONS]||All the various relations an emergency contact can have with a member (i.e. Mother, Brother)||
+||[#CPFT_REQUIREMENTS CPFT_REQUIREMENTS]||The Requirements for all of the CPFTs||
+||[#CPFT_TEST_TYPES CPFT_TEST_TYPES]||The various tests for CPFT's (i.e. Shuttle Run)||
+||[#DISCIPLINE_LOG DISCIPLINE_LOG]||Logs all discipline action given to Members||
+||[#DISCIPLINE_OFFENSES DISCIPLINE_OFFFENSES]||The type of offense that disciplinary action was given for (i.e. Disrespectful behavior)||
+||[#DISCIPLINE_TYPE DISCIPLINE_TYPE]||The type of Discipline Action given (i.e. verbal warning)||
+||[#EMERGENCY_CONTACT EMERGENCY_CONTACT]||Holds emergency contact information for members||
+||[#EVENTS EVENT]||Holds the Events that members sign into||
+||[#EVENT_LOCATION EVENT_LOCATION]||The location the events are held at||
+||[#EVENT_TYPES EVENT_TYPES]||The type of the event (i.e. meeting, volunteering)||
+||[#FLIGHTS FLIGHTS]||Your flights in your squadron||
+||[#GRADE GRADE]|| The various Ranks||
+||[#INTRUSION_TYPE INTRUSION_TYPE]||The type of audit-able event for AUDIT_LOG||
+||[#LOGIN_LOG LOGIN_LOG]||Logs all login attempts to prevent brute force attacks||
+||[#MEMBER MEMBER]||Holds the information for the Actual Members (their names)||
+||[#MEMBERSHIP_TYPES MEMBERSHIP_TYPES]||The types of membership (i.e. cadet, senior member, etc)||
+||[#NEW_MEMBER NEW_MEMBER]||Sign-in for perspective members who don't have CAPIDS||
+||[#NEXT_VISIT NEXT_VISIT]||Pages in /login that can be accessed based upon the page they were just on||
+||[#PHASES PHASES]||The various phases for promotions (i.e. Phase I C/AB-C/ssgt)||
+||[#PROMOTION_BOARD PROMOTION_BOARD]||Tracks all promotion boards given||
+||[#PROMTION_RECORD PROMOTION_RECORD]||Holds the record of each promotion||
+||[#PROMOTION_SIGN_UP PROMOTION_SIGN_UP]||Holds requests to promote||
+||[#REGION REGION]||Holds all the CAP regions for use with the CAP Units||
+||[#REQUIREMENTS_PASSED REQUIREMENTS_PASSED]||All the promotion requirements that have been passed (i.e. Passing the written Wright Brothers test)||
 ||REQUIREMENT_TYPE||The types of promotion requirements (i.e. CPFTs Drill Tests)||
 ||RIBBON||Holds all the ribbons you can be awarded||
 ||RIBBON_REQUEST||Holds all the requests for receiving a ribbon, *note* requests do not need to be approved, because only staff can enter the requests||
