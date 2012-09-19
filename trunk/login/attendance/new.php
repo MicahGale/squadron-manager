@@ -16,6 +16,7 @@
  *
  * 
  */
+//TODO insert subevents doing both roots.
 include_once("projectFunctions.php");
 session_secure_start();
 $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
@@ -70,8 +71,16 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             $needsOther= false;                                        //says if needs to get input for other, and delays insert
             $subEvents= array();
             $subEvents = parse_Sub_events($_POST);
+            $otherSubs =array();
             for($i=0;$i<count($subEvents);$i++) {  //cycle trough subevents array and make sure there are no others or nulls
-                
+                if($subEvents[$i]=="null") {      //if was null then pull it out
+                    array_splice($subEvents,$i);  //pull it out without distorting the indexes
+                }
+                if($subEvents[$i]=="other") {
+                    array_push($otherSubs, $i);       //inserts into the otherSubs array to show we need to get specifity
+                    $subEvents[$i]=null;            //null it so no dirty input to the db on accident
+                    $needsOther = true;
+                }
             }
             if(isset($_POST['dayend'])&&$_POST['dayend']!="")                        //if end date is given then parse
                 $endDate=  parse_date_input ($_POST,'end');
@@ -105,16 +114,33 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                $_SESSION['type']=$type;
                $_SESSION['isCurrent']=$isCurrent;
                $_SESSION['gotoAttend']=$gotoAttend;
+               $_SESSION['subEvents']=$subEvents;
+               $_SESSION['otherSubs']=$otherSubs;
                echo '<form method="post">';
                echo '<input type="hidden" name="other" value="hi"/>';
                if($locat) 
-                   echo 'Please specify other Location: <input type="text" name="otherLocat" maxlength="50"/><br>';
+                   echo 'Please specify other Location: <input type="text" name="otherLocat" maxlength="50" size="5"/><br>';
                if($type)
-                   echo 'Please Specify other event type: <input type="text" name="otherType" maxlenght="40"/><br>';
+                   echo 'Please Specify other event type: <input type="text" name="otherType" maxlength="40" size="5"/><br>';
+               if(count($otherSubs)!=0) { //if there were subevents that other needed to specify loop through for input
+                   for($i=0;$i<count($otherSubs);$i++) {       //loop through
+                       echo "Please specify other sub-event #$i:".' <input type="text" name="sub'.$otherSubs[$i].'" maxlength="40" size="5"/><br>';
+                   }
+               }
                echo '<input type="submit" value="Finish and Create event"/> </form>';
            } else {
-               $_SESSION['gotoAttend']=$gotoAttend;
-               insert_Event($startDate, $type, $name, $isCurrent, $locat, $endDate);                  //just insert as normal   
+               $event_Code=insert_Event($startDate, $type, $name, $isCurrent, $locat, $endDate);  //just insert as normal 
+               if(count($subEvents)!=0) {         //if has subevents insert them
+                   insert_Subevents($event_Code, $subEvents);
+               }
+               ?>
+            <strong>The event has been successfully saved</strong><br>
+                <?php
+               if($gotoAttend) {
+                   echo "<meta http-equiv=\"REFRESH\" content=\"5;url=/loging/attendance/add.php?eCode=$event_Code\">";
+                   echo "You will be redirected in 5 seconds to enter attendence for this event.";
+               }
+               //TODO show success screen, and redirect
            }
         } else {                                                     //process other fields
             $locatSpec=false;
@@ -153,8 +179,27 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 $locat=$_SESSION['locat'];
             if(!$typeSpec)
                 $type=$_SESSION['type'];
-            insert_Event($_SESSION['startDate'], $type, $_SESSION['name'], $_SESSION['isCurrent'], $_SESSION['locat'], $_SESSION['endDate']);
-            unset($_SESSION['startDate'],$_SESSION['name'],$_SESSION['isCurrent'],$_SESSION['locat'],$_SESSION['endDate']);
+            if(count($_SESSION['otherSubs'])) {
+                for($i=0;$i<count($_SESSION['otherSubs']);$i++) { //loops trough parsing other subevent input
+                    $buffer[$i]=  cleanInputString($_POST['sub'.$_SESSION['otherSubs'][$i]],40,"Sub-event #".$_SESSION['otherSubs'][$i],false);   
+                }
+                $codes=insert_other_Subevents($buffer);   //inserts codes into db
+                for($i=0;$i<count($buffer);$i++) {          //shift codes into subevent array
+                    $_SESSION['subEvents'][$_SESSION['otherSubs'][$i]]=$codes[$i]; //pushes onto array
+                }
+            }
+            $event_Code=insert_Event($_SESSION['startDate'], $type, $_SESSION['name'], $_SESSION['isCurrent'], $_SESSION['locat'], $_SESSION['endDate']);
+            if(count($_SESSION['subEvents'])>0) {                 //if had subevents then insert them now
+                insert_Subevents($event_Code, $_SESSION['subEvents']);  //inserts them
+            }
+            ?>
+            <strong>The event has been saved</strong><br>
+            <?php
+            if($_SESSION['gotoAttend']) {
+               echo "<meta http-equiv=\"REFRESH\" content=\"5;url=/loging/attendance/add.php?eCode=$event_Code\">";
+               echo "You will be redirected in 5 seconds to enter attendence for this event.";
+            }
+            unset($_SESSION['startDate'],$_SESSION['name'],$_SESSION['isCurrent'],$_SESSION['locat'],$_SESSION['endDate'],$_SESSION['subEvents'],$_SESSION['otherSubs']);
         }
         function insert_Event(DateTime $startDate,$type,$name,$isCurrent,$locat,$endDate) {
             var_dump(func_get_args());
@@ -177,9 +222,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                $query.="null')";
            echo $query;
            Query($query, $ident);
-           if($_SESSION['gotoAttend']) {
-//               echo "<meta http-equiv=\"REFRESH\" content=\"0;url=/loging/attendance/add.php?eCode=$event_code\">";
-           }
+           return $event_code;
         }
         function parse_Sub_events(array $input, $count=10) {
             $parsed=array();
@@ -199,6 +242,29 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                  execute($stmt);
              }
              close_stmt($stmt);
+         }
+         function insert_other_Subevents(array $subEvents) {
+             global $ident;
+             $codes=array();
+             $insert=prepare_statement($ident, "INSERT INTO SUBEVENT_TYPE (SUBEVENT_TYPE, SUBEVENT_NAME)
+                 VALUES(?,?)");                       //prepares insert statement
+             $search = prepare_statement($ident,"SELECT SUBEVENT_TYPE FROM SUBEVENT_TYPE WHERE SUBEVENT_TYPE=?");  //prepare statement to search if it exists
+             for($i=0;$i<count($subEvents);$i++) {
+                 $name= $subEvents[$i];
+                 $code=substr($name,0,3);   //try to create a code
+                 bind($search,"S",$code);    //binds for search
+                 $results=execute($search);
+                 $length= numRows($results);
+                 while($length>0) {         //while there are results
+                     $code=rand(-99,999);       //randomly generate code
+                     bind($search,"S",$code);    //binds for search
+                     $results=execute($search);
+                     $length= numRows($results);
+                 }
+                 bind($insert,"SS",$code,$name);      //insert the subevent
+                 $codes[$i]= $code;       //pushes onto array of event codes created
+             }
+             return $codes;
          }
         ?> 
     </body>
