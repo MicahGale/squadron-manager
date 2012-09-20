@@ -39,9 +39,10 @@ if(in_array("Search", $_POST)) {             //if searched for member save input
             <form method="get">
             <?php
             for($i=0;$i<$numberOfInserts;$i++) {  //loop through to create a ton of inputs
-                
+                echo 'Insert by CAPID: <input type="text" name="cap[]" size="5" maxlength="6"/>, or <input type="submit" name="search'.$i.'" value="Search"/>';
             }
             ?>
+                <input tyep="submit"
             </form>
             <?php
         }
