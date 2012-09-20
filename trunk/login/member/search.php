@@ -28,7 +28,7 @@ session_secure_start();
     </head>
     <body>
                 <?php
-                $ident=  mysql_connect('localhost', $_SESSION['member']->getCapid(), $_SESSION['password']);
+                $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password'],'localhost');
                 include('squadManHeader.php');
                 if(isset($_GET['redirect'])) {                      //keep redirect path and clean it up
                     $redirect = cleanInputString($_GET['redirect'],127, "redirect URL", $_SERVER['SCRIPT_NAME'],false);
@@ -47,9 +47,9 @@ session_secure_start();
                             WHERE CAPID='".$_SESSION['member']->getCapid()."'))
                         AND B.URL='$redirect'";
                      $result = Query($query, $ident, $_SERVER['SCRIPT_NAME']);
-                     if(mysql_num_rows($result)>=1) {                            //if found redirect url in permissions the allow it to continue
+                     if(numRows($result)>=1) {                            //if found redirect url in permissions the allow it to continue
                          $_SESSION['redirect']=$redirect;
-                         break;
+                         exit;
                      } else {
                          $query = "SELECT A.NEXT_URL
                                 FROM SQUADRON_INFO.NEXT_VISIT A 
@@ -69,7 +69,7 @@ session_secure_start();
                                     SELECT TASK_CODE FROM SQUADRON_INFO.SPECIAL_PERMISSION
                                     WHERE CAPID='".$_SESSION['member']->getCapid()."'))";
                          $result=  Query($query, $ident, $_SERVER['SCRIPT_NAME']);
-                         if(mysql_num_rows($result)>=1) {                           //if found it in next permissions
+                         if(numRows($result)>=1) {                           //if found it in next permissions
                              $_SESSION['redirect']=$redirect;
                          } else {
                              die("<meta http-equiv=\"REFRESH\" content=\"0;url=/login/home.php");
@@ -109,9 +109,13 @@ session_secure_start();
                 if(strlen($search_capid)<6) {                                //if its not a full capid add wildcards to it
                     $search_capid='%'.$search_capid.'%';
                 }
+                $stmt = prepare_statement($ident,"SELECT CAPID FROM SQUADRON_INFO.MEMBER 
+                        WHERE CAPID LIKE $search_capid
+                        AND NAME_FIRST LIKE ?
+                        AND NAME_LAST LIKE ?");              //prepare the query
                 $found_members = array();
                 $size = count($exploded);
-                for($i=0;$i<=$size;$i++) {                             //cycles through array to search split names by varying 
+                for($i=0;$i<=$size;$i++) {       //cycles through array to search split names by varying 
                     $string_1='%';
                     $string_2='%';
                     if($i>=1) {                         //makes sure has any array elements in it
@@ -124,28 +128,22 @@ session_secure_start();
                             $string_2 = $string_2.$exploded[$j].'%';
                         }
                     }
-                    $query ="SELECT CAPID FROM SQUADRON_INFO.MEMBER 
-                        WHERE CAPID LIKE '$search_capid'
-                        AND NAME_FIRST LIKE '$string_1'
-                        AND NAME_LAST LIKE '$string_2'";
-                    $results = Query($query, $ident, $_SERVER['SCRIPT_NAME']);   //first searchf assuming first name was first
-                    $result_size = mysql_num_rows($results);
+                    bind($stmt,"ss",$string_1,$string_2);
+                    $results = allResults(execute($stmt));   //first searchf assuming first name was first
+                    $result_size = numRows($results);
                     for($j=0;$j<$result_size;$j++) {                      //now parses user results as an instance of searched_member
-                        $found_capid = mysql_result($results, $j,'CAPID');
+                        $found_capid = $results[$j]["CAPID"];
                         if(!isset($found_members[$found_capid])) { //if not already found
                             $found_members[$found_capid] = new searched_member($found_capid, $search_capid, $string_1, $string_2,$ident); //create new object
                         } else {
                             $found_members[$found_capid]->recalc_match($string_1, $string_2);  //else just see if higher match
                         }
                     }
-                    $query ="SELECT CAPID FROM SQUADRON_INFO.MEMBER 
-                        WHERE CAPID LIKE '$search_capid'
-                        AND NAME_FIRST LIKE '$string_2'
-                        AND NAME_LAST LIKE '$string_1'";
-                    $results = Query($query, $ident, $_SERVER['SCRIPT_NAME']);   //then assume last name was first
-                    $result_size = mysql_num_rows($results);
+                    bind($stmt,"ss",$string_2,$string_1);
+                    $results = allResults(execute($stmt));   //then assume last name was first
+                    $result_size = numRows($results);
                     for($j=0;$j<$result_size;$j++) {                      //now parses user results as an instance of searched_member
-                        $found_capid = mysql_result($results, $j,'CAPID');
+                        $found_capid = $results[$j]['CAPID'];
                         if(!isset($found_members[$found_capid])) { //if not already found
                             $found_members[$found_capid] = new searched_member($found_capid, $search_capid, $string_2, $string_1,$ident); //create new object
                         } else {
