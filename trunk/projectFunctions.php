@@ -333,7 +333,7 @@ function cleanInputString($input, $length, $fieldName, $empty) {                
     return $clean;
 }
 function cleanInputDate($input, $regex, $length, $fieldName, $page) {                      //clean and log numbers
-    $clean = htmlspecialchars(mysql_real_escape_string($input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    $clean = htmlspecialchars(mysqli_real_escape_string($input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
     if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean) != 1) || strtotime($clean) == false) {
         echo "<font color=\"red\"> $fieldName is not a valid date.</font><br>";
         $time = auditLog($page, $_SERVER['REMOTE_ADDR'], 'SI');
