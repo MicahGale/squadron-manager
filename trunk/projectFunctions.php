@@ -282,9 +282,11 @@ function prepare_statement($ident,$query) {
 }
 function bind($ident,$types) {
     $bindings=array($ident,$types);
-    array_merge($bindings,  func_get_args());     //get all args into array to pass into function
+    var_dump(func_get_args());
+    $buffer= array_merge($bindings,  func_get_args());     //get all args into array to pass into function
+//    var_dump($buffer);
     if(!call_user_func("mysqli_stmt_bind_param", $bindings))
-        reportDbError (mysqli_errno ($idnet), mysqli_error($ident));
+        reportDbError (mysqli_errno ($ident), mysqli_error($ident));
 }
 function execute($ident) {
     if(!mysqli_stmt_execute($ident))

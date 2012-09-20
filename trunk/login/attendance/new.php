@@ -60,7 +60,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 }
                 ?>
                 <br>
-                <input type="submit" value="create event"/><input type="submit" name="sub" value="Add More Subevents"/>
+                <input type="submit" value="create event"/><!-- input type="submit" name="sub" value="Add More Subevents"/  -->
             </form>
             <?php
         } else if(!isset($_POST['other'])){         //start processing input if not other input specified
@@ -202,7 +202,6 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             unset($_SESSION['startDate'],$_SESSION['name'],$_SESSION['isCurrent'],$_SESSION['locat'],$_SESSION['endDate'],$_SESSION['subEvents'],$_SESSION['otherSubs']);
         }
         function insert_Event(DateTime $startDate,$type,$name,$isCurrent,$locat,$endDate) {
-            var_dump(func_get_args());
             global $ident;
             $event_code=$startDate->format(EVENT_CODE_DATE).$type;                //make event code, and test it
            $query ="SELECT EVENT_CODE FROM EVENT WHERE EVENT_CODE='$event_code'";
@@ -214,13 +213,15 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
            }
            //TODO unset PREVEIOUS CURRENT EVENT 
            //TODO ALLOW FOR SUBEVENTS
+           if($isCurrent=="true") {                            //if is current unsets old ones
+               Query("UPDATE EVENT SET IS_CURRENT=FALSE", $ident);
+           }
            $query="INSERT INTO EVENT(EVENT_CODE,EVENT_DATE,EVENT_TYPE,EVENT_NAME,IS_CURRENT,LOCATION,END_DATE)
                VALUES('$event_code','".$startDate->format(PHP_TO_MYSQL_FORMAT)."','$type','$name',$isCurrent,'$locat','";
            if($endDate!="null")
                $query.=$endDate->format (PHP_TO_MYSQL_FORMAT)."')";
            else
                $query.="null')";
-           echo $query;
            Query($query, $ident);
            return $event_code;
         }
@@ -228,7 +229,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             $parsed=array();
             for($i=0;$i<$count;$i++) {
                 //TODO double check length
-                array_push($parsed, cleanInputString($input["subEvent$i"], 3, "subevnet$i",true));
+                array_push($parsed, cleanInputString($input["SubEvent$i"], 3, "subevnet$i",true));
             }
             return $parsed;
          }
