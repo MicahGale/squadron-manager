@@ -16,7 +16,6 @@
  *
  * 
  */
-//TODO insert subevents doing both roots.
 include_once("projectFunctions.php");
 session_secure_start();
 $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
@@ -69,7 +68,6 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             $endDate = "null";
             $startDate= parse_date_input($_POST,"start");
             $needsOther= false;                                        //says if needs to get input for other, and delays insert
-            $subEvents= array();
             $subEvents = parse_Sub_events($_POST);
             $otherSubs =array();
             for($i=0;$i<count($subEvents);$i++) {  //cycle trough subevents array and make sure there are no others or nulls
