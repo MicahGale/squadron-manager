@@ -280,13 +280,25 @@ function prepare_statement($ident,$query) {
         reportDbError (mysqli_errno ($ident), mysqli_error ($ident));
     return $stmt;
 }
-function bind($ident,$types) {
-    $bindings=array($ident,$types);
-    var_dump(func_get_args());
-    $buffer= array_merge($bindings,  func_get_args());     //get all args into array to pass into function
-//    var_dump($buffer);
-    if(!call_user_func("mysqli_stmt_bind_param", $bindings))
-        reportDbError (mysqli_errno ($ident), mysqli_error($ident));
+function bind($ident,$types, array &$bind) {
+    for($i=0;$i<count($bind);$i++) {
+        $buffer[$i]=$bind[$i];
+    }
+    $pass = array_merge(array($ident,$types), $buffer);
+    echo "<pre>";
+    var_dump($pass);
+    echo "</pre>";
+    call_user_func_array("mysqli_stmt_bind_param", $pass);
+//    echo "<pre>";
+//    $bindings = func_get_args();    //get all args into array to pass into function
+//    var_dump($bindings);
+//    for($i=0;$i<count($bindings);$i++) {
+//       $reference[$i]=&$bindings[$i]; 
+//    }
+//    var_dump($reference);
+//    echo "</pre>";
+//    call_user_func("mysqli_stmt_bind_param", $reference);
+//        reportDbError (mysqli_errno (null), mysqli_error(null));
 }
 function execute($ident) {
     if(!mysqli_stmt_execute($ident))
