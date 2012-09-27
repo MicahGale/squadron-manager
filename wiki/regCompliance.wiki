@@ -1,0 +1,19 @@
+#summary Compliance with CAP Regulations
+
+= Introduction =
+
+This outlines how Squadron-Manager complies with the relevant Civil Air Patrol Regulations, Manuals, and Pamphlets.  Below are relevant CAP Publications that we attempt to Comply with
+
+*||Regulation||Description||Copy compliance is Based on||*
+||[http://capmembers.com/media/cms/R001_002_15BAF8B12FA4B.pdf CAPR1-2]||Personally Identifiable Information||3 Apr 12||
+||[http://capmembers.com/media/cms/R010_002_06448D9F87459.pdf CAPR10-2]||Files Maintenance and Records Disposition||16 Feb 11||
+
+*_Please Note:_*Squadron-Manager comes with no warranty, and there is no guarantee of its compliance with Civil Air Patrol Regulations, Manuals and Pamphlets.  There will be bugs that may interfere with this compliance.  If you find such a bug please report it in the issues, and we will try our best to remedy this problem.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
