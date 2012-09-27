@@ -135,7 +135,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php'),
         ('MSE','Member Search','ME','member/search.php'),
         ('DDE','Find Discipline Event','DA','discipline/details.php'),
         ('EVR','Find Event Report','EV','attendance/event.php'),
-        ('NEV','Create a new Event','EV','attendance/new.php');
+        ('NEV','Create a new Event','EV','attendance/new.php'),
+        ('EVI','Insert attendance for an Event','EV','attendance/add.php');
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -143,7 +144,8 @@ VALUES('CTO','MEA')
         ('AL','HOM')
         ('CTO','DDE'),
         ('CTO','EVR'),
-        ('CTO','NEV');
+        ('CTO','NEV'),
+        ('CTO','EVI');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
