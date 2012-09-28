@@ -1,0 +1,14 @@
+#summary Steps to install squadron Manager
+#labels Phase-Deploy
+
+= Introduction =
+
+This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
