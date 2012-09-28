@@ -5,12 +5,8 @@
 
 This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware.
 
+*Legal Note:* Squadron Manager is free software licensed under the GNU General Public License version 3. You may redistribute and/or modify it under the terms of the GNU General Public License version 3 as published by the Free Software Foundation.
 
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Squadron Manager comes without a warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License version 3 for more details.
 
 ==Securing==
