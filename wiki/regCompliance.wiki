@@ -17,7 +17,8 @@ This outlines how Squadron-Manager complies with the relevant Civil Air Patrol R
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Here are the exact ways that the regulations are complied with.
+
+==CAPR1-2==
+
+This Regulation outlines the requirements for protecting Members' Personally Identifiable Information.  The developers of Squadron Manager take a Security First philosophy in creating and maintaining Squadron Manager to safeguard CAP members' information.  [DevelopingPhilosophy#Security_First This page] details this philosophy, and the exact security software security measures in place.
