@@ -1,4 +1,5 @@
 #summary Compliance with CAP Regulations
+#labels Phase-Support,Phase-Requirements
 
 = Introduction =
 
@@ -14,6 +15,9 @@ This outlines how Squadron-Manager complies with the relevant Civil Air Patrol R
 
 *_Please Note:_*Squadron-Manager comes with no warranty, and there is no guarantee of its compliance with Civil Air Patrol Regulations, Manuals and Pamphlets.  There will be bugs that may interfere with this compliance.  If you find such a bug please report it in the issues, and we will try our best to remedy this problem.
 
+*Note:* We can only secure our software, in order to ensure compliance, the server that Squadron Manager must be securely configured, and maintained.  Please follow [install#Securing these steps]
+
+*Legal Note:*  Squadron Manager comes with no Warranty, and no Guarantee of being secure.  If you find a security leak please immediately notify the proper commanders as outlined in CAPR1-2, and then let us know of the issue either on [https://groups.google.com/forum/#!forum/squadron-manager-users Our Google Group], [https://code.google.com/p/squadron-manager/issues/list Report it as an issue], or email me at [mailto:Micah.Gale@gmail.com Micah.Gale@gmail.com]
 
 = Details =
 
