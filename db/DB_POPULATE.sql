@@ -150,7 +150,8 @@ VALUES('CTO','MEA')
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
         ('member/search.php','member/report.php'),
-        ('discipline/details.php','member/report.php');
+        ('discipline/details.php','member/report.php'),
+        ('attendance/event.php','member/report.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),

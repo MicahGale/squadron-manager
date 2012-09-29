@@ -574,7 +574,7 @@ function display_event_search_in($ident){   //if doesn't have an event selected 
 </form>
 <?php
 }
-function search($ident,$callable){      //if didn't provide complete then search
+function searchEvent($ident,$callable,$link="/login/attendance/event.php"){      //if didn't provide complete then search
     ?>
 <table border="1" cellpadding="0"><tr><th>Event Date</th><th>Event Type</th><th>Event Location</th></tr>
     <?php
@@ -610,7 +610,7 @@ function search($ident,$callable){      //if didn't provide complete then search
     } else {
         for($i=0;$i<$size;$i++) {
             echo "<tr><td>";
-            echo '<a href="/login/attendance/event.php?eCode='.$result[$i]['EVENT_CODE'].'">';
+            echo '<a href="'.$link.'?eCode='.$result[$i]['EVENT_CODE'].'">';
             $date=new DateTime($result[$i]['EVENT_DATE']);
             echo $date->format(PHP_DATE_FORMAT)."</a></td><td>";
             echo $result[$i]['EVENT_TYPE_NAME']."</td>";
