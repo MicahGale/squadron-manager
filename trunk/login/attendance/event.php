@@ -33,7 +33,7 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
         if(!isset($_GET['eCode'])&&!isset($_POST['month'])) {
             display_event_search_in($ident);
         } else if((!isset($_POST['day'])||$_POST['type']=="null"||$_POST['location']!="null")&&!isset($_GET['eCode'])) {
-            search($ident,"report");
+            searchEvent($ident,"report");
         } else {
             report($_GET['eCode']);
         } 
