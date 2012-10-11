@@ -12,3 +12,5 @@ _ Squadron Manager comes without a warranty; without even the implied warranty o
 ==Securing==
 
 ==Requirements==
+
+need mysqlnd!
