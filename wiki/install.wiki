@@ -10,3 +10,5 @@ This Guide will walk you through the process of installing Squadron Manger, and 
 _ Squadron Manager comes without a warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License version 3 for more details. _
 
 ==Securing==
+
+==Requirements==
