@@ -183,7 +183,7 @@ function newVisitor($page, $defaultFname = null, $defaultLname = null) {
     echo "Emergency Contact Phone Number:<input type=\"text\" name=\"ContPhone\" size=\"5\"/><br>\n";
     echo "<input type=\"submit\" value=\"Finish\"/></form>\n";
 }
-function dropDownMenu($query, $name, $identifier, $hasotherfield, $default = null, $hasNoSelect=false) {      //drop down menu 1st field is code 2nd is name
+function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default = null, $hasNoSelect=false) {      //drop down menu 1st field is code 2nd is name
     $results = Query($query, $identifier);                     //TODO include error handlin
     $row = 0;
     echo "<select name=\"$name\">";

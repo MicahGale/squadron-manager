@@ -119,6 +119,7 @@ if(isset($_GET['capid'])) {            //if has given capid then store it after 
             echo '<meta http-equiv="REFRESH content="0;url=/login/attendance/add.php?ecode='.$code.'">';
             exit;
         }
+        include("squadManFooter.php");
         ?>
     </body>
 </html>
