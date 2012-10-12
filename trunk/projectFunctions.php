@@ -18,7 +18,6 @@
  */
 /** 
  * **********************FOR v. .10*****************************
- * TODO Create basic Attendence: Report<, create event, enter
  * TODO create testing controls and entering
  * TODO add admin to add other users
  * TODO create page for units
@@ -218,7 +217,7 @@ function reportDbError($errorno,$error) {
     echo"<br><strong>Page:</strong>".$_SERVER['SCRIPT_NAME']."<br>\n";
     echo"<strong>IP:</strong>" . $_SERVER['REMOTE_ADDR'] . "<br>";
 }
-function Query($query, $ident, $message = null) {         //kill $page sig on all queries
+function Query($query, mysqli $ident, $message = null) {         //kill $page sig on all queries
     $results = mysqli_query($ident, $query);
     if ($results == false) {
         reportDbError(mysqli_errno($ident),  mysqli_error($ident));
@@ -237,7 +236,7 @@ function connect($username,$password,$server="localhost",$db="SQUADRON_INFO") {
         return $connection;                    //else just give them the resource
     }
 }
-function Result($result,$row,$field) {
+function Result(mysqli_result $result,$row,$field) {
     if(is_int($field)) {                          //if number was given number then get field name
         $temp=  mysqli_fetch_field_direct($result,$field);
         $field = $temp->name;  
@@ -258,59 +257,46 @@ function Result($result,$row,$field) {
         }
     }
 }
-function allResults($result) {
+function allResults(mysqli_result $result) {
     $array=array();
     for($row=0;$row<mysqli_num_rows($result);$row++) {       //get all the rows and gett array
         $array[$row]=  mysqli_fetch_assoc($result);
     }
     return $array;
 }
-function numRows($result) {
+function numRows(mysqli_result $result) {
     if(!is_bool($result))                  //if is actually a result
         return mysqli_num_rows($result);
     else
         return 0;                //else return 0
 }
-function close($ident) {
+function close(mysqli $ident) {
     return mysqli_close($ident);
 }
-function prepare_statement($ident,$query) {
+function prepare_statement(mysqli $ident,$query) {
     $stmt= mysqli_stmt_init($ident);
     if(!mysqli_stmt_prepare($stmt, $query))
         reportDbError (mysqli_errno ($ident), mysqli_error ($ident));
     return $stmt;
 }
-function bind($ident,$types, array &$bind) {
+function bind(mysqli_stmt $ident,$types, array $bind) {
     for($i=0;$i<count($bind);$i++) {
-        $buffer[$i]=$bind[$i];
+        $buffer[$i]=&$bind[$i];
     }
     $pass = array_merge(array($ident,$types), $buffer);
-    echo "<pre>";
-    var_dump($pass);
-    echo "</pre>";
     call_user_func_array("mysqli_stmt_bind_param", $pass);
-//    echo "<pre>";
-//    $bindings = func_get_args();    //get all args into array to pass into function
-//    var_dump($bindings);
-//    for($i=0;$i<count($bindings);$i++) {
-//       $reference[$i]=&$bindings[$i]; 
-//    }
-//    var_dump($reference);
-//    echo "</pre>";
-//    call_user_func("mysqli_stmt_bind_param", $reference);
-//        reportDbError (mysqli_errno (null), mysqli_error(null));
 }
-function execute($ident) {
-    if(!mysqli_stmt_execute($ident))
-        reportDbError (mysqli_errno ($ident), mysqli_error($ident));
+function execute(mysqli_stmt $ident) {
+    if(!($success=mysqli_stmt_execute($ident)))                         //if there was an error with the execution
+        reportDbError (mysqli_stmt_errno ($ident), mysqli_stmt_error($ident));
     else {
-        if(!($result=mysqli_stmt_get_result($ident))) {
-            reportDbError(mysqli_errno($ident), mysqli_error($ident));
+        if(($result=mysqli_stmt_get_result($ident))!=false) {
+            return $result;
         }
-        return $result;
     }
+    return $success;       //if no results then return the success
 }
-function close_stmt($stmt) {
+function close_stmt(mysqli_stmt $stmt) {
     mysqli_stmt_close($stmt);                 //closes the prepared statement
 }
 function cleanInputInt($input, $length, $fieldName) {
@@ -1305,20 +1291,19 @@ class member {
         <table border="1" cellpadding="0">
             <tr><th>Disciplinary Action taken</th><th>Date</th><th>Type of Offense</th><th>Severity</th><th>Reported by</th></tr>
         <?php
-        $size= numRows($result);
+        $results=  allResults($result);        //get all results
+        $size= count($results);
         for($i=0;$i<$size;$i++) {                        //loop through the result
             echo "<tr><td>";
-            echo '<a href="/login/discipline/details.php?capid='.$this->capid.'&ToA='.Result($result, $i,'A.TYPE_OF_ACTION').'&event='.Result($result, $i,'A.EVENT_CODE').'&O='.  Result($result, $i, 'A.OFFENSE').'&given='.  Result($result, $i,'A.GIVEN_BY').'">';
-            echo Result($result, $i,'B.DISCIPLINE_NAME').'</a></td>';         
-            $date = new DateTime(Result($result, $i,'C.EVENT_DATE'));
+            echo '<a href="/login/discipline/details.php?capid='.$this->capid.'&ToA='.$results[$i]['TYPE_OF_ACTION'].'&event='.$results[$i]['EVENT_CODE'].'&O='.$results[$i]['OFFENSE'].'&given='.$results[$i]['GIVEN_BY'].'">';
+            echo $results[$i]['DISCIPLINE_NAME'].'</a></td>';         
+            $date = new DateTime($results[$i]['EVENT_DATE']);
             echo '<td>'.$date->format(PHP_DATE_FORMAT).'</td>';
-            echo "<td>".Result($result, $i, 'D.OFFENSE_NAME').'</td>';
-            echo '<td>'.Result($result, $i,'A.SEVERITY').'</td>';
-            $capid=  Result($result, $i, 'A.GIVEN_BY');
-            $given = new member(Result($result, $i,'A.GIVEN_BY'),1,$_SERVER['SCRIPT_NAME'],$ident);
-            echo '<td><a href="/login/member/report?capid='."$capid\">".$given->title()."</a>";
+            echo "<td>".$results[$i]['OFFENSE_NAME'].'</td>';
+            echo '<td>'.$results[$i]['SEVERITY'].'</td>';
+            $given = new member($results[$i]['GIVEN_BY'],1,$ident);
+            $given->link_report();
             echo"</td></tr>";
-            
         }
         ?>
         </table>

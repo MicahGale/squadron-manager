@@ -61,25 +61,27 @@ if(isset($_GET['capid'])) {            //if has given capid then store it after 
                 values('".$_SESSION['eCode']."',?)");                                //prepares statements
             $success=true;
             for($i=0;$i<count($input);$i++) {                             //loop trhough to insert data    
-                bind($stmt,'s',$input[$i]);
+                bind($stmt,'s',array($input[$i]));
                 if(!execute($stmt))
                     $success=false;
             }
             if($success) {
+                unset($_SESSION['input'],$_SESSION['number'],$_SESSION['eCode']);
                 ?>
                 <strong>The attendance you entered has been saved.</strong>
                 <?php
             }
             close_stmt($stmt);
-        } else if(isset($_GET['ecode'])||isset($_SESSION['eCode'])) {  //if event code is specified then create a bunch of inputs
+        } else if(isset($_GET['eCode'])||isset($_SESSION['eCode'])) {  //if event code is specified then create a bunch of inputs
             if(!isset($_SESSION['eCode'])) {              //if is the first enterance
-                $_SESSION['eCode']=  cleanInputString($_GET['ecode'],32,"Event Code",FALSE);        //store the event code for future use
+                $_SESSION['eCode']=  cleanInputString($_GET['eCode'],32,"Event Code",FALSE);        //store the event code for future use
                 $numberOfInserts=50;
                 $_SESSION['number']=$numberOfInserts;    //stores to session
                 ?>
                 <strong>Please enter attendance for this event below</strong><br>
                 <br>
                 <form method="post">
+                    <input type="submit" name="insert" value="insert"/> <br>
                 <?php
                 for($i=0;$i<$numberOfInserts;$i++) {  //loop through to create a ton of inputs
                     echo 'Insert by CAPID: <input type="text" name="cap[]" size="5" maxlength="6"/> or <input type="submit" name="search'.$i.'" value="Search"/>'."<br>\n";
@@ -94,6 +96,7 @@ if(isset($_GET['capid'])) {            //if has given capid then store it after 
                 <strong>Please enter attendance for this event below</strong><br>
                 <br>
                 <form method="post">
+                    <input type="submit" name="insert" value="insert"/> <br>
                     <input type="hidden" name="number" value="<?php echo $numberOfInserts;?>"/>
                 <?php
                 for($i=0;$i<$numberOfInserts;$i++) {  //loop through to create a ton of inputs
