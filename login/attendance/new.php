@@ -55,7 +55,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 for($i=0;$i<10;$i++) {                 //create 10 dropDowns for the subevents
                     //todo check that the query is right
                     dropDownMenu('SELECT SUBEVENT_TYPE, SUBEVENT_NAME FROM SUBEVENT_TYPE',"SubEvent$i",$ident,true,null,true);
-                    echo"<br>";
+                    echo"<br>\n";
                 }
                 ?>
                 <br>
@@ -135,7 +135,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             <strong>The event has been successfully saved</strong><br>
                 <?php
                if($gotoAttend) {
-                   echo "<meta http-equiv=\"REFRESH\" content=\"5;url=/loging/attendance/add.php?eCode=$event_Code\">";
+                   echo "<meta http-equiv=\"REFRESH\" content=\"5;url=/login/attendance/add.php?eCode=$event_Code\">";
                    echo "You will be redirected in 5 seconds to enter attendence for this event.";
                }
                //TODO show success screen, and redirect
@@ -214,12 +214,20 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
            if($isCurrent=="true") {                            //if is current unsets old ones
                Query("UPDATE EVENT SET IS_CURRENT=FALSE", $ident);
            }
-           $query="INSERT INTO EVENT(EVENT_CODE,EVENT_DATE,EVENT_TYPE,EVENT_NAME,IS_CURRENT,LOCATION,END_DATE)
-               VALUES('$event_code','".$startDate->format(PHP_TO_MYSQL_FORMAT)."','$type','$name',$isCurrent,'$locat','";
-           if($endDate!="null")
-               $query.=$endDate->format (PHP_TO_MYSQL_FORMAT)."')";
+           $query="INSERT INTO EVENT(EVENT_CODE,EVENT_DATE,EVENT_TYPE,IS_CURRENT,EVENT_NAME,LOCATION,END_DATE)
+               VALUES('$event_code','".$startDate->format(PHP_TO_MYSQL_FORMAT)."','$type',$isCurrent,";
+           if($name!="null")
+               $query.="'$name',";
            else
-               $query.="null')";
+               $query.="null,";
+           if($locat!="null")              //if the locat isn't null then use it
+               $query.="'$locat','";
+           else                         //else insert a null locat
+               $query.="null,";
+           if($endDate!="null")
+               $query.="'".$endDate->format (PHP_TO_MYSQL_FORMAT)."')";
+           else
+               $query.="null)";
            Query($query, $ident);
            return $event_code;
         }
@@ -227,17 +235,20 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             $parsed=array();
             for($i=0;$i<$count;$i++) {
                 //TODO double check length
-                array_push($parsed, cleanInputString($input["SubEvent$i"], 3, "subevnet$i",true));
+                $buffer=$input["SubEvent$i"];
+                if(!is_null($buffer)&&$buffer!="null") {
+                    array_push($parsed,cleanInputString($buffer, 3, "subevnet$i",true));
+                }
             }
             return $parsed;
          }
          function insert_Subevents($event_Code, array $subEvents) {
              global $ident;
              $stmt=prepare_statement($ident,"INSERT INTO SUBEVENT(PARENT_EVENT_CODE, SUBEVENT_CODE)
-                 VALUES('$event_Code','?'");   //prepare a statement to do a mass insert
+                 VALUES('$event_Code',?)");   //prepare a statement to do a mass insert
              $size=count($subEvents);
              for($i=0;$i<$size;$i++) {      //bind and execute all the inputs
-                 bind($stmt,"s",$subEvents[$i]);  //binds info
+                 bind($stmt,"s",array($subEvents[$i]));  //binds info
                  execute($stmt);
              }
              close_stmt($stmt);
