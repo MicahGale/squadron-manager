@@ -11,7 +11,7 @@ This outlines how Squadron-Manager complies with the relevant Civil Air Patrol R
 ||[http://capmembers.com/media/cms/R035_005_489E25C089E93.pdf CAPR35-5]||CAP Officer and NCO Appointments and Promotions||16 Mar 10||
 ||[http://capmembers.com/media/cms/R039_003_83459660D4F44.pdf CAPR39-3]||Award of CAP Medals, Ribbons, and Certificates.||7 Feb 12||
 ||[http://capmembers.com/media/cms/R052_016_2011_02_BFAB729553AB1.pdf CAPR52-16]||Cadet Program Management||1 Feb 11||
-||CAPP52-18||Cadet Physical Fitness Program||1 April 2003 (change 1 Oct 06)||
+||[http://www.capmembers.com/media/cms/P052_018_501C183A14D19.pdf CAPP52-18]||Cadet Physical Fitness Program||1 April 2003 (change 1 Oct 06)||
 ||[http://capmembers.com/media/cms/u_082503080020.pdf CAPR110-1]||Internet Operations||1 Jan 00||
 
 *_Please Note:_*Squadron-Manager comes with no warranty, and there is no guarantee of its compliance with Civil Air Patrol Regulations, Manuals and Pamphlets.  There will be bugs that may interfere with this compliance.  If you find such a bug please report it in the issues, and we will try our best to remedy this problem.
