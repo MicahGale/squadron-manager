@@ -174,7 +174,6 @@ function prepDisplay($results_sorted) {
         <title>Search for Member</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
-        
     </head>
     <body>
           <?php include('squadManHeader.php'); ?>      

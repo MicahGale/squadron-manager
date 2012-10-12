@@ -136,7 +136,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php'),
         ('DDE','Find Discipline Event','DA','discipline/details.php'),
         ('EVR','Find Event Report','EV','attendance/event.php'),
         ('NEV','Create a new Event','EV','attendance/new.php'),
-        ('EVI','Insert attendance for an Event','EV','attendance/add.php');
+        ('EVI','Insert attendance for an Event','EV','attendance/add.php'),
+        ('TSE','View Testing Sign-up','TP','testing/testSignUp');
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -145,13 +146,15 @@ VALUES('CTO','MEA')
         ('CTO','DDE'),
         ('CTO','EVR'),
         ('CTO','NEV'),
-        ('CTO','EVI');
+        ('CTO','EVI'),
+        ('CTO','TSE');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
         ('member/search.php','member/report.php'),
         ('discipline/details.php','member/report.php'),
-        ('attendance/event.php','member/report.php');
+        ('attendance/event.php','member/report.php'),
+        ('testing/testSignUp.php','member/report.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),

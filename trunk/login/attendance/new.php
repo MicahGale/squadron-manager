@@ -276,6 +276,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
              }
              return $codes;
          }
+         include("squadManFooter.php");
         ?> 
     </body>
 </html>
