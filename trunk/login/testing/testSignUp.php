@@ -39,7 +39,7 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                         Filter by test type:
                         <?php
                         dropDownMenu("SELECT TYPE_CODE, TYPE_NAME FROM REQUIREMENT_TYPE
-                            WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
+                            WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
                         ?>
                         <input type="submit" name="filter" value="filter"/><br><br>
                         <input type="submit" name="save" value="save"/>
@@ -55,29 +55,67 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                                 unset($_SESSION['filter']);
                             }
                         }
-                        $query ='SELECT A.CAPID, C.TYPE_NAME,CONCAT(A.ACHIEV_CODE," - ",B.NAME) AS TEST_NAME
+                        $query ='SELECT A.CAPID, C.TYPE_NAME,CONCAT(A.ACHIEV_CODE," - ",B.NAME) AS TEST_NAME, A.ACHIEV_CODE, A.REQUIRE_TYPE
                             FROM TESTING_SIGN_UP A, PROMOTION_REQUIREMENT B, REQUIREMENT_TYPE C
                             WHERE A.ACHIEV_CODE=B.ACHIEV_CODE
                             AND A.REQUIRE_TYPE=B.REQUIREMENT_TYPE
                             AND C.TYPE_CODE=A.REQUIRE_TYPE
-                            AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\')';
+                            AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\',\'PB\')';
                         if(isset($_SESSION['filter'])) {
                             $query.=" AND A.REQUIRE_TYPE='".$_SESSION['filter']."'";  //if there's a filter then apply it
                         }
                         $results = allResults(Query($query, $ident));
+                        $_SESSION['results']=$results;  //stores the results so they may be used later
                         $size=count($results);
                         for($i=0;$i<$size;$i++) {            //display testing requests
                             echo "<tr><td>";
-                            $capid=$results[$i]['CAPID'];
-                            $member=new member($capid,1, $ident);
+                            $member=new member($results[$i]["CAPID"],1, $ident);
                             echo $member->link_report();
                             echo "</td><td>".$results[$i]['TYPE_NAME']."</td><td>".$results[$i]['TEST_NAME']."</td>";
-                            echo '<td><input type="checkbox" name="passed[]" value="'.$capid.'"/></td>';
-                            echo '<td><input type="text" size="1" maxlength="3" name="percentage'.$capid.'"/></td>';
-                            echo '<td><input type="checkbox" name="eservices[]" value="'.$capid.'"/></td>';
-                            echo '<td><input type="checkbox" name="remove[]" value="'.$capid."\"/></td></tr>\n";
-                        } if(isset($_POST['save'])) {                       //if saved is requested then save it
-                            //TODO handle promo boards differently
+                            echo '<td><input type="checkbox" name="passed[]" value="'.$i.'"/></td>';
+                            echo '<td><input type="text" size="1" maxlength="3" name="percentage'.$i.'"/></td>';
+                            echo '<td><input type="checkbox" name="eservices[]" value="'.$i.'"/></td>';
+                            echo '<td><input type="checkbox" name="remove[]" value="'.$i."\"/></td></tr>\n";
+                        } 
+                        if(isset($_POST['save'])) {                       //if saved is requested then save it
+                            $query="INSERT INTO REQUIREMENTS_PASSED(CAPID,ACHIEV_CODE,REQUIREMENT_TYPE,TEXT_SET,PASSED_DATE,ON_ESERVICES)
+                                VALUES(?,?,?,?,CURDATE(),?)";
+                            $stmt=  prepare_statement($ident, $query);        //prepare statement to insert data
+                            $success = true;
+                            $toRemove = array();               //array to tell what testing sign ups to remove
+                            for($i=0;$i<count($_POST['passed']);$i++) {   //cycles through ones that were passed and save input
+                                array_push($toRemove, $_POST['passed'][$i]); //remove the ones that were passed
+                                $capid=$_SESSION['results'][$_POST['passed'][$i]]['CAPID'];
+                                $member = new member($capid,2, $ident);           //get text set
+                                $text = $member->get_text();
+                                $achiev=$_SESSION['results'][$_POST['passed'][$i]]['ACHIEV_CODE'];
+                                $type= $_SESSION['results'][$_POST['passed'][$i]]['REQUIRE_TYPE'];
+                                if(in_array($_POST['passed'][$i], $_POST['eservices'])) {           //if they also checked the eservices box then say so
+                                    $onEservices = "true";
+                                } else {
+                                    $onEservices = "false";
+                                }
+                                bind($stmt,"issss", array($capid,$achiev,$type,$text,$onEservices));
+                                if(!execute($stmt))                  //if failed log it
+                                    $success=false;
+                            }
+                            $query="DELETE FROM TESTING_SIGN_UP 
+                                WHERE CAPID=?
+                                ACHIEV_CODE=?
+                                REQUIRE_TYPE=?";
+                            $stmt= prepare_statement($ident, $query);
+                            for($i=0;$i<count($_POST['remove']);$i++) {      //get request to delete testing sign up
+                                array_push($toRemove, $_POST['remove'][$i]);   //push it onto the array
+                            }
+                            foreach ($toRemove as $buffer) {
+                                $capid=$results[$buffer]['CAPID'];
+                                $achiev = $results[$buffer]['ACHIEV_CODE'];
+                                $type = $results[$buffer]['REQUIRE_TYPE'];
+                                bind($stmt,"iss", array($capid,$achiev,$type));   //bind the field so it can be deleted
+                                if(!execute($stmt))
+                                    $success=false;               //if failed then document it
+                            }
+                            close_stmt($stmt);
                         }
                         ?>
                     </table>

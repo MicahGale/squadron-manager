@@ -1353,6 +1353,9 @@ class member {
     public function link_report() {
         return '<a href="/login/member/report.php?capid='.$this->capid.'">'.$this->title().'</a>';
     }
+    public function get_text() {
+        return $this->text_set;
+    }
 }
 class unit {
     private $charter_num;
