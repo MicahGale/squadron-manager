@@ -16,6 +16,16 @@
  *
  * 
  */
+/*
+ *forms: is recursive and is post
+ *  filterTypes: dropDown menu- gives possible filters
+ * filter:       submit: applies the requested filter
+ * save:         submit: saves 
+ * passed[]:     value=result row checkbox:  weather or not to save the input, weather or not to insert data
+ * percentage(result row): text: the percentage the test passed with
+ * eservice[]    value=result row : checkbox: if the test is entered onto eservices yet
+ * remove[]     value=result row:  checkbox: to remove sign-ups that weren't passed.
+ */
 require("projectFunctions.php");
 session_secure_start();
 $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
@@ -45,7 +55,7 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                         <input type="submit" name="save" value="save"/>
                     <table border="1" cellpadding="0">
                         <tr>
-                            <th>Member</th><th>Test type</th><th>Test</th><th>Passed</th><th>Percentage</th><th>On Eservices</th><th>Remove</th>
+                            <th>Member</th><th>Test type</th><th>Test</th><th>Passed</th><th>Percentage (optional)</th><th>On Eservices</th><th>Remove</th>
                         </tr>
                         <?php
                         if(isset($_POST['filter'])) {
@@ -64,7 +74,9 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                         if(isset($_SESSION['filter'])) {
                             $query.=" AND A.REQUIRE_TYPE='".$_SESSION['filter']."'";  //if there's a filter then apply it
                         }
+                        echo $query;
                         $results = allResults(Query($query, $ident));
+                        var_dump($results);
                         $_SESSION['results']=$results;  //stores the results so they may be used later
                         $size=count($results);
                         for($i=0;$i<$size;$i++) {            //display testing requests
@@ -100,9 +112,9 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                                     $success=false;
                             }
                             $query="DELETE FROM TESTING_SIGN_UP 
-                                WHERE CAPID=?
-                                ACHIEV_CODE=?
-                                REQUIRE_TYPE=?";
+                                WHERE CAPID=? 
+                                AND ACHIEV_CODE=? 
+                                AND REQUIRE_TYPE=?";
                             $stmt= prepare_statement($ident, $query);
                             for($i=0;$i<count($_POST['remove']);$i++) {      //get request to delete testing sign up
                                 array_push($toRemove, $_POST['remove'][$i]);   //push it onto the array
