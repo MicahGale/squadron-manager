@@ -58,10 +58,10 @@
  * auditLog - query
  * auditDump- query
  */
- define("PHP_DATE_FORMAT","d M y");
- define("PHP_TO_MYSQL_FORMAT","Y-m-d");
- define( "SQL_DATE_FORMAT", "%d-%m-%Y");
- define("EVENT_CODE_DATE",'dMy');
+ define("PHP_DATE_FORMAT","d M y");     //Date formats to use, default php display date
+ define("PHP_TO_MYSQL_FORMAT","Y-m-d");   //how to format to insert into mysql
+ define( "SQL_DATE_FORMAT", "%d-%m-%Y");  //php display except at mysql level
+ define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
 function auditLog($ip, $type) {
     $time = date('o-m-d H:i:s');
     $ident= Connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
