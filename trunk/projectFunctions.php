@@ -45,6 +45,7 @@
  *Function to change to port to different DBMS
  * CleanInputInt-sql escape function
  * CleanInputString -''
+ * cleanInputDate   -''
  * Connect
  * Query
  * Result
@@ -311,7 +312,7 @@ function cleanInputInt($input, $length, $fieldName) {
             $clean = null;
         }
     }
-    $clean = intval($clean);                                            //cast it to int
+    $clean = floatval($clean);                                            //cast it to int
     return $clean;
 }
 function cleanInputString($input, $length, $fieldName, $empty) {                      //clean and log numbers
@@ -332,11 +333,12 @@ function cleanInputString($input, $length, $fieldName, $empty) {                
     }
     return $clean;
 }
-function cleanInputDate($input, $regex, $length, $fieldName, $page) {                      //clean and log numbers
-    $clean = htmlspecialchars(mysqli_real_escape_string($input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
-    if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean) != 1) || strtotime($clean) == false) {
+function cleanInputDate($input, $regex, $length, $fieldName) {                      //clean and log numbers
+    $link = mysqli_connect();
+    $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean) != 1)) {
         echo "<font color=\"red\"> $fieldName is not a valid date.</font><br>";
-        $time = auditLog($page, $_SERVER['REMOTE_ADDR'], 'SI');
+        $time = auditLog($_SERVER['SCRIPT_NAME'], $_SERVER['REMOTE_ADDR'], 'SI');
         auditDump($time, $fieldName, $input);
         $badInput = true;
         if (strlen($clean) > $length || (preg_match($regex, $clean)) || strtotime($clean) == false) {
