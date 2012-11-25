@@ -1,8 +1,4 @@
 <?php
-/*
- * assume passed if percent is supplied
- * don't enter if the percent didn't pass
- */
 /* * Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager

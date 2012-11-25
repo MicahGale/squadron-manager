@@ -51,7 +51,7 @@ session_secure_start();
                     <?php
                         $member->display_Contact($ident, false);
                         echo "<br><br>";
-                        $member->promotionReport($ident,false);
+                        $member->promotionReport($ident,false,true);
                         echo "<br><br>";
                         $member->attendance_report($ident,false);
                         echo "<br><br>";
