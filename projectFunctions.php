@@ -129,9 +129,9 @@ function newMember($identifier, $page,$capid) {                                 
         Date of Birth:\n";
     enterDate(true,'DoB');
     echo "<br>CAP Grade"; //SELECT A.ACHIEV_CODE, CONCAT(A.ACHIEV_CODE,'-',B.GRADE_NAME) FROM ACHIEVEMENT A JOIN SQAUDRON_INFO.GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY B.GRADE_NUM
-    dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "achiev", $identifier, false);
+    dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "achiev", $identifier, false);
     echo "<br>Member Type";
-    dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES", "member", $identifier, false);  //creates drop down menu for membership types
+    dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'", "member", $identifier, false);  //creates drop down menu for membership types
     echo "<br>Textbook Set";
     dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL'", 'text', $identifier, false);  //creates drop down menu for text sets
     echo "<br>Unit Charter Number:";
@@ -609,6 +609,76 @@ function searchEvent($ident,$callable,$link="/login/attendance/event.php"){     
      </table>
     <?php
 }
+function getEventPromo($ident,$capid) {
+    $query ="SELECT A.ACHIEVEMENT, A.DATE_PROMOTED
+            FROM PROMOTION_RECORD A JOIN ACHIEVEMENT B
+            ON A.ACHIEVEMENT=B.ACHIEV_CODE
+            WHERE CAPID='$capid'
+            ORDER BY B.ACHIEV_NUM";
+    $promotions= allResults(Query($query, $ident));
+    $query="SELECT B.EVENT_DATE FROM ATTENDANCE A
+            JOIN EVENT B ON A.EVENT_CODE=B.EVENT_DATE
+            WHERE A.CAPID='$capid'
+            AND B.EVENT_TYPE<>'M'
+            AND B.EVENT_DATE BETWEEN ? AND ?";
+    $activ=  prepare_statement($ident, $query);
+    $query ="SELECT B.EVENT_DATE, C.SUBEVENT_CODE 
+        FROM SUBEVENT C, ATTENDANCE A
+        JOIN EVENT B ON A.EVENT_CODE=B.EVENT_CODE
+        WHERE C.PARENT_EVENT_CODE=A.EVENT_CODE
+        AND CAPID='$capid'
+        AND C.SUBEVENT_CODE IN (
+        SELECT TYPE_CODE FROM REQUIREMENT_TYPE
+        WHERE IS_SUBEVENT=TRUE)
+        AND B.EVENT_DATE BETWEEN ? AND ?
+        ORDER BY C.SUBEVENT_CODE";
+    $subevent= prepare_statement($ident, $query);
+    $results=array();
+    for($i=0;$i<count($promotions)+1;$i++) {//TODO figure out which promo counted for
+        if($i==0) {                            //if at 0 so the first one try dec 1,1941-first promo
+            bind($activ,"ss", array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
+            bind($subevent,"ss",array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
+            $promoFor=$promotions[$i]['ACHIEVEMENT'];
+        } else if($i<count($promotions)) {          //if is less then the count so in bounds then bind by 2 promos
+            bind($activ,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
+            bind($subevent,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
+            $promoFor=$promotions[$i]['ACHIEVEMENT'];
+        } else {                                                 //if hit top then try between last promo and now
+            bind($activ,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
+            bind($subevent,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
+            $query='SELECT NEXT_ACHIEV FROM ACHIEVEMENT 
+                WHERE ACHIEV_CODE=\''.$promotions[$i-1]['ACHIEVEMENT']."'";
+            $promoFor=Result(Query($query, $ident),0,'NEXT_ACHIEV');
+        }
+        $activity = allResults(execute($activ));                  //execute the prepared statements and get results
+        $subs = allResults(execute($subevent));
+        $results[$promoFor]=array();            //create an array for the current promotion
+        if(count($activity)>0) //if had activity for promo then show it
+            $results[$promoFor]['AC']=$activity[0]['EVENT_DATE'];  //shown
+        for($j=0;$j<count($subs);$j++) {         //parse subevent results
+            $results[$promoFor][$subs[$j]['SUBEVENT_CODE']]=$subs[$j]['EVENT_DATE'];//ORGANIZE INTO ARRAY BY SUB_CODE AND STORE DATE
+        }
+    }
+    close_stmt($activ);
+    close_stmt($subevent);
+    return $results;
+}
+function checkEventPromo(array $results, $achiev,$code) {        //checks if the event exists for such promo
+    if(isset($results[$achiev][$code]))        //if isset then return the date
+        return $results[$achiev][$code];
+    else 
+        return false;                        //otherwise assume not and return false
+}
+function specialPromoRequire($ident) {
+    $results=array('AC');
+    $query='SELECT TYPE_CODE FROM REQUIREMENT_TYPE
+        WHERE IS_SUBEVENT=TRUE';
+    $result =  allResults(Query($query, $ident));
+    for($i=0;$i<count($result);$i++) {            //get all the results
+        array_push($results,$result[$i]['TYPE_CODE']);
+    }
+    return $results;
+}
 class member {
     private $capid;
     private $name_last;
@@ -800,7 +870,7 @@ class member {
             return Query($query, $ident, $message);
         }
     }
-    public function promotionReport($ident, $header=true) {
+    public function promotionReport($ident, $header=true, $date=false,$edit=false) {
         ?>
         <table border="0" width="900"><tr><td valign="top" align="center">
                     <strong>Promotion Report
@@ -813,74 +883,100 @@ class member {
                     <?php
                     }
                     echo"</td></tr>";               //center header
-                    $header = Query("SELECT TYPE_NAME, TYPE_CODE FROM REQUIREMENT_TYPE
+                    $header = allResults(Query("SELECT TYPE_NAME, TYPE_CODE FROM REQUIREMENT_TYPE
                         WHERE MEMBER_TYPE='".$this->memberType."'
-                            OR MEMBER_TYPE IS NULL
-            ORDER BY TYPE_CODE", $ident);    //QUERY TO get requirement types
+                        OR MEMBER_TYPE IS NULL
+                        ORDER BY TYPE_CODE", $ident));    //QUERY TO get requirement types
                     echo "<tr><td align=\"center\">    
-            <table border =\"1\" cellspacing=\"1\" width=\"900\">
-            <tr><th>Achievement</th>";                     //creates headers of rows based on requirement types
-                    for ($row = 0; $row < numRows($header); $row++) { 
-                        echo "<th>" .Result($header, $row, "TYPE_NAME") . "</th>";  //make them into headers
+                        <table border =\"1\" cellspacing=\"1\" width=\"900\">
+                        <tr><th>Achievement</th>";                     //creates headers of rows based on requirement types
+                    for ($row = 0; $row < count($header); $row++) { 
+                        echo "<th>" .$header[$row]["TYPE_NAME"] . "</th>";  //make them into headers
                     }
-                    echo "<th>Date Promoted</th></tr>\n";
+                    echo "<th>Promotion</th></tr>\n";
                     $query = "SELECT B.ACHIEV_CODE AS ACHIEV, A.REQUIREMENT_TYPE AS TYPE, A.PASSED_DATE AS DATE
-            FROM REQUIREMENTS_PASSED A JOIN ACHIEVEMENT B
-            ON A.ACHIEV_CODE=B.ACHIEV_CODE
-            WHERE A.CAPID='" . $this->capid . "'
-            ORDER BY B.ACHIEV_NUM, A.REQUIREMENT_TYPE";           //shows what they already passed
-                    $passed = Query($query, $ident);             //get all the requirements the  ^cadet passed
+                        FROM REQUIREMENTS_PASSED A JOIN ACHIEVEMENT B
+                        ON A.ACHIEV_CODE=B.ACHIEV_CODE
+                        WHERE A.CAPID='" . $this->capid . "'
+                        ORDER BY B.ACHIEV_NUM, A.REQUIREMENT_TYPE";           //shows what they already passed
+                    $passed = allResults(Query($query, $ident));             //get all the requirements the  ^cadet passed
                     $query = "SELECT ACHIEV_NAME, ACHIEV_CODE FROM ACHIEVEMENT 
-            WHERE MEMBER_TYPE='".$this->memberType."'   
-            AND ACHIEV_CODE <> '0'
-            ORDER BY ACHIEV_NUM";
-                    $achievements = Query($query, $ident);    //get all the achievements ^
+                        WHERE MEMBER_TYPE='".$this->memberType."'   
+                        AND ACHIEV_CODE <> '0'
+                        ORDER BY ACHIEV_NUM";
+                    $achievements = allResults(Query($query, $ident));    //get all the achievements ^
                     $query = "SELECT A.ACHIEV_CODE, A.REQUIREMENT_TYPE FROM PROMOTION_REQUIREMENT A
                         JOIN ACHIEVEMENT B 
                         ON A.ACHIEV_CODE=B.ACHIEV_CODE
-            WHERE A.TEXT_SET IN('" . $this->text_set . "','ALL')
-                AND B.MEMBER_TYPE='".$this->memberType."'
-            ORDER BY ACHIEV_NUM, REQUIREMENT_TYPE";              
-                    $requirements = Query($query, $ident);          //get all the requirements ^
+                        WHERE A.TEXT_SET IN('" . $this->text_set . "','ALL')
+                        AND B.MEMBER_TYPE='".$this->memberType."'
+                        ORDER BY ACHIEV_NUM, REQUIREMENT_TYPE";              
+                    $requirements = allResults(Query($query, $ident));          //get all the requirements ^
+                    $query = "SELECT A.ACHIEV_CODE, A.REQUIRE_TYPE
+                            FROM TESTING_SIGN_UP A JOIN ACHIEVEMENT B
+                            ON A.ACHIEV_CODE=B.ACHIEV_CODE
+                            WHERE A.CAPID='".$this->capid."'
+                            ORDER BY B.ACHIEV_NUM, A.REQUIRE_TYPE";
+                    $sign_up=  allResults(Query($query, $ident));
                     $max = Query("SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A
-            JOIN ACHIEVEMENT B ON A.ACHIEV_CODE=B.NEXT_ACHIEV
-            WHERE B.ACHIEV_CODE='" . $this->achievement . "'", $ident);
-                    $promoted = Query("SELECT ACHIEVEMENT, DATE_PROMOTED
-                        FROM PROMOTION_RECORD WHERE CAPID='".$this->capid."'",$ident);  //gets promotion dates
+                        JOIN ACHIEVEMENT B ON A.ACHIEV_CODE=B.NEXT_ACHIEV
+                        WHERE B.ACHIEV_CODE='" . $this->achievement . "'", $ident);
+                    $promoted = allResults(Query("SELECT ACHIEVEMENT, DATE_PROMOTED
+                        FROM PROMOTION_RECORD WHERE CAPID='".$this->capid."'",$ident));  //gets promotion dates
                     $maxAchiev = Result($max, 0, "ACHIEV_CODE");             //get the next achievement so don't list to spaatz
-                    $size_achiev = numRows($achievements);
-                    $size_passed = numRows($passed);
+                    $special = specialPromoRequire($ident);           //get the requirements that are attendance based
+                    $eventRequire= getEventPromo($ident, $this->capid);
+                    $size_achiev = count($achievements);
+                    $size_passed = count($passed);
                     $promo_index =0;                                 //index of promotion
                     for ($achievRow = 0; $achievRow < $size_achiev; $achievRow++) {  //loop to create rows
-                        echo "<tr><td>" . Result($achievements, $achievRow, "ACHIEV_NAME") . "</td>"; //shows name of achievemnt
-                        $achievCode = Result($achievements, $achievRow, "ACHIEV_CODE");
-                        $passedRequire = null;
-                        settype($passedRequire, "array");             //gets all the passed requirements for this row's achievemtn
+                        echo "<tr><td>" .$achievements[$achievRow]["ACHIEV_NAME"] . "</td>"; //shows name of achievemnt
+                        $achievCode = $achievements[$achievRow]["ACHIEV_CODE"];
+                        $passedRequire = array();      //gets all the passed requirements for this row's achievemtn
                         for ($passedRow = 0; $passedRow < $size_passed; $passedRow++) {
-                            if (Result($passed, $passedRow, "ACHIEV") == $achievCode) {  //if it is for this achievement
-                                array_push($passedRequire, array("Code" => Result($passed, $passedRow, "TYPE"),
-                                    "Date" => new DateTime(Result($passed, $passedRow, "DATE")))); //PUSH THE TYPE CODE AND DATE ONTO THE ARRAYfr
+                            if ($passed[$passedRow]["ACHIEV"] == $achievCode) {  //if it is for this achievement
+                                array_push($passedRequire, array("Code" => $passed[$passedRow]["TYPE"],
+                                    "Date" => new DateTime($passed[$passedRow]["DATE"]))); //PUSH THE TYPE CODE AND DATE ONTO THE ARRAYfr
                             }
                         }
-                        $require = null;             //gets all requirements for this achievemnets promo
-                        settype($require, "array");
-                        for ($passedRow = 0; $passedRow < numRows($requirements); $passedRow++) {
-                            if (Result($requirements, $passedRow, "ACHIEV_CODE") == $achievCode) {  //if it is for this achievement
-                                array_push($require, Result($requirements, $passedRow, "REQUIREMENT_TYPE")); //PUSH THE TYPE CODE on to the array
+                        $require = array();             //gets all requirements for this achievemnets promo
+                        for ($passedRow = 0; $passedRow < count($requirements); $passedRow++) {
+                            if ($requirements[$passedRow]["ACHIEV_CODE"] == $achievCode) {  //if it is for this achievement
+                                array_push($require,$requirements[$passedRow]["REQUIREMENT_TYPE"]); //PUSH THE TYPE CODE on to the array
                             }
                         }
-                        $passedRow = 0;
+                        $sign=array();  //the array for holding sign_ups for this promotion
+                        for($passedRow=0;$passedRow<count($sign_up);$passedRow++) {  //gets all the sign_ups for this achievement
+                            if($sign_up[$passedRow]['ACHIEV_CODE']==$achievCode) {  //if the sign up is for this achiev push it on the array
+                                array_push($sign, $sign_up[$passedRow]['REQUIRE_TYPE']);
+                            }
+                        } 
+                        $passedRow = 0; //assume all requirements alligned use these to shift over in stack
                         $requireRow = 0;
-                        for ($row = 0; $row < numRows($header); $row++) {    //cylces through requirements to display them 
-                            $testCode = Result($header, $row, "TYPE_CODE");
+                        $signRow=0;
+                        for ($row = 0; $row < count($header); $row++) {    //cylces through requirements to display them 
+                            $testCode = $header[$row]["TYPE_CODE"];
                             if (array_key_exists($passedRow, $passedRequire)) {     //if have record for that passed just show it
                                 if ($passedRequire[$passedRow]["Code"] == $testCode) {        //checks if has been passed
-                                    echo"<td>" . $passedRequire[$passedRow]["Date"]->format(PHP_DATE_FORMAT) . "</td>";
+                                    if($date) {
+                                        echo'<td><font color="green">' . $passedRequire[$passedRow]["Date"]->format(PHP_DATE_FORMAT) . "</font></td>";
+                                    } else 
+                                        echo '<td><font color="green">Complete</font></td>';
                                     $passedRow++;
                                     $requireRow++;           //increment other counters up
-                                } elseif (array_key_exists($requireRow, $require)) {       //else sees if there are any requirements for that
+                                } else if (isset($require[$requireRow])) {       //else sees if there are any requirements for that
                                     if ($require[$requireRow] == $testCode) {             //sees if required
-                                        echo "<td></td>";             //leaves cell blank than if no entry, but required
+                                        if(in_array($testCode, $special)&&($buffer=  checkEventPromo($eventRequire, $achievCode, $testCode))!=false) {          //if event based check if fulfilled it
+                                            if($date) {
+                                                $event= new DateTime($buffer); //display the date
+                                                echo '<td><font color="green">'.$event->format(PHP_DATE_FORMAT).'</font></td>';
+                                            } else 
+                                                echo '<td><font color="green">complete</font></td>';                                            
+                                        }else if(isset($sign[$signRow])&&$sign[$signRow]==$testCode) {
+                                            echo '<td><font color="orange">In progress</font></td>';
+                                            $signRow++;
+                                        } else
+                                            echo '<td><font color="red">Needs Work</font></td>';             //leaves cell blank than if no entry, but required
                                         $requireRow++;
                                     } else {        //else assume not required
                                         echo "<td>n/a</td>";
@@ -899,10 +995,13 @@ class member {
                                 echo "<td>n/a</td>";           //assumes not required
                             }
                         }
-                        if(numRows($promoted)>$promo_index) {
-                            if(Result($promoted, $promo_index,'ACHIEVEMENT')==$achievCode) {           //if the promoted date is for the right row
-                                $date = new DateTime(Result($promoted, $promo_index,'DATE_PROMOTED'));
-                                echo "<td>".$date->format(PHP_DATE_FORMAT)."</td>";  //echo the date promoted
+                        if(count($promoted)>$promo_index) {
+                            if($promoted[$promo_index]['ACHIEVEMENT']==$achievCode) {           //if the promoted date is for the right row
+                                $datePromo = new DateTime($promoted[$promo_index]['DATE_PROMOTED']);
+                                if($date)
+                                    echo '<td><font color="green">'.$datePromo->format(PHP_DATE_FORMAT)."</font></td>";  //echo the date promoted
+                                else
+                                    echo '<td><font color="green">complete</font></td>';  //if can't see date then just show completion
                                 $promo_index++;
                             } else {
                                 echo "<td></td>";           //else show a blank cell
