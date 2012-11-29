@@ -679,6 +679,19 @@ function specialPromoRequire($ident) {
     }
     return $results;
 }
+function promotionAprove($ident,$memberType) {
+    $query="SELECT A.CAPID, A.ACHIEV_CODE FROM PROMOTION_SIGN_UP A
+        JOIN MEMBER B ON A.CAPID=B.CAPID
+        WHERE B.MEMBER_TYPE='$memberType'";  //get everyone who wants to promote that is the selected member type
+    $results = allResults(Query($query, $ident));  //get this stuff
+    $signUps=array();
+    for($i=0;$i<count($signUps);$i++) {         //parse it, and objectify
+        //0=>member requesting 1=>requesting for
+        array_push($signUps, array(new member($results[$i]['CAPID'],3, $ident),$results[$i]['ACHIEV_CODE']));
+    }
+    $results=null;  //delete useless array that results, reparsed, is now useless
+    unset($results); //''
+}
 class member {
     private $capid;
     private $name_last;
