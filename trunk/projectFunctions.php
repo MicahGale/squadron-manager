@@ -691,6 +691,20 @@ function promotionAprove($ident,$memberType) {
     }
     $results=null;  //delete useless array that results, reparsed, is now useless
     unset($results); //''
+    $query ="SELECT TYPE_CODE, TYPE_NAME FROM
+        REQUIREMENT_TYPE WHERE MEMBER_TYPE='$memberType' ORDER BY TYPE_NAME"; //get the requirements for the header
+    $header=  allResults(Query($query, $ident));    //get headers
+    ?>
+    <table border="1">
+    <tr><th>Member</th>
+    <?php
+    for($i=0;$i<count($header);$i++) {  //displays the headers
+        echo "<th>".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
+    }
+    echo "<th>Approved</th>";   //display approval header
+    ?>
+    </table>
+    <?php
 }
 class member {
     private $capid;
