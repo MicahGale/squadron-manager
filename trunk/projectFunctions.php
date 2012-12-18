@@ -1504,6 +1504,34 @@ class member {
         $sign_up=  allResults(Query($query, $ident));            //was signed up for
         $specialRequires= specialPromoRequire($ident);            //the type of requirements that need event attendance
         $eventAttendance = getEventPromo($ident, $this->capid);
+        $incomplete=0;   //var that tells how many are incomplete
+        $inProg=0;      //the number of requirements that are in progress
+        for($i=0;$i<count($requirements);$i++) {  //cycle through the requirements and say whats good and not
+            $found= false;          //tells if the requirement has been found
+            $current=$passed[$i]['TYPE'];   //gets the searched require code
+            for($j=0;$j<count($passed);$j++) {   //searches trough the passed requirements
+                if($passed[$j]['TYPE']==$current) {
+                    //mark this requirement as passed 0=>the marker P=Passed 1=>date
+                    $this->promoRecord[$current]=array('P',new DateTime($passed[$j]['DATE']));
+                    $found = true;    //says its found, skip the rest
+                    break;  //kill this for loop
+                }
+            }
+            if(!$found) {  //if wasn't found then see if in progress
+                for($j=0;$j<count($sign_up);$j++) {   //search for the test sign up
+                    if($sign_up[$j]['TYPE']==$current) {  //if was testing then show it
+                        $this->promoRecord[$current]=array('I');  //marks as incomplete
+                        $found=true;
+                        break;
+                    }                    
+                }
+            }
+            if(!$found) {                           //if still not found try spec events
+                if(in_array($current, $specialRequires)) {  //if 
+                    
+                }
+            }
+        }
     }
 }
 class unit {
