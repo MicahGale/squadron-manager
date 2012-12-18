@@ -34,6 +34,20 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
         <table border="0" width="800" >
             <tr><td align="center">
                     <strong>View Promotion Sign-up</strong>
+                        <form method="post"><strong>Select Member Type:</strong>
+                            <?php
+                            if(!isset($_SESSION['memberType'])) 
+                               $_SESSION['memberType']='C';        //if hasn't chosen member type, then assume cadets
+                            if(isset($_POST['filter'])) {  //if set a filter then get it in
+                                $_SESSION['memberType']=cleanInputString($_POST['memberType'],1,"member filter",false);
+                            }
+                            dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType']);
+                            ?>
+                            <input type="submit" name="filter" value="Filter"/> <br>
+                        </form>
+                        <?php
+                        promotionAprove($ident, $_SESSION['memberType']);
+                        ?>
                 </td></tr>
         </table>
         <?php
