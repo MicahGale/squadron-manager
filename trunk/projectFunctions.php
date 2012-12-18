@@ -723,6 +723,7 @@ class member {
     private $picture_link;
     private $isEmpty = false;     //member doesn't exist    
     private $initLevel;
+    private $promoRecord=array();
     public function __construct($capid, $level, $ident, $name_last = null, $name_first = null, $gender = null, dateTime $DoB = null, $memberType = null, $achievement = null, $text_set = null, $unit = null, DateTime $Date_of_Join = null) {
         $this->capid = cleanInputInt($capid, 6, "CAPID");
         if ($level == -1) {             //levels -1= all from input 0=capid 1=capid+name+gender+achievement 2=1+text+member_type+picture 3=2+dates 4=3+emergency+unit         
@@ -1483,6 +1484,26 @@ class member {
     }
     public function get_text() {
         return $this->text_set;
+    }
+    function getPromotionInfo($promoFor, $ident) {
+        $query = "SELECT REQUIREMENT_TYPE AS TYPE, PASSED_DATE AS DATE
+            FROM REQUIREMENTS_PASSED 
+            WHERE CAPID='".$this->capid."' AND ACHIEV_CODE='$promoFor'
+            ORDER BY A.REQUIREMENT_TYPE";           //shows what they already passed
+        $passed=  allResults(Query($query, $ident));           //all the passed requirements
+        $query = "SELECT A.REQUIREMENT_TYPE FROM PROMOTION_REQUIREMENT A
+            WHERE A.TEXT_SET IN('" . $this->text_set . "','ALL')
+            AND B.MEMBER_TYPE='".$this->memberType."' and
+            ACHIEV_CODE='$promoFor'
+            ORDER REQUIREMENT_TYPE"; 
+        $requirements =  allResults(Query($query, $ident));      //all requirements to actually promote
+        $query = "SELECT A.REQUIRE_TYPE
+                FROM TESTING_SIGN_UP A 
+                WHERE A.CAPID='".$this->capid."' AND ACHIEV_CODE='$promoFor'
+                ORDER A.REQUIRE_TYPE";
+        $sign_up=  allResults(Query($query, $ident));            //was signed up for
+        $specialRequires= specialPromoRequire($ident);            //the type of requirements that need event attendance
+        $eventAttendance = getEventPromo($ident, $this->capid);
     }
 }
 class unit {
