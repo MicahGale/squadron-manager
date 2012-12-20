@@ -59,8 +59,8 @@ session_secure_start();
                         echo "<br><br>";
                         $member->discipline_report($ident, false);
                         echo "<br><br>";
-                        $member->staff_position($ident, false);
-                        new chain_of_command($ident,$member->getCapid());
+//                        $member->staff_position($ident, false);
+//                        new chain_of_command($ident,$member->getCapid());
                     }
                     ?>
                 </td>

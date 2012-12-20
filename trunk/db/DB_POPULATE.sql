@@ -157,6 +157,7 @@ VALUES('member/approve.php','member/finalApprove.php'),
         ('discipline/details.php','member/report.php'),
         ('attendance/event.php','member/report.php'),
         ('testing/testSignUp.php','member/report.php');
+        ('testing/promotionSign.php','member/report.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),
