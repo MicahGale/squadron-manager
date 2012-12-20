@@ -634,29 +634,31 @@ function getEventPromo($ident,$capid) {
         ORDER BY C.SUBEVENT_CODE";
     $subevent= prepare_statement($ident, $query);
     $results=array();
-    for($i=0;$i<count($promotions)+1;$i++) {//TODO figure out which promo counted for
-        if($i==0) {                            //if at 0 so the first one try dec 1,1941-first promo
-            bind($activ,"ss", array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
-            bind($subevent,"ss",array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
-            $promoFor=$promotions[$i]['ACHIEVEMENT'];
-        } else if($i<count($promotions)) {          //if is less then the count so in bounds then bind by 2 promos
-            bind($activ,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
-            bind($subevent,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
-            $promoFor=$promotions[$i]['ACHIEVEMENT'];
-        } else {                                                 //if hit top then try between last promo and now
-            bind($activ,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
-            bind($subevent,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
-            $query='SELECT NEXT_ACHIEV FROM ACHIEVEMENT 
-                WHERE ACHIEV_CODE=\''.$promotions[$i-1]['ACHIEVEMENT']."'";
-            $promoFor=Result(Query($query, $ident),0,'NEXT_ACHIEV');
-        }
-        $activity = allResults(execute($activ));                  //execute the prepared statements and get results
-        $subs = allResults(execute($subevent));
-        $results[$promoFor]=array();            //create an array for the current promotion
-        if(count($activity)>0) //if had activity for promo then show it
-            $results[$promoFor]['AC']=$activity[0]['EVENT_DATE'];  //shown
-        for($j=0;$j<count($subs);$j++) {         //parse subevent results
-            $results[$promoFor][$subs[$j]['SUBEVENT_CODE']]=$subs[$j]['EVENT_DATE'];//ORGANIZE INTO ARRAY BY SUB_CODE AND STORE DATE
+    if(count($promotions)>0) {
+        for($i=0;$i<count($promotions)+1;$i++) {
+            if($i==0) {                            //if at 0 so the first one try dec 1,1941-first promo
+                bind($activ,"ss", array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
+                bind($subevent,"ss",array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
+                $promoFor=$promotions[$i]['ACHIEVEMENT'];
+            } else if($i<count($promotions)) {          //if is less then the count so in bounds then bind by 2 promos
+                bind($activ,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
+                bind($subevent,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
+                $promoFor=$promotions[$i]['ACHIEVEMENT'];
+            } else {                                                 //if hit top then try between last promo and now
+                bind($activ,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
+                bind($subevent,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
+                $query='SELECT NEXT_ACHIEV FROM ACHIEVEMENT 
+                    WHERE ACHIEV_CODE=\''.$promotions[$i-1]['ACHIEVEMENT']."'";
+                $promoFor=Result(Query($query, $ident),0,'NEXT_ACHIEV');
+            }
+            $activity = allResults(execute($activ));                  //execute the prepared statements and get results
+            $subs = allResults(execute($subevent));
+            $results[$promoFor]=array();            //create an array for the current promotion
+            if(count($activity)>0) //if had activity for promo then show it
+                $results[$promoFor]['AC']=new DateTime($activity[0]['EVENT_DATE']);  //shown
+            for($j=0;$j<count($subs);$j++) {         //parse subevent results
+                $results[$promoFor][$subs[$j]['SUBEVENT_CODE']]=new DateTime($subs[$j]['EVENT_DATE']);//ORGANIZE INTO ARRAY BY SUB_CODE AND STORE DATE
+            }
         }
     }
     close_stmt($activ);
@@ -680,15 +682,19 @@ function specialPromoRequire($ident) {
     return $results;
 }
 function promotionAprove($ident,$memberType) {
-    $query="SELECT A.CAPID, A.ACHIEV_CODE FROM PROMOTION_SIGN_UP A
+    $query="SELECT A.CAPID, A.ACHIEV_CODE, A.APPROVED
+        FROM PROMOTION_SIGN_UP A
         JOIN MEMBER B ON A.CAPID=B.CAPID
         WHERE B.MEMBER_TYPE='$memberType'";  //get everyone who wants to promote that is the selected member type
     $results = allResults(Query($query, $ident));  //get this stuff
     $signUps=array();
-    for($i=0;$i<count($signUps);$i++) {         //parse it, and objectify
+    for($i=0;$i<count($results);$i++) {         //parse it, and objectify
         //0=>member requesting 1=>requesting for
-        array_push($signUps, array(new member($results[$i]['CAPID'],3, $ident),$results[$i]['ACHIEV_CODE']));
+        $signUps[$i]= array(new member($results[$i]['CAPID'],3, $ident),$results[$i]['ACHIEV_CODE']);
+        $signUps[$i][2]=$signUps[$i][0]->getPromotionInfo($signUps[$i][1], $ident);       //get the promo info and number incomplete
+        $signUps[$i][3]=$results[$i]['APPROVED'];                   //store if they have been approved
     }
+    usort($signUps,'compareSignUp');  //reorder array based on who is most incomplete list them first
     $results=null;  //delete useless array that results, reparsed, is now useless
     unset($results); //''
     $query ="SELECT TYPE_CODE, TYPE_NAME FROM
@@ -701,10 +707,20 @@ function promotionAprove($ident,$memberType) {
     for($i=0;$i<count($header);$i++) {  //displays the headers
         echo "<th>".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
     }
-    echo "<th>Approved</th>";   //display approval header
+    echo "<th>Approved</th></tr>\n";   //display approval header
+    for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
+        $signUps[$i][0]->displayPromoRequest($header,$signUps[$i][3]);
+    }
     ?>
     </table>
     <?php
+}
+function compareSignUp($a,$b) {    //compares the signups based on the number of incompletes and inprogress
+    $aCount=$a[2][0]+$a[2][1]*0.5;
+    $bCount=$b[2][0]+$b[2][1]*0.5;
+    if($aCount==$bCount)
+        return 0;
+    return ($aCount < $bCount) ? 1 : -1;
 }
 class member {
     private $capid;
@@ -996,7 +1012,7 @@ class member {
                                     if ($require[$requireRow] == $testCode) {             //sees if required
                                         if(in_array($testCode, $special)&&($buffer=  checkEventPromo($eventRequire, $achievCode, $testCode))!=false) {          //if event based check if fulfilled it
                                             if($date) {
-                                                $event= new DateTime($buffer); //display the date
+                                                $event= $buffer; //display the date
                                                 echo '<td><font color="green">'.$event->format(PHP_DATE_FORMAT).'</font></td>';
                                             } else 
                                                 echo '<td><font color="green">complete</font></td>';                                            
@@ -1014,7 +1030,7 @@ class member {
                                 }
                             } elseif (array_key_exists($requireRow, $require)) {   //else sees if there are any requirements for that
                                 if ($require[$requireRow] == $testCode) {
-                                    echo "<td></td>";          //say its incomplete blank than if no entry, but required
+                                    echo '<td><font color="red">Needs Work</font></td>';          //say its incomplete blank than if no entry, but required
                                     $requireRow++;
                                 } else {
                                     echo "<td>n/a</td>";
@@ -1489,18 +1505,19 @@ class member {
         $query = "SELECT REQUIREMENT_TYPE AS TYPE, PASSED_DATE AS DATE
             FROM REQUIREMENTS_PASSED 
             WHERE CAPID='".$this->capid."' AND ACHIEV_CODE='$promoFor'
-            ORDER BY A.REQUIREMENT_TYPE";           //shows what they already passed
+            ORDER BY REQUIREMENT_TYPE";           //shows what they already passed
         $passed=  allResults(Query($query, $ident));           //all the passed requirements
-        $query = "SELECT A.REQUIREMENT_TYPE FROM PROMOTION_REQUIREMENT A
+        $query = "SELECT A.REQUIREMENT_TYPE AS TYPE FROM PROMOTION_REQUIREMENT A
+            JOIN ACHIEVEMENT B ON A.ACHIEV_CODE=B.ACHIEV_CODE
             WHERE A.TEXT_SET IN('" . $this->text_set . "','ALL')
             AND B.MEMBER_TYPE='".$this->memberType."' and
-            ACHIEV_CODE='$promoFor'
-            ORDER REQUIREMENT_TYPE"; 
+            A.ACHIEV_CODE='$promoFor'
+            ORDER BY REQUIREMENT_TYPE"; 
         $requirements =  allResults(Query($query, $ident));      //all requirements to actually promote
-        $query = "SELECT A.REQUIRE_TYPE
+        $query = "SELECT A.REQUIRE_TYPE AS TYPE
                 FROM TESTING_SIGN_UP A 
-                WHERE A.CAPID='".$this->capid."' AND ACHIEV_CODE='$promoFor'
-                ORDER A.REQUIRE_TYPE";
+                WHERE A.CAPID='".$this->capid."' AND A.ACHIEV_CODE='$promoFor'
+                ORDER BY A.REQUIRE_TYPE";
         $sign_up=  allResults(Query($query, $ident));            //was signed up for
         $specialRequires= specialPromoRequire($ident);            //the type of requirements that need event attendance
         $eventAttendance = getEventPromo($ident, $this->capid);
@@ -1508,7 +1525,7 @@ class member {
         $inProg=0;      //the number of requirements that are in progress
         for($i=0;$i<count($requirements);$i++) {  //cycle through the requirements and say whats good and not
             $found= false;          //tells if the requirement has been found
-            $current=$passed[$i]['TYPE'];   //gets the searched require code
+            $current=$requirements[$i]['TYPE'];   //gets the searched require code
             for($j=0;$j<count($passed);$j++) {   //searches trough the passed requirements
                 if($passed[$j]['TYPE']==$current) {
                     //mark this requirement as passed 0=>the marker P=Passed 1=>date
@@ -1521,17 +1538,56 @@ class member {
                 for($j=0;$j<count($sign_up);$j++) {   //search for the test sign up
                     if($sign_up[$j]['TYPE']==$current) {  //if was testing then show it
                         $this->promoRecord[$current]=array('I');  //marks as incomplete
+                        $inProg++;                 //increase count
                         $found=true;
                         break;
                     }                    
                 }
             }
             if(!$found) {                           //if still not found try spec events
-                if(in_array($current, $specialRequires)) {  //if 
-                    
+                if(in_array($current, $specialRequires)) {  //if is a special case then check it out.
+                    if(($buffer=checkEventPromo($eventAttendance,$promoFor, $current))!=false) {  //if it was so then say so
+                        $this->promoRecord[$current]=array('P',$buffer);
+                        $found = true;
+                    }  
                 }
             }
+            if(!$found) {
+                $this->promoRecord[$current]=array('F'); //if was never found then show this requirement as failed
+                $incomplete++;  //count it
+            }
         }
+        return array($incomplete,$inProg);
+    } 
+    function displayPromoRequest($header,$approved) {
+         echo "<tr><td>";  //let's start this row
+        echo $this->link_report()."</td>";   //show member
+        for($j=0;$j<count($header);$j++) {              //TODO actually display stuff
+            $index=$header[$j]['TYPE_CODE'];   //get the current requirement
+            if(isset($this->promoRecord[$index])) {  //if has that requirement do stuff
+                $current=$this->promoRecord[$index];  //load it
+                echo "<td>";
+                if($current[0]=="P") {                 //if all good display it in green
+                    echo '<font color="green">';
+                    enterDate(false,$this->capid.$index,$current[1]);
+                }
+                echo "</td>";
+            } else  {            //else just leave blank
+                echo "<td>n/a</td>";
+            }
+            
+        }   //display yes bubble
+        echo '<td><input type="radio" name="'.$this->getCapid().'" value="yes"';
+        if($approved==1) 
+            echo 'checked/>';
+        else echo '/>';
+        echo "Yes<br>";
+        //display no bubble
+        echo '<input type="radio" name="'.$this->getCapid().'" value="no"';
+        if($approved==0)
+            echo 'checked/>';
+        else echo '/>';
+        echo "No </td></tr>";
     }
 }
 class unit {

@@ -30,7 +30,6 @@
         <table border="0" width ="900">  <!table for formatting>
             <tr>                       <!left column>
                 <td style="text-align: left;width: 780px">
-                    <a href="/FridayRound2ASVista.zip">CP dl</a>
                     <strong>Today is:</strong> 
                         <?php 
                         echo date(PHP_DATE_FORMAT); 

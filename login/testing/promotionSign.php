@@ -43,11 +43,19 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             }
                             dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType']);
                             ?>
-                            <input type="submit" name="filter" value="Filter"/> <br>
+                            <input type="submit" name="filter" value="Filter"/> <br><br>
+                            <strong>Color Key</strong><br>
+                            <font color="green">████</font>=Completed task, and passed<br>
+                            <font color="Orange">████</font>=Signed up to test, but hasn't been entered<br>
+                            <font color="red">████</font>=Hasn't passed, and isn't signed up to test<br><br>
                         </form>
-                        <?php
-                        promotionAprove($ident, $_SESSION['memberType']);
-                        ?>
+                        <form method="post">
+                            <input type="submit" name="save" value="Save"/><br>
+                            <?php
+                            promotionAprove($ident, $_SESSION['memberType']);
+                            ?>
+                            <input type="submit" name="save" value="Save"/>
+                        </form>  
                 </td></tr>
         </table>
         <?php
