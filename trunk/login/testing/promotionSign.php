@@ -26,6 +26,16 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <title>Promotion Sign-Up</title>
+        <style>
+            body {color:black;}
+            td { border-color: black; }
+            p.P {color:green}
+            p.I {color:orange}
+            p.F {color:red}
+            td.P {color:green}
+            td.I {color:orange}
+            td.F {color:red}
+        </style>
     </head>
     <body>
         <?php
@@ -45,13 +55,17 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             ?>
                             <input type="submit" name="filter" value="Filter"/> <br><br>
                             <strong>Color Key</strong><br>
-                            <font color="green">████</font>=Completed task, and passed<br>
-                            <font color="Orange">████</font>=Signed up to test, but hasn't been entered<br>
-                            <font color="red">████</font>=Hasn't passed, and isn't signed up to test<br><br>
+                            <p class="P">████=Completed task, and passed</p>
+                            <p class="I">████=Signed up to test, but hasn't been entered</p>
+                            <p class="F">████=Hasn't passed, and isn't signed up to test</p>
+                            <a href="/help/inputPercentages.php" target="_blank">How to Input Percentages</a>
                         </form>
                         <form method="post">
                             <input type="submit" name="save" value="Save"/><br>
                             <?php
+                            if(isset($_POST)&&isset($_POST['save'])) {  //if has post and not filter parse it and save it
+                                parsePromoInput($ident, $_POST);
+                            }
                             promotionAprove($ident, $_SESSION['memberType']);
                             ?>
                             <input type="submit" name="save" value="Save"/>

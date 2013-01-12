@@ -30,9 +30,9 @@
         <table border="0" width ="900">  <!table for formatting>
             <tr>                       <!left column>
                 <td style="text-align: left;width: 780px">
-                    <strong>Today is:</strong> 
+                    <p><strong>Today is:</strong> 
                         <?php 
-                        echo date(PHP_DATE_FORMAT); 
+                        echo date(PHP_DATE_FORMAT)."</p>\n"; 
                         $connection= Connect('Viewer',"2438iuoewjkld--[p0xfdkuu,zcxmeeeeem4e8m, cxpondsvlkc m,ryfsdhPOJLKNUHKJN<",'localhost');
                         $rowLocal=0;
                         $max = 10;
@@ -46,7 +46,7 @@
                                 $max=10;
                             }
                             if($max>0) {
-                                echo "<br><strong> We have these things planned for today: </strong>";
+                                echo "<p><strong> We have these things planned for today: </strong>";
                             }
                             while($rowLocal<$max) {
                                 echo Result($result, $rowLocal,"SUBEVENT_NAME");
@@ -59,6 +59,7 @@
                                 }
                                 $rowLocal++;
                             }
+                            echo "</p>\n";
                         }
                         ?>
                     <br>
