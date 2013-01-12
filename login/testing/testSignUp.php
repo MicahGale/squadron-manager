@@ -68,7 +68,7 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             $toInsert =array();
                             for($i=0;$i<count($results);$i++) {     //insert based on specified percentage
                                 if(isset($_POST["percentage$i"])&&$_POST["percentage$i"]!="") { //if a percentage is entered then enter it
-                                    $percent=  parsePercent($i);
+                                    $percent=  parsePercent($i,$_POST,$_SESSION['results'][$i]["PASSING_PERCENT"]);
                                     if($percent!=null&&$percent!=false) {
                                         array_push($toInsert, $i);             //insert it if the percent isn't null or ridonculous
                                     }
@@ -87,7 +87,7 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                                 $text = $member->get_text();
                                 $achiev=$_SESSION['results'][$toInsert[$i]]['ACHIEV_CODE'];
                                 $type= $_SESSION['results'][$toInsert[$i]]['REQUIRE_TYPE'];
-                                $percent = parsePercent($toInsert[$i]);
+                                $percent = parsePercent($toInsert[$i],$_POST,$_SESSION['results'][$toInsert[$i]]["PASSING_PERCENT"]);
                                 if(isset($_POST['passed'])&&isset($_POST['eservice'])&&in_array($toInsert[$i], $_POST['eservice'])) {           //if they also checked the eservices box then say so
                                     $onEservices = "true";
                                 } else {
@@ -149,34 +149,6 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             echo '<td><input type="text" size="1" maxlength="10" name="percentage'.$i.'"/></td>';
                             echo '<td><input type="checkbox" name="eservices[]" value="'.$i.'"/></td>';
                             echo '<td><input type="checkbox" name="remove[]" value="'.$i."\"/></td></tr>\n";
-                        } 
-                        function parsePercent($resultRow) {
-                            $input = $_POST['percentage'.$resultRow];
-                            if($input=="") 
-                                return null;
-                            if(strpos($input,"/")==false) {          //if there is no / assume decimal or percent
-                                $percent=  cleanInputInt($input,strlen($input),"percentage".$resultRow); //clean and parse as num
-                                if($percent>1) {         //if was a percent i.e. >1 and a big num
-                                    $percent = $percent/100;
-                                }  //else assume is decimal and is all good
-                            } else {
-                               $input =  cleanInputDate($input,"#^[0-9]+/[0-9]+$#",strlen($input),"percentage$resultRow");
-                               $input = explode("/", $input);   //split into numerator and denominator
-                               $numerator = cleanInputInt($input[0], strlen($input[0]),"numerator$resultRow");    //take the numerator from first thing
-                               $denominator = cleanInputInt($input[1],  strlen($input[1]), 'denominator'.$resultRow);  //take the denom from second position
-                               $percent=$numerator/$denominator;
-                            }
-                            if($percent>1||$percent<$_SESSION['results'][$resultRow]["PASSING_PERCENT"]) { //check if the percent is legit
-                                if($percent>1) {  //if over 100% yell at the user
-                                    echo '<font color="red">Cannot be over 100%</font>';
-                                } else {
-                                    echo '<font color="red">Did not pass, passing score is:';
-                                    echo round($_SESSION['results'][$resultRow]["PASSING_PERCENT"]*100,2)."%</font>";
-                                }
-                                return false;
-                            } else {
-                                return round($percent,2);
-                            }
                         }
                         ?>
                     </table>

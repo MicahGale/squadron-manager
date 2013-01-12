@@ -1,5 +1,5 @@
 <?php
-/* * Copyright 2012 Micah Gale
+/* Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -16,21 +16,25 @@
  *
  * 
  */
-/** 
+/*
  * **********************FOR v. .10*****************************
- * TODO create testing controls and entering
+ * TODO integrate promo sign-up into bromodisplay
+ * TODO remove achiev_code from testing_sign_up destroy test banking
+ * TODO create testing controls and entering add pt testing hold 
+ * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users
  * TODO create page for units
- * TODO debug session hijacking resign-in also do post keep thingy with foreach and allow to go back to where logout
- *TODO membership termination and deletion and edit members
+ * TODO check promoboard halts on sign-up and promo report
+ * TODO membership termination and deletion and edit members
  * TODO allow to change password
  * TODO notifications
  * TODO finish populating db
  * TODO populate pictures
  * ***************************Debug/fix*******************************************
- * TODO consider promo boards
- * TODO just kill views
- * TODO fix member side
+ * TODO consider promo boards for all
+ * TODO fix member-side queries
+ * TODO debug session hijacking resign-in keep post input
+ * TODO make main page redirect to home if signed-in
  * 
  * *******************FOR LATER******************************
  * 
@@ -41,7 +45,7 @@
  * TODO add statistics esp. for attendance
  * TODO use css  
  */
-/**
+/*
  *Function to change to port to different DBMS
  * CleanInputInt-sql escape function
  * CleanInputString -''
@@ -303,12 +307,12 @@ function close_stmt(mysqli_stmt $stmt) {
 function cleanInputInt($input, $length, $fieldName) {
     $link = mysqli_connect();
     $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
-    if (strlen($clean) != $length || !is_numeric($clean) || $clean != $input) {
+    if (strlen($clean) > $length || !is_numeric($clean) || $clean != $input) {
         $badInput = true;
         $time = auditLog( $_SERVER['REMOTE_ADDR'], "SI");
         auditDump($time, $fieldName, $clean);
         echo "<font color=\"red\">$fieldName is not a valid number it must be $length digits long.</font><br>";
-        if (strlen($clean) != $length || !is_numeric($clean)) {          //nulls if wrong type
+        if (strlen($clean) >= $length || !is_numeric($clean)) {          //nulls if wrong type
             $clean = null;
         }
     }
@@ -515,15 +519,13 @@ function enterDate($sameLine = true, $append = null, DateTime $default = null) {
     echo"/>";
 }
 function parse_date_input(array $input, $append = null) {
-    if ($append == null) {
-        $month = cleanInputString($input["month"], 2, "month", false);
-        $day = cleanInputString($input["Date"], 2, "day", false);
-        $year = cleanInputInt($input["Year"], 4, "year");
-    } else {
-        $month = cleanInputString($input["month" . $append], 2, "month", false);
-        $day = cleanInputString($input["Date" . $append], 2, "day", false);
-        $year = cleanInputInt($input["Year" . $append], 4, "year");
-    }
+    if(!isset($input['Date'.$append]))
+            return null;
+    if($input['Date'.$append]==""||$input['Year'.$append]=="")
+            return null;
+    $month = cleanInputString($input["month" . $append], 2, "month", false);
+    $day = cleanInputString($input["Date" . $append], 2, "Date", false);
+    $year = cleanInputInt($input["Year" . $append], 4, "Year");
     try {
         $buffer = new DateTime($day . "-" . $month . "-" . $year);
     } catch (exception $e) {
@@ -698,7 +700,9 @@ function promotionAprove($ident,$memberType) {
     $results=null;  //delete useless array that results, reparsed, is now useless
     unset($results); //''
     $query ="SELECT TYPE_CODE, TYPE_NAME FROM
-        REQUIREMENT_TYPE WHERE MEMBER_TYPE='$memberType' ORDER BY TYPE_NAME"; //get the requirements for the header
+        REQUIREMENT_TYPE WHERE (MEMBER_TYPE='$memberType' OR MEMBER_TYPE IS NULL)
+        AND TYPE_CODE IN ( SELECT REQUIREMENT_TYPE FROM PROMOTION_REQUIREMENT 
+        WHERE ACHIEV_CODE IN(SELECT ACHIEV_CODE FROM PROMOTION_SIGN_UP))ORDER BY TYPE_NAME"; //get the requirements for the header
     $header=  allResults(Query($query, $ident));    //get headers
     ?>
     <table border="1">
@@ -709,8 +713,10 @@ function promotionAprove($ident,$memberType) {
     }
     echo "<th>Approved</th></tr>\n";   //display approval header
     for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
-        $signUps[$i][0]->displayPromoRequest($header,$signUps[$i][3]);
+        $signUps[$i][0]->displayPromoRequest($header,true,true,$signUps[$i][3]);
     }
+    $_SESSION['signUps']=$signUps;
+    $_SESSION['header']=$header;
     ?>
     </table>
     <?php
@@ -721,6 +727,115 @@ function compareSignUp($a,$b) {    //compares the signups based on the number of
     if($aCount==$bCount)
         return 0;
     return ($aCount < $bCount) ? 1 : -1;
+}
+/**Creates an input field to input promotion score, and date
+ * 
+ * @param type $capid The capid of who it is
+ * @param type $type the requirement type this is for
+ * @param DateTime $date The date passed if any
+ * @param type $percentage the percentage stored if already passed
+ * @param type $achiev  The achievement this is for
+ * @return returns whether or not more needs to be displayed.
+ */
+function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null, $achiev=null) {
+    $append = $capid.$type.$achiev;
+    if(in_array($type, array('LT','AE','DT'))) {
+        if(is_numeric($percentage)) {   //if percent is a decimal change to percent
+            $display =  round($percentage*100,2)."%";
+        } else{
+            $display = $percentage;
+        }
+        echo '%:<input type="text" size="1" maxlength="10" name="percentage'.$append.'" value="'.$display.'"/>';
+    } if(!in_array($type,array('PB','PT'))) {
+        enterDate(false, $append, $date);
+        return false;
+    } else {
+        if($type=="PT") {      //if was pt test link to page for pt test
+            ?>
+            <a href="/login/testing/indivPT.php" target="_blank">enter PT test</a>
+            <?php
+        } else {        //if was promo board give link
+        ?>
+            <a href="/login/testing/promoBoard.php" target="_blank">enter Promotion Board</a>
+        <?php
+        }
+        return true;
+    } 
+}
+/**
+ * Parse the input from the promotion sign-up and insert it
+ */
+function parsePromoInput(mysqli $ident,array $input) {
+    $approve=  prepare_statement($ident, "UPDATE PROMOTION_SIGN_UP SET APPROVED=?
+        WHERE CAPID=? AND ACHIEV_CODE=?");  //create a prepared statement to approve one 
+    $insert =  prepare_statement($ident,"INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET,PASSED_DATE,PERCENTAGE)
+        VALUES(?,?,?,?,?,?)");         //create prepared statement to insert requirements
+    $update = prepare_statement($ident,"UPDATE REQUIREMENTS_PASSED
+        SET PASSED_DATE=?, PERCENTAGE=?
+        WHERE CAPID=? AND ACHIEV_CODE=? AND REQUIREMENT_TYPE=?");
+    $deleteTest =  prepare_statement($ident,"DELETE FROM TESTING_SIGN_UP
+        WHERE CAPID=? AND REQUIRE_TYPE=?");
+    $signUps=$_SESSION['signUps'];
+    $header=$_SESSION['header'];
+    for($i=0;$i<count($signUps);$i++) {       //cycle through old sign-ups
+        $current=$signUps[$i];
+        $capid=$current[0]->getCapid();
+        if(isset($input[$capid])) {   //aprove it
+            if($input[$capid]=="yes") {          //if approved bind the vars
+                bind($approve,"iis", array(1,$capid,$current[1]));  //aprove it
+            } else {
+                bind($approve,"iis",array(0,$capid,$current[1])); //disprove it
+            }
+            execute($approve);       //aprove it or disprove it!
+        }
+        $current[0]->parsePromoEdit($insert,$update,$deleteTest,$header,$input);   //parse each member's thing
+    }
+    $_SESSION['signUps']=null;
+    $_SESSION['header']=null;
+    unset($_SESSION['signUps'],$_SESSION['header']);
+    close_stmt($approve);
+    close_stmt($insert);
+    close_stmt($update);
+    close_stmt($deleteTest);
+}
+/**Parses percentage input
+ * 
+ * @param type $append the appended stuff to post array
+ * @param array $inputs the post array
+ * @param type $passing the passing percentage as a decimal
+ * @return null|boolean|float returns null if no input, false if incorrect, and the percentage as a float
+ */
+function parsePercent($append, array $inputs, $passing) {
+    if(isset($inputs['percentage'.$append])&&$inputs['percentage'.$append])
+        $input = $inputs['percentage'.$append];
+    else 
+        return null;
+    if($input=="") 
+        return null;
+    $input= str_replace("%","", $input);      //strips out percent signs
+    if(strpos($input,"/")==false) {          //if there is no / assume decimal or percent
+        $percent=  cleanInputInt($input,5,"percentage".$append); //clean and parse as num
+        if($percent>1) {         //if was a percent i.e. >1 and a big num
+            $percent = $percent/100;
+        }  //else assume is decimal and is all good
+    } else {
+       $input =  cleanInputDate($input,"#^[0-9]+/[0-9]+$#",strlen($input),"percentage$append");
+       $input = explode("/", $input);   //split into numerator and denominator
+       $numerator = cleanInputInt($input[0],3,"numerator$append");    //take the numerator from first thing
+       $denominator = cleanInputInt($input[1],3, 'denominator'.$append);  //take the denom from second position
+       $percent=$numerator/$denominator;
+    }
+    if($percent>1||$percent<$passing) { //check if the percent is legit
+        if($percent>1) {  //if over 100% yell at the user
+            echo '<font color="red">Cannot be over 100%</font>';
+        } else {
+            echo '<font color="red">Did not pass, passing score is:';
+            echo round($passing*100,2)."%</font>";
+        }
+        return false;
+    } else {
+        return round($percent,2);
+    }
 }
 class member {
     private $capid;
@@ -1501,13 +1616,15 @@ class member {
     public function get_text() {
         return $this->text_set;
     }
-    function getPromotionInfo($promoFor, $ident) {
-        $query = "SELECT REQUIREMENT_TYPE AS TYPE, PASSED_DATE AS DATE
+    function getPromotionInfo($promoFor, mysqli $ident) {
+        $this->promoRecord['achiev']=$promoFor;
+        $query = "SELECT REQUIREMENT_TYPE AS TYPE, PASSED_DATE AS DATE, PERCENTAGE
             FROM REQUIREMENTS_PASSED 
             WHERE CAPID='".$this->capid."' AND ACHIEV_CODE='$promoFor'
             ORDER BY REQUIREMENT_TYPE";           //shows what they already passed
         $passed=  allResults(Query($query, $ident));           //all the passed requirements
-        $query = "SELECT A.REQUIREMENT_TYPE AS TYPE FROM PROMOTION_REQUIREMENT A
+        $query = "SELECT A.REQUIREMENT_TYPE AS TYPE, A.NUMBER_QUESTIONS AS NUMBER, PASSING_PERCENT AS PERCENT 
+            FROM PROMOTION_REQUIREMENT A
             JOIN ACHIEVEMENT B ON A.ACHIEV_CODE=B.ACHIEV_CODE
             WHERE A.TEXT_SET IN('" . $this->text_set . "','ALL')
             AND B.MEMBER_TYPE='".$this->memberType."' and
@@ -1529,7 +1646,12 @@ class member {
             for($j=0;$j<count($passed);$j++) {   //searches trough the passed requirements
                 if($passed[$j]['TYPE']==$current) {
                     //mark this requirement as passed 0=>the marker P=Passed 1=>date
-                    $this->promoRecord[$current]=array('P',new DateTime($passed[$j]['DATE']));
+                    if($requirements[$i]['NUMBER']==null) {
+                        $percent = $passed[$j]['PERCENTAGE'];
+                    } else {
+                        $percent = round($requirements[$i]['NUMBER']*$passed[$j]['PERCENTAGE'])."/".$requirements[$i]['NUMBER'];
+                    }
+                    $this->promoRecord[$current]=array('P',new DateTime($passed[$j]['DATE']),$percent, "percent"=>$requirements[$i]['PERCENT']);
                     $found = true;    //says its found, skip the rest
                     break;  //kill this for loop
                 }
@@ -1537,7 +1659,7 @@ class member {
             if(!$found) {  //if wasn't found then see if in progress
                 for($j=0;$j<count($sign_up);$j++) {   //search for the test sign up
                     if($sign_up[$j]['TYPE']==$current) {  //if was testing then show it
-                        $this->promoRecord[$current]=array('I');  //marks as incomplete
+                        $this->promoRecord[$current]=array('I', "percent"=>$requirements[$i]['PERCENT']);  //marks as incomplete
                         $inProg++;                 //increase count
                         $found=true;
                         break;
@@ -1547,47 +1669,121 @@ class member {
             if(!$found) {                           //if still not found try spec events
                 if(in_array($current, $specialRequires)) {  //if is a special case then check it out.
                     if(($buffer=checkEventPromo($eventAttendance,$promoFor, $current))!=false) {  //if it was so then say so
-                        $this->promoRecord[$current]=array('P',$buffer);
+                        $this->promoRecord[$current]=array('P',$buffer,"percent"=>$requirements[$i]['PERCENT']);
                         $found = true;
                     }  
                 }
             }
             if(!$found) {
-                $this->promoRecord[$current]=array('F'); //if was never found then show this requirement as failed
+                $this->promoRecord[$current]=array('F',"percent"=>$requirements[$i]['PERCENT']); //if was never found then show this requirement as failed
                 $incomplete++;  //count it
             }
         }
         return array($incomplete,$inProg);
     } 
-    function displayPromoRequest($header,$approved) {
-         echo "<tr><td>";  //let's start this row
+    /**
+     * 
+     * @param array $header  the array of the requirement_types from the header section
+     * @param boolean $disPlayDates weather or not to display the dates for promotions
+     * @param boolean $canEdit   weather or not they can change the information or if read-only
+     * @param boolean $approved weather or not the promotion is approved
+     */
+    function displayPromoRequest(array $header, $disPlayDates=false, $canEdit=false ,$approved=null) {
+        echo "<tr><td>";  //let's start this row
         echo $this->link_report()."</td>";   //show member
         for($j=0;$j<count($header);$j++) {              //TODO actually display stuff
             $index=$header[$j]['TYPE_CODE'];   //get the current requirement
             if(isset($this->promoRecord[$index])) {  //if has that requirement do stuff
                 $current=$this->promoRecord[$index];  //load it
-                echo "<td>";
-                if($current[0]=="P") {                 //if all good display it in green
-                    echo '<font color="green">';
-                    enterDate(false,$this->capid.$index,$current[1]);
+                echo '<td class="'.$current[0].'">';
+                $displayText = true;
+                if($disPlayDates) {       //if displaying dates
+                    if($canEdit) {
+                        $date=null;
+                        $percent=null;
+                        if(isset($current[1]))       //if date and percent set get it
+                            $date = $current[1];
+                        if(isset($current[2])) 
+                            $percent=$current[2];
+                        $displayText=promoRequireInput($this->capid,$index, $date, $percent);  //display the input
+                    } if(!$canEdit||($displayText)) {            //if can't edit
+                        if($current[0]=="P") {
+                            echo $current[1]->format(PHP_DATE_FORMAT);
+                            $displayText=false;
+                        }
+                    }
+                } if($displayText) {
+                    switch ($current[0]) {
+                        case "P":
+                            echo "Passed";
+                            break;
+                        case "I":
+                            echo "In progress";
+                            break;
+                        case "F":
+                            echo "Needs Work";
+                            break;
+                    }
                 }
                 echo "</td>";
             } else  {            //else just leave blank
                 echo "<td>n/a</td>";
             }
             
-        }   //display yes bubble
-        echo '<td><input type="radio" name="'.$this->getCapid().'" value="yes"';
-        if($approved==1) 
-            echo 'checked/>';
-        else echo '/>';
-        echo "Yes<br>";
-        //display no bubble
-        echo '<input type="radio" name="'.$this->getCapid().'" value="no"';
-        if($approved==0)
-            echo 'checked/>';
-        else echo '/>';
-        echo "No </td></tr>";
+        }   //display yes bubble if allowed to edit info
+        if($canEdit&&is_numeric($approved)) {
+            echo '<td><input type="radio" name="'.$this->getCapid().'" value="yes"';
+            if($approved==1) 
+                echo ' checked/>';
+            else echo '/>';
+            echo "Yes<br>";
+            //display no bubble
+            echo '<input type="radio" name="'.$this->getCapid().'" value="no"';
+            if($approved==0)
+                echo ' checked/>';
+            else echo '/>';
+            echo "No </td></tr>\n";
+        } else {
+            echo "</tr>\n";
+        }
+    }
+    /**Parse the edited promotion requirements
+     * 
+     * @param mysqli_stmt $insert a prepared statement to insert the passed promotion requirement
+     * @param mysqli_stmt $update prepared statement for updating ^
+     * @param mysqli_stmt $delete delete test_sign_up if in process
+     * @param array $header the requirement_types
+     * @param array $input the post input
+     * @param achiev the achievement code if multiple achievements
+     */
+    function parsePromoEdit(mysqli_stmt $insert, mysqli_stmt $update, mysqli_stmt $delete, array $header, array $input, $achiev=null) {
+        if($achiev==null) {  //if achievement isn't specified
+            $achiev_code=$this->promoRecord['achiev'];
+        } else 
+            $achiev_code=$achiev;
+        for($i=0;$i<count($header);$i++) {      //cycle through the requirements and parse them
+            $type=$header[$i]['TYPE_CODE'];
+            $append = $this->capid.$type.$achiev;            //the appended string
+            $percent = parsePercent($append, $input, $this->promoRecord[$type]["percent"]); //parse the percentage
+            $date=  parse_date_input($input, $append);                 //parse the date
+            if($date!=null&&$percent!=false) {         //if date is valid and the percent is valid
+                switch($this->promoRecord[$type][0]) {                     //switchfor choosing which prepared satement
+                    case "P":
+                        bind($update,"sdiss",array($date->format(PHP_TO_MYSQL_FORMAT),$percent,$this->capid,$achiev_code,$type));
+                        execute($update);
+                        break;
+                    case "I":
+                    Case "F":
+                        bind($insert,"issssd",array($this->capid,$achiev_code,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent));           //insert 
+                        execute($insert);
+                        if($this->promoRecord[$type][0]=='F') 
+                            break;  //break if they didn't sign up
+                        bind($delete,'is',array($this->capid,$type));
+                        execute($delete);            //execute and delete the sign-up
+                        break;
+                }
+            }
+        }
     }
 }
 class unit {
