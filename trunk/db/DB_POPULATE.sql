@@ -24,12 +24,12 @@ VALUES ('SAF','Safety'),
         ('AE','Aerospace Education'),
         ('CD','Character Development');
 #################INSERT VALUES FOR CPFT TYPE#############
-INSERT INTO CPFT_TEST_TYPES (TEST_CODE, TEST_NAME)
-VALUES ('SR','Sit and Reach'),
-        ('CU','Curl-ups'),
-        ('PU','Push-ups'),
-        ('RS','Shuttle Run'),
-        ('MR','Mile Run');
+INSERT INTO CPFT_TEST_TYPES (TEST_CODE, TEST_NAME,IS_RUNNING)
+VALUES ('SR','Sit and Reach',FALSE),
+        ('CU','Curl-ups',FALSE),
+        ('PU','Push-ups',FALSE),
+        ('RS','Shuttle Run',TRUE),
+        ('MR','Mile Run',TRUE);
 #################INSERT INTRUSION TYPES##################
 INSERT INTO INTRUSION_TYPE (INTRUSION_CODE,INTRUSION_NAME)
 VALUES ('DC','Page direct call'),
@@ -102,11 +102,15 @@ VALUES('LT','Leadership Test'),
     ('ME','Mentor a cadet','C'),
     ('AC','Squadron Activity'),
     ('CD','Character Development','C'),
-    ('SA','Safety');
+    ('SA','Safety',NULL),
+    ('CO','Cadet Oath','C'),
+    ('GS','Grooming Standards','C');
 #########################insert promotion requirements##########################
 INSERT INTO PROMOTION_REQUIREMENT (ACHIEV_CODE, REQUIREMENT_TYPE, PER_ACHIEVEMENT, PER_PHASE, TEXT_SET, NAME, PASSING_PERCENT, IS_ONLINE)
 VALUES('WB','LT',TRUE,FALSE,'L21C','Wright Brothers','80',false),
-    ('WB','CD',TRUE,FALSE,'ALL',null,null,false);
+    ('WB','CD',TRUE,FALSE,'ALL',null,null,false),
+    ('WB','CO',TRUE,FALSE,'ALL',null,null,false),
+    ('WB','GS',true,false,'ALL',null,null,false);
 #######################insert contact relationships############################
 INSERT INTO CONTACT_RELATIONS(RELATION_CODE,RELATION_NAME)
 VALUES('FA','Father'),
@@ -138,7 +142,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php'),
         ('NEV','Create a new Event','EV','attendance/new.php'),
         ('EVI','Insert attendance for an Event','EV','attendance/add.php'),
         ('TSE','View Testing Sign-up','TP','testing/testSignUp'),
-        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php');
+        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php'),
+        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php');
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -149,14 +154,15 @@ VALUES('CTO','MEA')
         ('CTO','NEV'),
         ('CTO','EVI'),
         ('CTO','TSE'),
-        ('CTO','PSE');
+        ('CTO','PSE'),
+        ('CTO','PTT');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
         ('member/search.php','member/report.php'),
         ('discipline/details.php','member/report.php'),
         ('attendance/event.php','member/report.php'),
-        ('testing/testSignUp.php','member/report.php');
+        ('testing/testSignUp.php','member/report.php'),
         ('testing/promotionSign.php','member/report.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)

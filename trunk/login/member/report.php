@@ -25,6 +25,7 @@ session_secure_start();
         <title>Member Report</title>
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
+         <link rel="stylesheet" type="text/css" href="/main.css">
     </head>
     <body>
         <?php

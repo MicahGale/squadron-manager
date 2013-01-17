@@ -16,6 +16,13 @@
  *
  * 
  */
+/*inputs
+ * $_GET
+ * redirect= the url to redirect as the whole url minus domain
+ * field = the target field in the redirect so can have multi search
+ * $_POST
+ * input the search input
+ */
 include("projectFunctions.php");
 session_secure_start();
 $ident=  Connect( $_SESSION['member']->getCapid(), $_SESSION['password'],'localhost');

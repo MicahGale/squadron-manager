@@ -1,5 +1,8 @@
 <?php
-/* * Copyright 2013 Micah Gale
+/**
+ * Creates a downloadable csv of the pt testing sign-up
+ */
+/*  Copyright 2013 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -16,20 +19,11 @@
  *
  * 
  */
-require("projectFunctions.php");
+require('projectFunctions.php');
 session_secure_start();
+header("Content-type: text/csv");
+$now =new DateTime;
+header("Content-Disposition: attachment; filename=cpft_test_".$now->format(EVENT_CODE_DATE).".csv");
+header("Pragma: no-cache");
+header("Expires: 0");
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="/patch.ico">
-        <title>Enter Promotion Board</title>
-    </head>
-    <body>
-        <?php
-        require("squadManHeader.php");
-        require("squadManFooter.php");
-        ?>
-    </body>
-</html>
