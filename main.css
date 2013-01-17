@@ -1,0 +1,16 @@
+/* 
+    Document   : main
+    Created on : Jan 12, 2013, 3:02:04 PM
+    Author     : micah
+    Description:
+        Purpose of the stylesheet follows.
+*/
+body {color:black;}
+td { border-color: black; }
+p.P {color:green}
+p.I {color:orange}
+p.F {color:red}
+td.P {color:green}
+td.I {color:orange}
+td.F {color:red}
+

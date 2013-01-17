@@ -25,17 +25,8 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css">
         <title>Promotion Sign-Up</title>
-        <style>
-            body {color:black;}
-            td { border-color: black; }
-            p.P {color:green}
-            p.I {color:orange}
-            p.F {color:red}
-            td.P {color:green}
-            td.I {color:orange}
-            td.F {color:red}
-        </style>
     </head>
     <body>
         <?php

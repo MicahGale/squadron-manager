@@ -52,12 +52,25 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
                         ?>
                         <input type="submit" name="filter" value="filter"/><br><br>
-                        <input type="submit" name="save" value="save"/>
+                        <input type="submit" name="save" value="save"/><br><br>
+                        <input type="submit" name="check" value="Check percentages"/>
                     <table border="1" cellpadding="0">
                         <tr>
-                            <th>Member</th><th>Test type</th><th>Test</th><th>Passed</th><th>Percentage (optional)<a href="/help/inputPercentages.php" target="_blank">?</a></th><th>On Eservices</th><th>Remove</th>
+                            <th>Member</th><th>Test type</th><th>Test</th><th>Passed</th><th>Percentage<a href="/help/inputPercentages.php" target="_blank">?</a></th><th>On Eservices</th><th>Remove</th>
                         </tr>
                         <?php
+                        if(isset($_POST['check'])) {           //if checking percentage
+                            $results=$_SESSION['results'];
+                            for($i=0;$i<count($results);$i++) {
+                                if(isset($_POST["percentage$i"])) {
+                                if(is_numeric(parsePercent($i, $_POST, $results[$i]['PASSING_PERCENT'])))
+                                        $percent[$i]=true;
+                                } else {
+                                    $percent[$i]=false;
+                                }
+                                $input[$i]=$_POST["percentage$i"];
+                            }
+                        }
                         if(isset($_POST['save'])) {                       //if saved is requested then save it
                             $results=$_SESSION['results'];
                             $query="INSERT INTO REQUIREMENTS_PASSED(CAPID,ACHIEV_CODE,REQUIREMENT_TYPE,TEXT_SET,PASSED_DATE,ON_ESERVICES,PERCENTAGE)
@@ -145,8 +158,14 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                             $member=new member($results[$i]["CAPID"],1, $ident);
                             echo $member->link_report();
                             echo "</td><td>".$results[$i]['TYPE_NAME']."</td><td>".$results[$i]['TEST_NAME']."</td>";
-                            echo '<td><input type="checkbox" name="passed[]" value="'.$i.'"/></td>';
-                            echo '<td><input type="text" size="1" maxlength="10" name="percentage'.$i.'"/></td>';
+                            echo '<td><input type="checkbox" name="passed[]" value="'.$i.'" ';
+                            if($percent[$i])
+                                echo "checked";
+                                echo'/></td>';
+                            echo '<td><input type="text" size="1" maxlength="10" name="percentage'.$i.'"';
+                            if(isset($input[$i]))
+                                echo 'value="'.$input[$i].'"';
+                            echo'/></td>';
                             echo '<td><input type="checkbox" name="eservices[]" value="'.$i.'"/></td>';
                             echo '<td><input type="checkbox" name="remove[]" value="'.$i."\"/></td></tr>\n";
                         }

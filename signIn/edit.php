@@ -14,11 +14,10 @@
             auditLog($_SERVER["REMOTE_ADDR"],"DC");
             echo"<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=../signIn/?CAPID=\">";
         }
-        ######################################TODO load all dates################################################# 
        $ident =Connect( 'Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
         $member=$_SESSION["member"];
        $member->init(4,$ident);
-        $member->editInformation($ident);
+        $member->editInformation("/signIn/finishEdit.php",$ident);
         ?>                 
         <a href="../index.php">go Home</a><br/>
         <a href="promotionReport.php">View Your Promotion Progress</a> <br/>
