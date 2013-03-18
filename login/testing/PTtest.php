@@ -168,6 +168,25 @@ if(isset($_POST['search'])) {  //if searched then save it
             $finfo=  finfo_open(FILEINFO_MIME_TYPE);
             echo finfo_file($finfo, $_FILES['file']['tmp_name']);
             finfo_close($finfo);
+            $locat = cleanUploadFile('file',5*1024,'/var/upload/csv', 'text/csv');
+            if(($handle=fopen($locat,'r'))!==false) {              //opens the file
+                while(($row=  fgetcsv($handle, 1000))!=false) {   //parses one row at a time
+                    if(!isset($columns)) {  //if the columns aren't defined
+                        if($row[0]=='CAPID') {  //if the first cell is capid, then parse the columns 
+                            for($i=2;$i<count($row);$i++) {       //cycle through the headers
+                                $buffer=$row[$i];   
+                                for($j=0;$j<count($header);$j++) {
+                                    if(str_replace(' ','', $buffer)==str_replace(" ", '', $header[$j]['TEST_NAME'])) {  //compares it to the test name without space
+                                        $columns[$i-2]=$header[$j]['TEST_CODE'];
+                                    }
+                                }
+                            }
+                        } else {
+                            
+                        }
+                    }
+                }
+            }
         }
         require("squadManFooter.php");
         ?>
