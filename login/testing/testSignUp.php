@@ -142,10 +142,11 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                                 unset($_SESSION['filter']);
                             }
                         }
-                        $query ='SELECT A.CAPID, C.TYPE_NAME,CONCAT(A.ACHIEV_CODE," - ",B.NAME) AS TEST_NAME, A.ACHIEV_CODE, A.REQUIRE_TYPE, B.PASSING_PERCENT
-                            FROM  REQUIREMENT_TYPE C, TESTING_SIGN_UP A
-                            LEFT JOIN  PROMOTION_REQUIREMENT B ON A.ACHIEV_CODE=B.ACHIEV_CODE AND A.REQUIRE_TYPE=B.REQUIREMENT_TYPE
-                            WHERE C.TYPE_CODE=A.REQUIRE_TYPE
+                        $query ='SELECT A.CAPID, C.TYPE_NAME,CONCAT(A.REQUIRE_TYPE," - ",B.NAME) AS TEST_NAME, E.ACHIEV_CODE, A.REQUIRE_TYPE, B.PASSING_PERCENT
+                            FROM  REQUIREMENT_TYPE C, TESTING_SIGN_UP A, PROMOTION_REQUIREMENT B, MEMBER D, ACHIEVEMENT E
+                            WHERE D.CAPID=A.CAPID AND E.ACHIEV_CODE=D.ACHIEVEMENT
+                            AND E.NEXT_ACHIEV=B.ACHIEV_CODE AND A.REQUIRE_TYPE=B.REQUIREMENT_TYPE
+                            AND C.TYPE_CODE=A.REQUIRE_TYPE
                             AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\',\'PB\')';
                         if(isset($_SESSION['filter'])) {
                             $query.=" AND A.REQUIRE_TYPE='".$_SESSION['filter']."'";  //if there's a filter then apply it

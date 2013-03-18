@@ -25,7 +25,9 @@
  */
 /*
  * **********************FOR v. .10*****************************
- * TODO create a pt test checker allow pt category waiver
+ * TODO create an image security file
+ * TODO create warning system
+ * TODO create a pt test checker
  * TODO ban terminated members
  * TODO create testing controls and entering add pt testing hold 
  * TODO consider cadet oath and grooming standards
@@ -52,11 +54,16 @@
  * TODO add statistics esp. for attendance
  * TODO use css  
  */
+/*Unix specific functions
+ * cleanUploadFile-path delimeter /
+ * 
+ */
 /*
  *Function to change to port to different DBMS
  * CleanInputInt-sql escape function
  * CleanInputString -''
  * cleanInputDate   -''
+ * cleanUploadFile -''
  * Connect
  * Query
  * Result
@@ -77,6 +84,8 @@
  define("PHP_TO_MYSQL_FORMAT","Y-m-d");   //how to format to insert into mysql
  define( "SQL_DATE_FORMAT", "%d-%m-%Y");  //php display except at mysql level
  define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
+ define("CPFT_RUNNING_REQ",1);            //the amount of running events that must be passed
+ define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
 function auditLog($ip, $type) {
     $time = date('o-m-d H:i:s');
     $ident= Connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
@@ -360,6 +369,66 @@ function cleanInputDate($input, $regex, $length, $fieldName) {                  
         }
     }
     return $clean;
+}
+/**A function to verify uploaded files. 
+ * 
+ * This verifies the proper data type, and that file was uploaded.
+ *   Checks for malicious code. Saves the file in the specified 
+ * directory with a new name, a md5hash and the timestamp. It also will handle
+ * any upload errors 
+ * 
+ * @param String $index the index for the file in the $_FILES array
+ * @param int $maxSize the maximum size of the file in bytes
+ * @param String $saveDir the directory to save the file in
+ * @param String $MIME_TYPE the mime type of the accepted file type
+ * @return String the URL to the saved file or false if there was an error or attack
+ */
+function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
+    $file = $_FILES[$index];         //get a buffer var
+    $time=  auditLog($_SERVER['REMOTE_ADDR'], 'UF');    //log the file upload
+    auditDump($time,"Uploaded By", $_SESSION['member']->getCapid());  //log who uploaded it
+    $ext=  end(split(".",$file['name']));   //get the extension
+    $allowed_ext=end(split("/",$MIME_TYPE));  //get the allowed type
+    $hash= md5_file($file['tmp_name']);
+    $now=new DateTime();
+    $locat=$saveDir.'/'.$hash.'_'.$now->format(EVENT_CODE_DATE).".".$ext;
+    if(!move_uploaded_file($file['tmp_name'],$locat)) { //try to move the file to the location                      // if wasn't uploaded
+        $error=  auditLog($_SERVER['REMOTE_ADDR'],'FA');
+        auditDump($error, 'reffer to', $time);
+        auditDump($error,'type','not uploaded');
+        auditDump($error,'File path', $file['tmp_name']);
+        echo '<p style="color:red">File must be uploaded.</p>';
+        return false;
+    }
+    $link=  mysqli_connect();          //store the location of the file 
+    auditDump($time,"location", mysqli_escape_string($link,$locat));
+    if($file['error']!=0) {        //if there was an error with the upload
+        $error=  auditLog($_SERVER['REMOTE_ADDR'],'FR');
+        auditDump($error, 'reffer to', $time);
+        auditDump($error, 'error code', $file['error']);  
+        echo '<p style="color:red">There was an error uploading your file</p>';
+        return false;
+    }
+    if($file['size']>$maxSize) {
+        $error=  auditLog($_SERVER['REMOTE_ADDR'],'FM');
+        auditDump($error, "Reffer to:", $time);
+        auditDump($error, "actual Size", $file['size']);
+        auditDump($error, "field", $index);
+        auditDump($error, 'name', $file['name']);
+        echo '<p style="color:red">Maximum upload Size is:'.($maxSize/1024)."kb. Upload was: ".($file['size']/1024)."kb</p>";
+        return false;
+    }
+    $finfo=  finfo_open(FILEINFO_MIME_TYPE);   //gets the file type by header bits
+    $header=  finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    if($file['type']!=$MIME_TYPE||($allowed_ext!='*'&&$ext!=$allowed_ext)) {  //checks that the extension is the proper type
+        $error=  auditLog($_SERVER['REMOTE_ADDR'],'FT');
+        auditDump($error,'reffer to',$time);
+        auditDump($error,'extension', $ext);
+        return false;
+    }
+    return $locat;
+    //TODO finish using header verification
 }
 function create_AES_256_key($password, $td) {
     $ks = mcrypt_enc_get_key_size($td);                    //gets key size
@@ -857,6 +926,65 @@ function parsePercent($append, array $inputs, $passing) {
     } else {
         return round($percent,2);
     }
+}
+/** Checks if the tester passed the CPFT
+ * 
+ * @param array $requirements an array from retrieveCPFTrequire 
+ * @param array $actual an array of the actual scores
+ * @param ident  the database connection
+ * @return true iff they passed, false if otherwise
+ */
+function verifyCPFT($ident, array $requirements, array $actual) {
+    $query ="SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=TRUE";  //gets the tests that are running
+    $running =  allResults(Query($query, $ident));
+    $query = "SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=FALSE"; //gets non-running events
+    $non_running=  allResults(Query($query, $ident));
+    $counter=0;
+    $running_passed=false;
+    for($i=0;$i<count($running);$i++) {          //check if passed running element
+        $buffer=$running[$i]['TEST_CODE'];
+        if($buffer=='MR'&&is_numeric($actual[$buffer])) {
+            $actual[$buffer]=  parseMinutes($actual[$buffer]);   //if it's a mile rule then convert it to decimal
+        }
+        if($actual[$buffer]>=$requirements[$buffer])
+            $counter++;
+        if($buffer=='RS'&&$actual[$buffer]<=$requirements[$buffer])
+            $counter++;
+        if($counter>=CPFT_RUNNING_REQ) {          //if passed the running req say so then break
+            $running_passed=true;
+            break;
+        }
+    }
+    $counter=0;
+    for($i=0;$i<count($non_running);$i++) {         //check non-running events
+        $buffer=$non_running[$i]['TEST_CODE'];
+        if($actual[$buffer]>=$requirements[$buffer]) {
+            $counter++;
+        }
+        if($counter>=CPFT_OTHER_REQ) {
+            return true;
+        }
+    }
+    return false;
+}
+/**Converts decimal form of minutes to mm:ss
+ * 
+ * @param type $input the decimal form of the minutes
+ */
+function minutesFromDecimal($input) {
+    $minutes=round($input,0,PHP_ROUND_HALF_DOWN);
+    $seconds=round(($input-$minutes)*60);  //create the seconds
+    return $minutes.":".$seconds;
+}
+/**Parses mm:ss as a decimal of minutes
+ * 
+ * @param type $input
+ */
+function parseMinutes($input) {
+    $exploded=  explode(":", $input);
+    $minute=$exploded[0];
+    $seconds=$exploded[1];
+    return $minute+$seconds/60;
 }
 class member {
     private $capid;
@@ -1721,6 +1849,53 @@ class member {
                 return false;
         }
         return true;   //if found nothing then
+    }
+    /**gets the cpft requirements for the member
+     * 
+     * @param type $ident the database connection
+     * @param type $capid the capid for the member
+     * @return an array of requirements the key is the test code
+     */
+    function retrieveCPFTrequire($ident) {
+        $query="SELECT FLOOR(DATEDIFF(CURDATE(),DATE_OF_BIRTH)/365.25) as AGE, ACHIEV_NUM, PHASE, GENDER
+            FROM MEMBER, ACHIEVEMENT
+            WHERE CAPID='".$this->capid."'
+            AND ACHIEVEMENT=ACHIEV_CODE";
+        $age = allResults(Query($query, $ident));   //get the cadet's age
+        if(count($age)>0) {
+            $gender=$age[0]['GENDER'];
+            $phase=$age[0]['PHASE'];
+            $achiev=$age[0]['ACHIEV_NUM'];
+            $age=$age[0]['AGE'];
+            if($age>17) {  //if older than 17 say it's 17
+                $age=17;
+            }
+        }
+        $query ="SELECT B.ACHIEV_NUM as START, C.ACHIEV_NUM as END, A.TEST_TYPE, A.REQUIREMENT
+            FROM CPFT_REQUIREMENTS A, ACHIEVEMENT B, ACHIEVEMENT C
+            WHERE START_ACHIEV=B.ACHIEV_CODE
+            AND END_ACHIEV=C.ACHIEV_CODE
+            AND A.AGE='$age' AND A.PHASE='$phase' and A.GENDER='$gender'";
+        $require=  allResults(Query($query, $ident));             //get requirements
+        $return=array();
+        if(count($require)>0) {  //
+            if($require[0]['START']!=null) {  //if more than 1 set per phase
+                for($i=0;$i<count($require);$i++) {
+                    if($require[$i]['START']<=$achiev&&$require[$i]['END']>=$achiev) { //if in range 
+                        $start=$require[$i]['START'];
+                         $query ="SELECT A.TEST_TYPE, A.REQUIREMENT
+                            FROM CPFT_REQUIREMENTS A, ACHIEVEMENT B
+                            WHERE B.ACHIEV_CODE=A.START_ACHIEV
+                            AND A.AGE='$age' AND A.PHASE='$phase' and A.GENDER='$gender' AND B.ACHIEV_NUM='$start'";
+                        $require=  allResults(Query($query, $ident));             //get requirements
+                    }
+                }
+            }
+            for($i=0;$i<count($require);$i++) {  //reorganizes the info and return it
+                $return[$require[$i]['TEST_TYPE']]=$require[$i]['REQUIREMENT'];
+            }
+        }
+        return $return;
     }
 }
 class unit {

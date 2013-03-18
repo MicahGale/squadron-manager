@@ -37,7 +37,12 @@ VALUES ('DC','Page direct call'),
         ('ER','Error with DB'),
         ('SH','Session Hijacking'),
         ('KS','Killed a Session'),
-        ('EX','php exception');
+        ('EX','php exception'),
+        ('UF','File Upload'),
+        ('FM','File upload exceeded max. size'),
+        ('FT','File Upload of improper type'),
+        ('FA','File upload attack'),
+        ('FR','File upload error');
 ################INSERT PHASES ############################
 INSERT INTO PHASES (PHASE_NUM, PHASE_NAME, MEMBER_TYPE)
 VALUES (1,'The Learning Phase','C'),
@@ -163,7 +168,8 @@ VALUES('member/approve.php','member/finalApprove.php'),
         ('discipline/details.php','member/report.php'),
         ('attendance/event.php','member/report.php'),
         ('testing/testSignUp.php','member/report.php'),
-        ('testing/promotionSign.php','member/report.php');
+        ('testing/promotionSign.php','member/report.php'),
+        ('testing/PTtest.php','testing/ptCSV.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),
