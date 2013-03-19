@@ -67,6 +67,15 @@ if(isset($_POST['search'])) {  //if searched then save it
             bind($insert,"sd", array($header[$i]['TEST_CODE'],$actual[$i] ));
             execute($insert);
         }
+        $_SESSION['achiev']=  cleanInputString($_SESSION['achiev'], 5,'achievement', false);
+        $buffer->init(2, $ident); //get the text set
+        if(isset($_POST['waiver'])&&$_POST['waiver']=='waive')
+            $waive="TRUE";
+        else
+            $waive="FALSE";
+        $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIRE_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICE, WAIVER)
+            VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."',false,'$waive')";
+        Query($query, $ident);
         unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev']);
         header("refresh:0;url=/login/testing/PTtest.php");
         exit;
@@ -115,7 +124,7 @@ if(isset($_POST['search'])) {  //if searched then save it
                 $date=$_SESSION['date'];
             enterDate(true,null,$date);
             ?>
-        <br> <br><input type="checkbox" name="waiver"/> Category II,III,IV CPFT waiver<br><br><table border="1">
+        <br> <br><input type="checkbox" name="waiver" value="waive"/> Category II,III,IV CPFT waiver<br><br><table border="1">
             <?php
             echo "<tr>";
             for($i=0;$i<count($header);$i++) {
@@ -164,10 +173,6 @@ if(isset($_POST['search'])) {  //if searched then save it
             <input type="submit" value="upload"/>
             <?php
         } else if(isset($_FILES['file'])) {
-            print_r($_FILES);
-            $finfo=  finfo_open(FILEINFO_MIME_TYPE);
-            echo finfo_file($finfo, $_FILES['file']['tmp_name']);
-            finfo_close($finfo);
             $locat = cleanUploadFile('file',5*1024,'/var/upload/csv', 'text/csv');
             if(($handle=fopen($locat,'r'))!==false) {              //opens the file
                 while(($row=  fgetcsv($handle, 1000))!=false) {   //parses one row at a time
@@ -182,7 +187,9 @@ if(isset($_POST['search'])) {  //if searched then save it
                                 }
                             }
                         } else {
-                            
+                            if(strpos($row[0],"--"==false)) {   //if the row doesn't start with --- then parse the input
+                                
+                            }
                         }
                     }
                 }
