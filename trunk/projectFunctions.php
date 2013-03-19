@@ -27,11 +27,11 @@
  * **********************FOR v. .10*****************************
  * TODO create an image security file
  * TODO create warning system
- * TODO create a pt test checker
  * TODO ban terminated members
- * TODO create testing controls and entering add pt testing hold 
+ * TODO create testing controls and entering add pt testing hold
+ * TODO create notifications
  * TODO consider cadet oath and grooming standards
- * TODO add admin to add other users
+ * TODO add admin to add other users and grant privelidges
  * TODO create page for units
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
@@ -387,12 +387,14 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
     $file = $_FILES[$index];         //get a buffer var
     $time=  auditLog($_SERVER['REMOTE_ADDR'], 'UF');    //log the file upload
     auditDump($time,"Uploaded By", $_SESSION['member']->getCapid());  //log who uploaded it
-    $ext=  end(split(".",$file['name']));   //get the extension
-    $allowed_ext=end(split("/",$MIME_TYPE));  //get the allowed type
+    $buffer=explode(".",$file['name']);
+    $ext=  end($buffer);   //get the extension
+    $buffer=explode('/',$MIME_TYPE);
+    $allowed_ext=end($buffer);  //get the allowed type
     $hash= md5_file($file['tmp_name']);
     $now=new DateTime();
     $locat=$saveDir.'/'.$hash.'_'.$now->format(EVENT_CODE_DATE).".".$ext;
-    if(!move_uploaded_file($file['tmp_name'],$locat)) { //try to move the file to the location                      // if wasn't uploaded
+    if(!move_uploaded_file($file['tmp_name'],$locat)) { //try to move the file to the location                      // if wasn't uploade
         $error=  auditLog($_SERVER['REMOTE_ADDR'],'FA');
         auditDump($error, 'reffer to', $time);
         auditDump($error,'type','not uploaded');
@@ -419,16 +421,19 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
         return false;
     }
     $finfo=  finfo_open(FILEINFO_MIME_TYPE);   //gets the file type by header bits
-    $header=  finfo_file($finfo, $file['tmp_name']);
+    $header=  finfo_file($finfo, $locat);
     finfo_close($finfo);
-    if($file['type']!=$MIME_TYPE||($allowed_ext!='*'&&$ext!=$allowed_ext)) {  //checks that the extension is the proper type
+    if($header==="text/plain"&& strpos($MIME_TYPE,'text/')!==false) {  //if the upload was text, and it was supposed to be a text derivative
+        $header=$MIME_TYPE;
+    }
+    if($file['type']!=$MIME_TYPE||($allowed_ext!='*'&&$ext!=$allowed_ext)||$header!=$MIME_TYPE) {  //checks that the extension is the proper type and that the actual data is the right type
         $error=  auditLog($_SERVER['REMOTE_ADDR'],'FT');
         auditDump($error,'reffer to',$time);
         auditDump($error,'extension', $ext);
+        echo '<p style="color:red">Upload must be: '.$MIME_TYPE." file type</p>";
         return false;
     }
     return $locat;
-    //TODO finish using header verification
 }
 function create_AES_256_key($password, $td) {
     $ks = mcrypt_enc_get_key_size($td);                    //gets key size
@@ -972,7 +977,7 @@ function verifyCPFT($ident, array $requirements, array $actual) {
  * @param type $input the decimal form of the minutes
  */
 function minutesFromDecimal($input) {
-    $minutes=round($input,0,PHP_ROUND_HALF_DOWN);
+    $minutes=(int)($input);
     $seconds=round(($input-$minutes)*60);  //create the seconds
     return $minutes.":".$seconds;
 }
