@@ -174,7 +174,8 @@ if(isset($_POST['search'])) {  //if searched then save it
             <?php
         } else if(isset($_FILES['file'])) {
             $locat = cleanUploadFile('file',5*1024,'/var/upload/csv', 'text/csv');
-            if(($handle=fopen($locat,'r'))!==false) {              //opens the file
+            if($locat!==false&&($handle=fopen($locat,'r'))!==false) {              //opens the file
+                $parse=array(array());                            //the array to hold it
                 while(($row=  fgetcsv($handle, 1000))!=false) {   //parses one row at a time
                     if(!isset($columns)) {  //if the columns aren't defined
                         if($row[0]=='CAPID') {  //if the first cell is capid, then parse the columns 
@@ -188,7 +189,18 @@ if(isset($_POST['search'])) {  //if searched then save it
                             }
                         } else {
                             if(strpos($row[0],"--"==false)) {   //if the row doesn't start with --- then parse the input
-                                
+                                $capid=  cleanInputInt($row[0], 6,'CAPID from CSV');
+                                $parse[$capid]['member']=new member($capid,1,$ident);
+                                $buffer=$parse[$capid]['member'];
+                                if($row[1]==(getName_Last().", ".$buffer->getName_first())) {  //check if the proper name in the row
+                                    $parse[$capid]['name']="C";
+                                } else {
+                                    $parse[$capid]['name']='I';
+                                }
+                                for($i=0;i<count($columns);$i++) {   //parse the test results
+                                    $parse[$capid]['actual'][$columns[$i]]=  cleanInputInt($row[$i+2], strlen($row[$i+2]),"Test input for:".$capid." for: ".$columns[$i]);  //parses the info
+                                }
+                                $standard=$buffer->retrieveCPFTrequire($ident);  //get the standards they need
                             }
                         }
                     }
