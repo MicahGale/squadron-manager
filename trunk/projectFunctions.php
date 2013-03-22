@@ -1861,7 +1861,7 @@ class member {
      * @param type $capid the capid for the member
      * @return an array of requirements the key is the test code
      */
-    function retrieveCPFTrequire($ident) {
+    function retrieveCPFTrequire($ident, DateTime $date= new DateTime() ) {
         $query="SELECT FLOOR(DATEDIFF(CURDATE(),DATE_OF_BIRTH)/365.25) as AGE, ACHIEV_NUM, PHASE, GENDER
             FROM MEMBER, ACHIEVEMENT
             WHERE CAPID='".$this->capid."'
