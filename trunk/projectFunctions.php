@@ -25,7 +25,8 @@
  */
 /*
  * **********************FOR v. .10*****************************
- * TODO create an image security file
+ * TODO create an image security file, make sure ../ is banned for pics and uploads ban _get session fixation
+ * TODO add user to auditlog
  * TODO create warning system
  * TODO ban terminated members
  * TODO create testing controls and entering add pt testing hold
@@ -33,6 +34,7 @@
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
  * TODO create page for units
+ * TODO create reports: emergency contact info, an eservices
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO allow to change password
@@ -46,7 +48,7 @@
  * TODO make main page redirect to home if signed-in
  * 
  * *******************FOR LATER******************************
- * 
+ * TODO have javascript resize function
  * TODO debug commanders and add chain of command
  * TODO  add scheduling
  * TODO add edit member and add picture
@@ -310,10 +312,10 @@ function bind(mysqli_stmt $ident,$types, array $bind) {
     $pass = array_merge(array($ident,$types), $buffer);
     call_user_func_array("mysqli_stmt_bind_param", $pass);
 }
-function execute(mysqli_stmt $ident) {
-    if(!($success=mysqli_stmt_execute($ident)))                         //if there was an error with the execution
+function execute(mysqli_stmt $ident) { 
+    if(!($success=mysqli_stmt_execute($ident))) {                       //if there was an error with the execution
         reportDbError (mysqli_stmt_errno ($ident), mysqli_stmt_error($ident));
-    else {
+    } else {
         if(($result=mysqli_stmt_get_result($ident))!=false) {
             return $result;
         }
@@ -948,12 +950,12 @@ function verifyCPFT($ident, array $requirements, array $actual) {
     $running_passed=false;
     for($i=0;$i<count($running);$i++) {          //check if passed running element
         $buffer=$running[$i]['TEST_CODE'];
-        if($buffer=='MR'&&is_numeric($actual[$buffer])) {
+        if($buffer=='MR'&&!is_numeric($actual[$buffer])) {
             $actual[$buffer]=  parseMinutes($actual[$buffer]);   //if it's a mile rule then convert it to decimal
         }
-        if($actual[$buffer]>=$requirements[$buffer])
+        if(isset($actual[$buffer],$requirements[$buffer])&&$actual[$buffer]>=$requirements[$buffer])
             $counter++;
-        if($buffer=='RS'&&$actual[$buffer]<=$requirements[$buffer])
+        if($buffer=='RS'&&isset($actual[$buffer],$requirements[$buffer])&&$actual[$buffer]<=$requirements[$buffer])
             $counter++;
         if($counter>=CPFT_RUNNING_REQ) {          //if passed the running req say so then break
             $running_passed=true;
@@ -963,7 +965,7 @@ function verifyCPFT($ident, array $requirements, array $actual) {
     $counter=0;
     for($i=0;$i<count($non_running);$i++) {         //check non-running events
         $buffer=$non_running[$i]['TEST_CODE'];
-        if($actual[$buffer]>=$requirements[$buffer]) {
+        if(isset($actual[$buffer],$requirements[$buffer])&&$actual[$buffer]>=$requirements[$buffer]) {
             $counter++;
         }
         if($counter>=CPFT_OTHER_REQ) {
@@ -1861,46 +1863,61 @@ class member {
      * @param type $capid the capid for the member
      * @return an array of requirements the key is the test code
      */
-    function retrieveCPFTrequire($ident, DateTime $date= new DateTime() ) {
-        $query="SELECT FLOOR(DATEDIFF(CURDATE(),DATE_OF_BIRTH)/365.25) as AGE, ACHIEV_NUM, PHASE, GENDER
-            FROM MEMBER, ACHIEVEMENT
-            WHERE CAPID='".$this->capid."'
-            AND ACHIEVEMENT=ACHIEV_CODE";
-        $age = allResults(Query($query, $ident));   //get the cadet's age
-        if(count($age)>0) {
-            $gender=$age[0]['GENDER'];
-            $phase=$age[0]['PHASE'];
-            $achiev=$age[0]['ACHIEV_NUM'];
-            $age=$age[0]['AGE'];
-            if($age>17) {  //if older than 17 say it's 17
-                $age=17;
-            }
-        }
-        $query ="SELECT B.ACHIEV_NUM as START, C.ACHIEV_NUM as END, A.TEST_TYPE, A.REQUIREMENT
-            FROM CPFT_REQUIREMENTS A, ACHIEVEMENT B, ACHIEVEMENT C
+    function retrieveCPFTrequire($ident, DateTime $date= null) {
+        $age=  $this->get_age($ident,$date);
+        $return['age']=$age;
+        if($age>17)       //round to 17
+            $age=17;
+        $query ="SELECT  A.TEST_TYPE, A.REQUIREMENT
+            FROM ACHIEVEMENT B, ACHIEVEMENT D, CPFT_REQUIREMENTS A
+            LEFT JOIN ACHIEVEMENT C ON END_ACHIEV=C.ACHIEV_CODE
             WHERE START_ACHIEV=B.ACHIEV_CODE
-            AND END_ACHIEV=C.ACHIEV_CODE
-            AND A.AGE='$age' AND A.PHASE='$phase' and A.GENDER='$gender'";
+            AND D.ACHIEV_CODE='".$this->achievement."'
+            AND A.AGE='$age' AND A.PHASE='".$this->get_phase($ident)."' and A.GENDER='".$this->gender."'
+            and (D.ACHIEV_NUM BETWEEN B.ACHIEV_NUM AND C.ACHIEV_NUM
+                OR (D.ACHIEV_NUM>=B.ACHIEV_NUM AND END_ACHIEV IS NULL))";
         $require=  allResults(Query($query, $ident));             //get requirements
-        $return=array();
-        if(count($require)>0) {  //
-            if($require[0]['START']!=null) {  //if more than 1 set per phase
-                for($i=0;$i<count($require);$i++) {
-                    if($require[$i]['START']<=$achiev&&$require[$i]['END']>=$achiev) { //if in range 
-                        $start=$require[$i]['START'];
-                         $query ="SELECT A.TEST_TYPE, A.REQUIREMENT
-                            FROM CPFT_REQUIREMENTS A, ACHIEVEMENT B
-                            WHERE B.ACHIEV_CODE=A.START_ACHIEV
-                            AND A.AGE='$age' AND A.PHASE='$phase' and A.GENDER='$gender' AND B.ACHIEV_NUM='$start'";
-                        $require=  allResults(Query($query, $ident));             //get requirements
-                    }
-                }
-            }
-            for($i=0;$i<count($require);$i++) {  //reorganizes the info and return it
-                $return[$require[$i]['TEST_TYPE']]=$require[$i]['REQUIREMENT'];
-            }
+        for($i=0;$i<count($require);$i++) {  //reorganizes the info and return it
+            $return[$require[$i]['TEST_TYPE']]=  floatval($require[$i]['REQUIREMENT']);
         }
         return $return;
+    }
+    function get_age($ident, DateTime $date=null) {
+        if($date==null) {  //if the date isn't specified assume today
+            $date="CURDATE()";
+        } else {             //else use the date specified
+            $date="'".($date->format(PHP_TO_MYSQL_FORMAT))."'";
+        }
+        $query="SELECT FLOOR(DATEDIFF($date,DATE_OF_BIRTH)/365.25) as AGE from MEMBER
+            WHERE CAPID='".$this->capid."'";
+        $age = allResults(Query($query, $ident));   //get the cadet's age
+        if(count($age>0))
+            return floatval ($age[0]['AGE']);
+        return false;
+    }
+    function get_phase($ident) {
+        $query = "SELECT PHASE FROM ACHIEVEMENT
+            WHERE ACHIEV_CODE='".$this->achievement."'";
+        $results=  allResults(Query($query, $ident));
+        if(count($results)>0)
+            return $results[0]['PHASE'];
+        return false;
+    }
+    function get_achievement() {
+        return $this->achievement;
+    }
+    /**
+     * 
+     * @param type $ident the ident for the 
+     * @return String the next achievement code false on an error
+     */
+    function get_next_achiev($ident) {
+        $query="SELECT NEXT_ACHIEV FROM ACHIEVEMENT
+            WHERE ACHIEV_CODE='".$this->achievement."'";
+        $results=  allResults(Query($query, $ident));
+        if(count($results)>0)
+            return $results[0]['NEXT_ACHIEV'];
+        return false;
     }
 }
 class unit {
