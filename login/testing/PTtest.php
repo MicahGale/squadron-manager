@@ -1,8 +1,27 @@
 <?php
-/**Handles all pt testing tasks, except for handling uploaded csv pt test files
+/**
+ * Handles all pt testing tasks, except for handling uploaded csv pt test files
  * 
  * This will handle viewing PT test sign-ups, creating PT test csv files, and entering individual PT tests
+ * 
+ * Input
+ * $_GET
+ * capid the individual who the test is for
+ * achiev the code they are testing for
+ * multi 0 is for individual 1 is for testing signup
+ * upload 0 if uploading files 1 when the file has been uploaded
+ * 
+ * $_POST
+ * capid the person (text)
+ * *TEST_CODE* the input for the CPFT test (text)
+ * search clicking on search for jumping to member search (submit)
+ * save saves the input (submit)
+ * *capid* the pass/fail of the member pass=passed fail=failed (radio)
+ * waive[$i]=*capid* waiving the cpft for the capid (checkbox)
+ * 
+ * 
  * @package Squadron-manager
+ * @copyright (c) 2013, Micah Gale
  */
 /*  Copyright 2013 Micah Gale
  *
@@ -19,22 +38,6 @@
  * You should have received the GNU General Public License version 3 with this in GPL.txt
  * if not it is available at <http://www.gnu.org/licenses/gpl.txt>.
  *
- * 
- */
-/*Input
- * $_GET
- * capid the individual who the test is for
- * achiev the code they are testing for
- * multi 0 is for individual 1 is for testing signup
- * upload 0 if uploading files 1 when the file has been uploaded
- * 
- * $_POST
- * capid the person (text)
- * *TEST_CODE* the input for the CPFT test (text)
- * search clicking on search for jumping to member search (submit)
- * save saves the input (submit)
- * *capid* the pass/fail of the member pass=passed fail=failed (radio)
- * waive[$i]=*capid* waiving the cpft for the capid (checkbox)
  * 
  */
 require("projectFunctions.php");
@@ -231,7 +234,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             <input type="submit" value="upload"/>
             <?php
         } else if(isset($_FILES['file'])) {
-            $locat = cleanUploadFile('file',5*1024,'/var/upload/csv', 'text/csv');
+            $locat = cleanUploadFile('file',5*1024,CSV_SAVE_PATH, 'text/csv');
             if($locat!==false&&($handle=fopen($locat,'r'))!==false) {              //opens the file
                 $date=  parse_date_input($_POST);               //get the test date
                 $parse=array();

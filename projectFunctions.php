@@ -1,5 +1,6 @@
 <?php
-/**The main API file for the project
+/**
+ * The main API file for the project
  * 
  * All the APIs for the project.  This is never directly displayed, nor can,
  * but is included in the all the pages, and its functions are invoked by the 
@@ -27,6 +28,8 @@
  * **********************FOR v. .10*****************************
  * TODO create an image security file, make sure ../ is banned for pics and uploads ban _get session fixation
  * TODO add user to auditlog
+ * TODO enforce CAPR110-1 password policy
+ * TODO change subevent drop downs to checkboxes
  * TODO create warning system
  * TODO ban terminated members
  * TODO create testing controls and entering add pt testing hold
@@ -80,14 +83,21 @@
  * auditDump- query
  */
 /**
+ * @constant PHP_DATE_FORMAT 
+ * 
  * The date format to universally display the date
  */
  define("PHP_DATE_FORMAT","d M y");     //Date formats to use, default php display date
- define("PHP_TO_MYSQL_FORMAT","Y-m-d");   //how to format to insert into mysql
+ /**
+  * how to format to insert into mysql
+  */
+ define("PHP_TO_MYSQL_FORMAT","Y-m-d");   
  define( "SQL_DATE_FORMAT", "%d-%m-%Y");  //php display except at mysql level
  define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
  define("CPFT_RUNNING_REQ",1);            //the amount of running events that must be passed
  define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
+ define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
+ define('PROFILE_PATH',"/usr/share/www/profile");  //the path to the profile pictures stored outside document root
 function auditLog($ip, $type) {
     $time = date('o-m-d H:i:s');
     $ident= Connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
@@ -325,11 +335,24 @@ function execute(mysqli_stmt $ident) {
 function close_stmt(mysqli_stmt $stmt) {
     mysqli_stmt_close($stmt);                 //closes the prepared statement
 }
+/**
+ * CleanInputInt-cleans input number
+ * 
+ * This cleans input numbers against SQL injection, XSS, and remote Execution and file traversing.
+ * It uses the mysqli_real_escape_string htmlspecialchars, and escapshellcmd to do this.
+ * It also checks lenght, and parses it as a number to prevent other issues. Any issues and the event will be 
+ * logged along with the sanatized form of the input
+ * 
+ * This 
+ * @param String $input the raw Input
+ * @param Int $length the absolute length the number must be 
+ * @param String $fieldName the name of the input field used for logging
+ * @return float The Input Number parsed and cleaned as a floating point 
+ */
 function cleanInputInt($input, $length, $fieldName) {
     $link = mysqli_connect();
-    $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    $clean = escapeshellcmd(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
     if (strlen($clean) > $length || !is_numeric($clean) || $clean != $input) {
-        $badInput = true;
         $time = auditLog( $_SERVER['REMOTE_ADDR'], "SI");
         auditDump($time, $fieldName, $clean);
         echo "<font color=\"red\">$fieldName is not a valid number it must be $length digits long.</font><br>";
@@ -342,7 +365,7 @@ function cleanInputInt($input, $length, $fieldName) {
 }
 function cleanInputString($input, $length, $fieldName, $empty) {                      //clean and log numbers
     $link= mysqli_connect();
-    $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    $clean = escapeshellcmd(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
     if (strlen($clean) > $length || $clean != $input || $clean == "" || $clean == null) {
         if (strlen($clean) == 0&& $empty == false) {
             echo "<font color=\"red\"> $fieldName can not be empty</font><br>";
@@ -360,7 +383,7 @@ function cleanInputString($input, $length, $fieldName, $empty) {                
 }
 function cleanInputDate($input, $regex, $length, $fieldName) {                      //clean and log numbers
     $link = mysqli_connect();
-    $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    $clean = escapeshellarg(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
     if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean) != 1)) {
         echo "<font color=\"red\"> $fieldName is not a valid date.</font><br>";
         $time = auditLog($_SERVER['SCRIPT_NAME'], $_SERVER['REMOTE_ADDR'], 'SI');
@@ -372,7 +395,8 @@ function cleanInputDate($input, $regex, $length, $fieldName) {                  
     }
     return $clean;
 }
-/**A function to verify uploaded files. 
+/**
+ * A function to verify uploaded files. 
  * 
  * This verifies the proper data type, and that file was uploaded.
  *   Checks for malicious code. Saves the file in the specified 
@@ -817,7 +841,8 @@ function compareSignUp($a,$b) {    //compares the signups based on the number of
         return 0;
     return ($aCount < $bCount) ? 1 : -1;
 }
-/**Creates an input field to input promotion score, and date
+/**
+ * Creates an input field to input promotion score, and date
  * 
  * Displays input tags to get the input for entering a promotion requirement
  * passage.  This only creates the input, and does not parse or handle the input
@@ -854,6 +879,11 @@ function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null,
 }
 /**
  * Parse the input from the promotion sign-up and insert it
+ * 
+ * Inserts the promotion information into the SQL database.
+ * @param mysqli $ident The resource for a SQL connection
+ * @param array $input the input array to be inserted 
+ * @return Void
  */
 function parsePromoInput(mysqli $ident,array $input) {
     $approve=  prepare_statement($ident, "UPDATE PROMOTION_SIGN_UP SET APPROVED=?
@@ -895,7 +925,8 @@ function parsePromoInput(mysqli $ident,array $input) {
     close_stmt($update);
     close_stmt($deleteTest);
 }
-/**Parses percentage input
+/**
+ * Parses percentage input
  * 
  * @param type $append the appended stuff to post array
  * @param array $inputs the post array
@@ -934,7 +965,8 @@ function parsePercent($append, array $inputs, $passing) {
         return round($percent,2);
     }
 }
-/** Checks if the tester passed the CPFT
+/**
+ *  Checks if the tester passed the CPFT
  * 
  * @param array $requirements an array from retrieveCPFTrequire 
  * @param array $actual an array of the actual scores
@@ -974,18 +1006,22 @@ function verifyCPFT($ident, array $requirements, array $actual) {
     }
     return false;
 }
-/**Converts decimal form of minutes to mm:ss
+/**
+ * Converts decimal form of minutes to mm:ss
  * 
- * @param type $input the decimal form of the minutes
+ * @param Float $input the decimal form of the minutes
+ * @return String the minutes in mm:ss
  */
 function minutesFromDecimal($input) {
     $minutes=(int)($input);
     $seconds=round(($input-$minutes)*60);  //create the seconds
     return $minutes.":".$seconds;
 }
-/**Parses mm:ss as a decimal of minutes
+/**
+ * Parses mm:ss as a decimal of minutes
  * 
  * @param type $input
+ * @return float the $input as a decimal for of the time
  */
 function parseMinutes($input) {
     $exploded=  explode(":", $input);
