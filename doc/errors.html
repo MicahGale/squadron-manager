@@ -1,0 +1,1799 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>Squadron-Manager</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="css/template.css" rel="stylesheet" media="all">
+<script src="js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="js/bootstrap.js" type="text/javascript"></script><script src="js/template.js" type="text/javascript"></script><script src="js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="img/favicon.ico">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="index.html">Squadron-Manager</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Packages</a></li>
+<li><a href="packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+<li><a href="packages/Squadron-Manager.html"><i class="icon-folder-open"></i> Squadron-Manager</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">233</span></a></li>
+<li><a href="markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul><li>todo 
+                <span class="label label-info">14</span>
+</li></ul></a></li>
+<li><a href="deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4"><ul class="side-nav nav nav-list">
+<li class="nav-header">Filter type</li>
+<li><div class="btn-group type-filter" data-toggle="buttons-checkbox">
+<button class="btn critical">Critical</button><button class="btn error">Error</button><button class="btn notice">Notice</button>
+</div></li>
+<li class="nav-header">Navigation</li>
+<li><a href="#footer.php"><i class="icon-file"></i>footer.php</a></li>
+<li><a href="#header.php"><i class="icon-file"></i>header.php</a></li>
+<li><a href="#help/inputPercentages.php"><i class="icon-file"></i>help/inputPercentages.php</a></li>
+<li><a href="#help/CPFTcsv.php"><i class="icon-file"></i>help/CPFTcsv.php</a></li>
+<li><a href="#squadManFooter.php"><i class="icon-file"></i>squadManFooter.php</a></li>
+<li><a href="#regulations/index.php"><i class="icon-file"></i>regulations/index.php</a></li>
+<li><a href="#squadManHeader.php"><i class="icon-file"></i>squadManHeader.php</a></li>
+<li><a href="#login/attendance/add.php"><i class="icon-file"></i>login/attendance/add.php</a></li>
+<li><a href="#login/attendance/event.php"><i class="icon-file"></i>login/attendance/event.php</a></li>
+<li><a href="#login/attendance/new.php"><i class="icon-file"></i>login/attendance/new.php</a></li>
+<li><a href="#login/redirect.php"><i class="icon-file"></i>login/redirect.php</a></li>
+<li><a href="#login/testing/testSignUp.php"><i class="icon-file"></i>login/testing/testSignUp.php</a></li>
+<li><a href="#login/testing/promotionSign.php"><i class="icon-file"></i>login/testing/promotionSign.php</a></li>
+<li><a href="#login/testing/ptCSV.php"><i class="icon-file"></i>login/testing/ptCSV.php</a></li>
+<li><a href="#login/testing/promoBoard.php"><i class="icon-file"></i>login/testing/promoBoard.php</a></li>
+<li><a href="#login/discipline/details.php"><i class="icon-file"></i>login/discipline/details.php</a></li>
+<li><a href="#login/logout.php"><i class="icon-file"></i>login/logout.php</a></li>
+<li><a href="#login/member/approve.php"><i class="icon-file"></i>login/member/approve.php</a></li>
+<li><a href="#login/member/report.php"><i class="icon-file"></i>login/member/report.php</a></li>
+<li><a href="#login/member/search.php"><i class="icon-file"></i>login/member/search.php</a></li>
+<li><a href="#login/member/finalApprove.php"><i class="icon-file"></i>login/member/finalApprove.php</a></li>
+<li><a href="#login/index.php"><i class="icon-file"></i>login/index.php</a></li>
+<li><a href="#login/encrypt.php"><i class="icon-file"></i>login/encrypt.php</a></li>
+<li><a href="#login/reSignIn.php"><i class="icon-file"></i>login/reSignIn.php</a></li>
+<li><a href="#login/home.php"><i class="icon-file"></i>login/home.php</a></li>
+<li><a href="#authors.php"><i class="icon-file"></i>authors.php</a></li>
+<li><a href="#licensing.php"><i class="icon-file"></i>licensing.php</a></li>
+<li><a href="#visitor/finishVisit.php"><i class="icon-file"></i>visitor/finishVisit.php</a></li>
+<li><a href="#visitor/complete.php"><i class="icon-file"></i>visitor/complete.php</a></li>
+<li><a href="#visitor/visitor.php"><i class="icon-file"></i>visitor/visitor.php</a></li>
+<li><a href="#index.php"><i class="icon-file"></i>index.php</a></li>
+<li><a href="#legal.php"><i class="icon-file"></i>legal.php</a></li>
+<li><a href="#projectFunctions.php"><i class="icon-file"></i>projectFunctions.php</a></li>
+<li><a href="#signIn/promotionReport.php"><i class="icon-file"></i>signIn/promotionReport.php</a></li>
+<li><a href="#signIn/addContact.php"><i class="icon-file"></i>signIn/addContact.php</a></li>
+<li><a href="#signIn/finishEdit.php"><i class="icon-file"></i>signIn/finishEdit.php</a></li>
+<li><a href="#signIn/logout.php"><i class="icon-file"></i>signIn/logout.php</a></li>
+<li><a href="#signIn/index.php"><i class="icon-file"></i>signIn/index.php</a></li>
+<li><a href="#signIn/newMember.php"><i class="icon-file"></i>signIn/newMember.php</a></li>
+<li><a href="#signIn/finishSignin.php"><i class="icon-file"></i>signIn/finishSignin.php</a></li>
+<li><a href="#signIn/addUnit.php"><i class="icon-file"></i>signIn/addUnit.php</a></li>
+<li><a href="#signIn/edit.php"><i class="icon-file"></i>signIn/edit.php</a></li>
+</ul></div>
+<div class="span8">
+<ul class="breadcrumb">
+<li>
+<a href=""><i class="icon-remove-sign"></i></a><span class="divider">\</span>
+</li>
+<li>Compilation Errors</li>
+</ul>
+<div class="package-contents">
+<a name="footer.php" id="footer.php"></a><h3>
+<i class="icon-file"></i>footer.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file footer.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="header.php" id="header.php"></a><h3>
+<i class="icon-file"></i>header.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file header.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="help/inputPercentages.php" id="help/inputPercentages.php"></a><h3>
+<i class="icon-file"></i>help/inputPercentages.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file help/inputPercentages.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="help/CPFTcsv.php" id="help/CPFTcsv.php"></a><h3>
+<i class="icon-file"></i>help/CPFTcsv.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file help/CPFTcsv.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="squadManFooter.php" id="squadManFooter.php"></a><h3>
+<i class="icon-file"></i>squadManFooter.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file squadManFooter.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="regulations/index.php" id="regulations/index.php"></a><h3>
+<i class="icon-file"></i>regulations/index.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file regulations/index.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="squadManHeader.php" id="squadManHeader.php"></a><h3>
+<i class="icon-file"></i>squadManHeader.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file squadManHeader.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/attendance/add.php" id="login/attendance/add.php"></a><h3>
+<i class="icon-file"></i>login/attendance/add.php<small style="float: right;padding-right: 10px;">2</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/attendance/add.php</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>118</td>
+<td>No DocBlock was found for function \punchIt()</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/attendance/event.php" id="login/attendance/event.php"></a><h3>
+<i class="icon-file"></i>login/attendance/event.php<small style="float: right;padding-right: 10px;">2</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/attendance/event.php</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>40</td>
+<td>No DocBlock was found for function \report()</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/attendance/new.php" id="login/attendance/new.php"></a><h3>
+<i class="icon-file"></i>login/attendance/new.php<small style="float: right;padding-right: 10px;">5</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/attendance/new.php</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>202</td>
+<td>No DocBlock was found for function \insert_Event()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>234</td>
+<td>No DocBlock was found for function \parse_Sub_events()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>245</td>
+<td>No DocBlock was found for function \insert_Subevents()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>256</td>
+<td>No DocBlock was found for function \insert_other_Subevents()</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/redirect.php" id="login/redirect.php"></a><h3>
+<i class="icon-file"></i>login/redirect.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/redirect.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/testing/testSignUp.php" id="login/testing/testSignUp.php"></a><h3>
+<i class="icon-file"></i>login/testing/testSignUp.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/testing/testSignUp.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/testing/promotionSign.php" id="login/testing/promotionSign.php"></a><h3>
+<i class="icon-file"></i>login/testing/promotionSign.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/testing/promotionSign.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/testing/ptCSV.php" id="login/testing/ptCSV.php"></a><h3>
+<i class="icon-file"></i>login/testing/ptCSV.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/testing/ptCSV.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/testing/promoBoard.php" id="login/testing/promoBoard.php"></a><h3>
+<i class="icon-file"></i>login/testing/promoBoard.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/testing/promoBoard.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents"></div>
+<div class="package-contents">
+<a name="login/discipline/details.php" id="login/discipline/details.php"></a><h3>
+<i class="icon-file"></i>login/discipline/details.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/discipline/details.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/logout.php" id="login/logout.php"></a><h3>
+<i class="icon-file"></i>login/logout.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/logout.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/member/approve.php" id="login/member/approve.php"></a><h3>
+<i class="icon-file"></i>login/member/approve.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/member/approve.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/member/report.php" id="login/member/report.php"></a><h3>
+<i class="icon-file"></i>login/member/report.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/member/report.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/member/search.php" id="login/member/search.php"></a><h3>
+<i class="icon-file"></i>login/member/search.php<small style="float: right;padding-right: 10px;">5</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/member/search.php</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>39</td>
+<td>No DocBlock was found for function \checkPath()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>54</td>
+<td>No DocBlock was found for function \search()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>145</td>
+<td>No DocBlock was found for function \prepDisplay()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>200</td>
+<td>No DocBlock was found for function \displayResults()</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/member/finalApprove.php" id="login/member/finalApprove.php"></a><h3>
+<i class="icon-file"></i>login/member/finalApprove.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/member/finalApprove.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/index.php" id="login/index.php"></a><h3>
+<i class="icon-file"></i>login/index.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/index.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/encrypt.php" id="login/encrypt.php"></a><h3>
+<i class="icon-file"></i>login/encrypt.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/encrypt.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/reSignIn.php" id="login/reSignIn.php"></a><h3>
+<i class="icon-file"></i>login/reSignIn.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/reSignIn.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="login/home.php" id="login/home.php"></a><h3>
+<i class="icon-file"></i>login/home.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file login/home.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="authors.php" id="authors.php"></a><h3>
+<i class="icon-file"></i>authors.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file authors.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="licensing.php" id="licensing.php"></a><h3>
+<i class="icon-file"></i>licensing.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file licensing.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="visitor/finishVisit.php" id="visitor/finishVisit.php"></a><h3>
+<i class="icon-file"></i>visitor/finishVisit.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file visitor/finishVisit.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="visitor/complete.php" id="visitor/complete.php"></a><h3>
+<i class="icon-file"></i>visitor/complete.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file visitor/complete.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="visitor/visitor.php" id="visitor/visitor.php"></a><h3>
+<i class="icon-file"></i>visitor/visitor.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file visitor/visitor.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="index.php" id="index.php"></a><h3>
+<i class="icon-file"></i>index.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file index.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="legal.php" id="legal.php"></a><h3>
+<i class="icon-file"></i>legal.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file legal.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents"></div>
+<div class="package-contents">
+<a name="projectFunctions.php" id="projectFunctions.php"></a><h3>
+<i class="icon-file"></i>projectFunctions.php<small style="float: right;padding-right: 10px;">182</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="error">
+<td>error</td>
+<td>101</td>
+<td>No DocBlock was found for function \auditLog()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>109</td>
+<td>No DocBlock was found for function \auditDump()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>115</td>
+<td>No DocBlock was found for function \logLogin()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>124</td>
+<td>No DocBlock was found for function \checkAccountLocks()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>156</td>
+<td>No DocBlock was found for function \newMember()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>179</td>
+<td>No DocBlock was found for function \newContact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>197</td>
+<td>No DocBlock was found for function \newUnit()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>207</td>
+<td>No DocBlock was found for function \newContactType()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>213</td>
+<td>No DocBlock was found for function \newVisitor()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>222</td>
+<td>No DocBlock was found for function \dropDownMenu()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>244</td>
+<td>No DocBlock was found for function \reportDbError()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>256</td>
+<td>No DocBlock was found for function \Query()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>265</td>
+<td>No DocBlock was found for function \connect()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>275</td>
+<td>No DocBlock was found for function \Result()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>296</td>
+<td>No DocBlock was found for function \allResults()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>303</td>
+<td>No DocBlock was found for function \numRows()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>309</td>
+<td>No DocBlock was found for function \close()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>312</td>
+<td>No DocBlock was found for function \prepare_statement()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>318</td>
+<td>No DocBlock was found for function \bind()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>325</td>
+<td>No DocBlock was found for function \execute()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>335</td>
+<td>No DocBlock was found for function \close_stmt()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>366</td>
+<td>No DocBlock was found for function \cleanInputString()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>384</td>
+<td>No DocBlock was found for function \cleanInputDate()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>464</td>
+<td>No DocBlock was found for function \create_AES_256_key()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>469</td>
+<td>No DocBlock was found for function \session_secure_start()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>531</td>
+<td>No DocBlock was found for function \session_predict_path()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>583</td>
+<td>No DocBlock was found for function \session_resign_in()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>592</td>
+<td>No DocBlock was found for function \enterDate()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>631</td>
+<td>No DocBlock was found for function \parse_date_input()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>648</td>
+<td>No DocBlock was found for function \monthArray()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>662</td>
+<td>No DocBlock was found for function \display_event_search_in()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>677</td>
+<td>No DocBlock was found for function \searchEvent()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>724</td>
+<td>No DocBlock was found for function \getEventPromo()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>780</td>
+<td>No DocBlock was found for function \checkEventPromo()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>786</td>
+<td>No DocBlock was found for function \specialPromoRequire()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>796</td>
+<td>No DocBlock was found for function \promotionAprove()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>837</td>
+<td>No DocBlock was found for function \compareSignUp()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>968</td>
+<td>Name of argument $ident does not match with the DocBlock's name $requirements in \verifyCPFT()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>968</td>
+<td>Name of argument $requirements does not match with the DocBlock's name $actual in \verifyCPFT()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>968</td>
+<td>The type hint of the argument is incorrect for the type definition of the @param tag with argument $actual in \verifyCPFT()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1032</td>
+<td>No DocBlock was found for \member</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1033</td>
+<td>No DocBlock was found for property $capid</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1034</td>
+<td>No DocBlock was found for property $name_last</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1035</td>
+<td>No DocBlock was found for property $name_first</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1036</td>
+<td>No DocBlock was found for property $gender</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1037</td>
+<td>No DocBlock was found for property $DoB</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1038</td>
+<td>No DocBlock was found for property $memberType</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1039</td>
+<td>No DocBlock was found for property $achievement</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1040</td>
+<td>No DocBlock was found for property $text_set</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1041</td>
+<td>No DocBlock was found for property $unit</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1042</td>
+<td>No DocBlock was found for property $Date_of_Join</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1043</td>
+<td>No DocBlock was found for property $emergencyContacts</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1044</td>
+<td>No DocBlock was found for property $date_terminated</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1045</td>
+<td>No DocBlock was found for property $badInput</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1046</td>
+<td>No DocBlock was found for property $picture_link</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1047</td>
+<td>No DocBlock was found for property $isEmpty</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1048</td>
+<td>No DocBlock was found for property $initLevel</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1049</td>
+<td>No DocBlock was found for property $promoRecord</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1050</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1070</td>
+<td>No DocBlock was found for method cleanFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1078</td>
+<td>No DocBlock was found for method cleanFieldsComplete()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1085</td>
+<td>No DocBlock was found for method addEmergencyContact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1088</td>
+<td>No DocBlock was found for method addEmeregencyContactArray()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1097</td>
+<td>No DocBlock was found for method insertMember()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1102</td>
+<td>No DocBlock was found for method insertEmergency()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1113</td>
+<td>No DocBlock was found for method sign_in()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1122</td>
+<td>No DocBlock was found for method emergency_get()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1129</td>
+<td>No DocBlock was found for method unit_set()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1132</td>
+<td>No DocBlock was found for method replaceOther()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1139</td>
+<td>No DocBlock was found for method exists()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1142</td>
+<td>No DocBlock was found for method getCapid()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1145</td>
+<td>No DocBlock was found for method getName_first()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1148</td>
+<td>No DocBlock was found for method getName_Last()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1151</td>
+<td>No DocBlock was found for method getGrade()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1165</td>
+<td>No DocBlock was found for method testSign_up()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1207</td>
+<td>No DocBlock was found for method signUp()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1222</td>
+<td>No DocBlock was found for method promotionReport()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1266</td>
+<td>No DocBlock was found for method editInformation()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1279</td>
+<td>No DocBlock was found for method editContact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1304</td>
+<td>No DocBlock was found for method init()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1367</td>
+<td>No DocBlock was found for method editFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1398</td>
+<td>No DocBlock was found for method updateContact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1407</td>
+<td>No DocBlock was found for method insertSingleContact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1415</td>
+<td>No DocBlock was found for method updateFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1427</td>
+<td>No DocBlock was found for method approveFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1455</td>
+<td>No DocBlock was found for method massUpdateFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1478</td>
+<td>No DocBlock was found for method saveUpdates()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1493</td>
+<td>No DocBlock was found for method getPicture()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1496</td>
+<td>No DocBlock was found for method get_full_memberType()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1504</td>
+<td>No DocBlock was found for method get_leader_text()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1512</td>
+<td>No DocBlock was found for method get_gender()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1520</td>
+<td>No DocBlock was found for method general_info()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1531</td>
+<td>No DocBlock was found for method display_Contact()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1554</td>
+<td>No DocBlock was found for method attendance_report()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1587</td>
+<td>No DocBlock was found for method promo_board_report()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1622</td>
+<td>No DocBlock was found for method discipline_report()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1657</td>
+<td>No DocBlock was found for method title()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1663</td>
+<td>No DocBlock was found for method staff_position()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1698</td>
+<td>No DocBlock was found for method link_report()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1701</td>
+<td>No DocBlock was found for method get_text()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1704</td>
+<td>No DocBlock was found for method getPromotionInfo()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1778</td>
+<td>No short description for method displayPromoRequest()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1778</td>
+<td>Argument $showPromo is missing from the Docblock of displayPromoRequest()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1856</td>
+<td>No DocBlock was found for method parsePromoEdit()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1902</td>
+<td>No DocBlock was found for method retrieveCPFTrequire()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1921</td>
+<td>No DocBlock was found for method get_age()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1934</td>
+<td>No DocBlock was found for method get_phase()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1942</td>
+<td>No DocBlock was found for method get_achievement()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1945</td>
+<td>No short description for method get_next_achiev()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1959</td>
+<td>No DocBlock was found for \unit</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1960</td>
+<td>No DocBlock was found for property $charter_num</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1961</td>
+<td>No DocBlock was found for property $region</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1962</td>
+<td>No DocBlock was found for property $wing</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1963</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1975</td>
+<td>No DocBlock was found for method getCharter()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1978</td>
+<td>No DocBlock was found for method insert_unit()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1983</td>
+<td>No DocBlock was found for \memberType</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1984</td>
+<td>No DocBlock was found for property $code</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1985</td>
+<td>No DocBlock was found for property $name</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1986</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1991</td>
+<td>No DocBlock was found for method getCode()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1995</td>
+<td>No DocBlock was found for \contact</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1996</td>
+<td>No DocBlock was found for property $name</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1997</td>
+<td>No DocBlock was found for property $relation</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1998</td>
+<td>No DocBlock was found for property $phone</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>1999</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2004</td>
+<td>No DocBlock was found for method getName()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2007</td>
+<td>No DocBlock was found for method getRelation()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2010</td>
+<td>No DocBlock was found for method getRelation_full()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2016</td>
+<td>No DocBlock was found for method getPhone()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2019</td>
+<td>No DocBlock was found for method setName()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2022</td>
+<td>No DocBlock was found for method setPhone()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2025</td>
+<td>No DocBlock was found for method setRelation()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2029</td>
+<td>No DocBlock was found for \relationShip</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2030</td>
+<td>No DocBlock was found for property $name</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2031</td>
+<td>No DocBlock was found for property $code</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2032</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2036</td>
+<td>No DocBlock was found for method insertRelat()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2040</td>
+<td>No DocBlock was found for method code_get()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2044</td>
+<td>No DocBlock was found for \visitor</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2045</td>
+<td>No DocBlock was found for property $Fname</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2046</td>
+<td>No DocBlock was found for property $Lname</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2047</td>
+<td>No DocBlock was found for property $contName</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2048</td>
+<td>No DocBlock was found for property $contPhone</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2049</td>
+<td>No DocBlock was found for property $badInput</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2050</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2054</td>
+<td>No DocBlock was found for method getRestofFields()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2057</td>
+<td>No DocBlock was found for method setContName()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2060</td>
+<td>No DocBlock was found for method setContPhone()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2063</td>
+<td>No DocBlock was found for method insert()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2068</td>
+<td>No DocBlock was found for \searched_member</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2069</td>
+<td>No DocBlock was found for property $member</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2070</td>
+<td>No DocBlock was found for property $percent_match</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2071</td>
+<td>No DocBlock was found for property $capid_match</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2072</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2083</td>
+<td>No DocBlock was found for method __destruct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2087</td>
+<td>No DocBlock was found for method get_member()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2090</td>
+<td>No DocBlock was found for method recalc_match()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2097</td>
+<td>No DocBlock was found for method match_name_last()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2102</td>
+<td>No DocBlock was found for method match_name_first()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2107</td>
+<td>No DocBlock was found for method match_capid()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2118</td>
+<td>No DocBlock was found for method get_match()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2121</td>
+<td>No DocBlock was found for method get_capid()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2124</td>
+<td>No DocBlock was found for method get_name()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2128</td>
+<td>No DocBlock was found for \chain_of_command</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2129</td>
+<td>No DocBlock was found for property $commanders</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2130</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2190</td>
+<td>No DocBlock was found for method display()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2253</td>
+<td>No DocBlock was found for method __destruct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2263</td>
+<td>No DocBlock was found for \commander</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2264</td>
+<td>No DocBlock was found for property $member</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2265</td>
+<td>No DocBlock was found for property $num_sub_pos</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2266</td>
+<td>No DocBlock was found for property $next_index</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2267</td>
+<td>No DocBlock was found for property $pos_code</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2268</td>
+<td>No DocBlock was found for method __construct()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2277</td>
+<td>No DocBlock was found for method add_sub()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2280</td>
+<td>No DocBlock was found for method get_Capid()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2286</td>
+<td>No DocBlock was found for method get_next()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2289</td>
+<td>No DocBlock was found for method get_num_sub()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2292</td>
+<td>No DocBlock was found for method get_pos_name()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2310</td>
+<td>No DocBlock was found for method display()</td>
+</tr>
+<tr class="error">
+<td>error</td>
+<td>2319</td>
+<td>No DocBlock was found for method __destruct()</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/promotionReport.php" id="signIn/promotionReport.php"></a><h3>
+<i class="icon-file"></i>signIn/promotionReport.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/promotionReport.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/addContact.php" id="signIn/addContact.php"></a><h3>
+<i class="icon-file"></i>signIn/addContact.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/addContact.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/finishEdit.php" id="signIn/finishEdit.php"></a><h3>
+<i class="icon-file"></i>signIn/finishEdit.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/finishEdit.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/logout.php" id="signIn/logout.php"></a><h3>
+<i class="icon-file"></i>signIn/logout.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/logout.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/index.php" id="signIn/index.php"></a><h3>
+<i class="icon-file"></i>signIn/index.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/index.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/newMember.php" id="signIn/newMember.php"></a><h3>
+<i class="icon-file"></i>signIn/newMember.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/newMember.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/finishSignin.php" id="signIn/finishSignin.php"></a><h3>
+<i class="icon-file"></i>signIn/finishSignin.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/finishSignin.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/addUnit.php" id="signIn/addUnit.php"></a><h3>
+<i class="icon-file"></i>signIn/addUnit.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/addUnit.php</td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="package-contents">
+<a name="signIn/edit.php" id="signIn/edit.php"></a><h3>
+<i class="icon-file"></i>signIn/edit.php<small style="float: right;padding-right: 10px;">1</small>
+</h3>
+<div><table class="table markers table-bordered">
+<thead><tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr></thead>
+<tbody><tr class="error">
+<td>error</td>
+<td>0</td>
+<td>No page-level DocBlock was found in file signIn/edit.php</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
+            generated on 2013-04-15T22:17:54-06:00.<br></footer></div>
+</div>
+</body>
+</html>
