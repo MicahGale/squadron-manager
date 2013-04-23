@@ -1,6 +1,8 @@
 <?php
 /**
  * Creates a downloadable csv of the pt testing sign-up
+ * @package Squadron-manager
+ * @copyright (c) 2013, Micah Gale
  */
 /*  Copyright 2013 Micah Gale
  *
@@ -29,7 +31,7 @@ header("Pragma: no-cache");
 header("Expires: 0");
 $query ="SELECT TEST_CODE, TEST_NAME FROM CPFT_TEST_TYPES ORDER BY TEST_NAME";
 $test = allResults(Query($query, $ident));   //gets the pt tests
-$fp = fopen('php://output','w');             //opens the file output stream
+$fp = fopen('php://output','wt');             //opens the file output stream
 $header[0]="CAPID";
 $header[1]='Name';
 for($i=0;$i<count($test);$i++) {           //changes the array

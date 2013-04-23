@@ -26,24 +26,21 @@
  */
 /*
  * **********************FOR v. .10*****************************
- * TODO create an image security file, make sure ../ is banned for pics and uploads ban _get session fixation
- * TODO add user to auditlog
  * TODO enforce CAPR110-1 password policy
  * TODO change subevent drop downs to checkboxes
  * TODO create warning system
  * TODO ban terminated members
- * TODO create testing controls and entering add pt testing hold
+ * TODO create testing controls and entering
  * TODO create notifications
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
- * TODO create page for units
- * TODO create reports: emergency contact info, an eservices
+ * TODO create reports: emergency contact info, and eservices
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO allow to change password
  * TODO notifications
  * TODO finish populating db
- * TODO populate pictures
+ * TODO check old TODO tags
  * ***************************Debug/fix*******************************************
  * TODO consider promo boards for all
  * TODO fix member-side queries
@@ -51,7 +48,9 @@
  * TODO make main page redirect to home if signed-in
  * 
  * *******************FOR LATER******************************
- * TODO have javascript resize function
+ *TODO populate pictures
+ *TODO have javascript resize function
+ *TODO create page for units
  * TODO debug commanders and add chain of command
  * TODO  add scheduling
  * TODO add edit member and add picture
@@ -104,6 +103,9 @@ function auditLog($ip, $type) {
     mysqli_query($ident,"INSERT INTO AUDIT_LOG(TIME_OF_INTRUSION, INTRUSION_TYPE, PAGE,IP_ADDRESS)
         VALUES('$time','$type','".$_SERVER['SCRIPT_NAME']."','$ip')");
     close($ident);
+    if(isset($_SESSION['member'])) {               //if this is an user session, attribute the user's capid to it
+        auditDump($time,"user CAPID", $_SESSION['member']->getCapid());
+    }
     return $time;
 }
 function auditDump($time, $fieldName, $fieldValue) {
@@ -412,7 +414,6 @@ function cleanInputDate($input, $regex, $length, $fieldName) {                  
 function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
     $file = $_FILES[$index];         //get a buffer var
     $time=  auditLog($_SERVER['REMOTE_ADDR'], 'UF');    //log the file upload
-    auditDump($time,"Uploaded By", $_SESSION['member']->getCapid());  //log who uploaded it
     $buffer=explode(".",$file['name']);
     $ext=  end($buffer);   //get the extension
     $buffer=explode('/',$MIME_TYPE);

@@ -31,7 +31,7 @@
         session_start();
         if(!array_key_exists("member", $_SESSION)) {                                //log and redirect user
             auditLog($_SERVER["REMOTE_ADDR"],"DC");
-            echo"<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=../signIn/?CAPID=\">";
+            echo"<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=/signIn/?CAPID=\">";
         } else {
             $ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
             $member= $_SESSION["member"];

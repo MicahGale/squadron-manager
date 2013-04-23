@@ -30,8 +30,24 @@
 require("projectFunctions.php");
 session_secure_start();
 header("content-type:image/jpeg");  //say it's a picture
-$capid=  cleanInputInt($_GET['capid'], 6, 'Picture CAPID');
-header("Content-Disposition: inline ; filename=$capid.jpg");
+if($_GET['capid']==='un') {        //if the image is unavailable then pick that one
+    $path=PROFILE_PATH.DIRECTORY_SEPARATOR."unavailable.jpg";
+    header("Content-Disposition: inline ; filename=unavailable.jpg");
+} else {
+   $capid=  cleanInputInt($_GET['capid'], 6, 'Picture CAPID'); 
+   $path= PROFILE_PATH.DIRECTORY_SEPARATOR.$capid.".jpg";           //gets the absolute path to the file
+   header("Content-Disposition: inline ; filename=$capid.jpg");
+    if (pathinfo($path, PATHINFO_DIRNAME)!==PROFILE_PATH||!file_exists($path)) {        //if the file is not in the right place
+        $path=PROFILE_PATH.DIRECTORY_SEPARATOR."unavailable.jpg";
+    }
+}
+
 header("Pragma: no-cache");
 header("Expires: 0");
+$write = fopen("php://output", 'wb'); //open the output to write to 
+$read= fopen("file://".$path,"rb");          //read the image
+$content=  fread($read, filesize($path));
+fwrite($write, $content);                            //write the image to the output
+fclose($write);
+fclose($read);       //close the file resources
 ?>
