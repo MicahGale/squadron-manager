@@ -52,11 +52,12 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 <br>
                 Please enter any sub-events:<br>
                 <?php
-                for($i=0;$i<10;$i++) {                 //create 10 dropDowns for the subevents
-                    //todo check that the query is right
-                    dropDownMenu('SELECT SUBEVENT_TYPE, SUBEVENT_NAME FROM SUBEVENT_TYPE',"SubEvent$i",$ident,true,null,true);
-                    echo"<br>\n";
+                $query='SELECT SUBEVENT_TYPE, SUBEVENT_NAME FROM SUBEVENT_TYPE';     //get all possible subevents
+                $result= allResults(Query($query, $ident));
+                for($i=0;$i<count($result);$i++) {                 //create checkbox for all possible subevents
+                    echo '<input type="checkbox" name="subevent[]" value="'.$result[$i]['SUBEVENT_TYPE'].'"/>: '.$result[$i]['SUBEVENT_NAME']."<br>";
                 }
+                echo '<input type="checkbox" name="subevent[]" value="other"/>Other<br>';
                 ?>
                 <br>
                 <input type="submit" value="create event"/><!-- input type="submit" name="sub" value="Add More Subevents"/  -->
