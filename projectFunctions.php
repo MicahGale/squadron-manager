@@ -28,7 +28,7 @@
  * **********************FOR v. .10*****************************
  * TODO enforce CAPR110-1 password policy
  * TODO change subevent drop downs to checkboxes
- * TODO create warning system
+ 
  * TODO ban terminated members
  * TODO create testing controls and entering
  * TODO create notifications
@@ -49,6 +49,7 @@
  * 
  * *******************FOR LATER******************************
  *TODO populate pictures
+ *TODO create warning system
  *TODO have javascript resize function
  *TODO create page for units
  * TODO debug commanders and add chain of command

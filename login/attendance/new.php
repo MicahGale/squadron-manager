@@ -1,5 +1,23 @@
 <?php
-/* * Copyright 2012 Micah Gale
+/**
+ * Page for creating a new event.
+ * 
+ * INPUTS
+ * $_POST 
+ * "start"-date-input- the start date of the event
+ * end - date-input - the end date for the event
+ * type- drop down menu- the event type meeting, etc
+ * location-drop down menu- the location for the event 
+ * name- text- the name for the event
+ * current- checkbox - whether or not this is the current event that members can sign into
+ * attend- checkbox - insert attendance of an event after creation
+ * subevent[]-checkbox array- all the subevents for that event
+ * 
+ * @package Squadron Manager
+ * @copyright (c) 2013, Micah Gale
+ * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
+ */
+/* Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -200,7 +218,19 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
             }
             unset($_SESSION['startDate'],$_SESSION['name'],$_SESSION['isCurrent'],$_SESSION['locat'],$_SESSION['endDate'],$_SESSION['subEvents'],$_SESSION['otherSubs']);
         }
-        function insert_Event(DateTime $startDate,$type,$name,$isCurrent,$locat,$endDate) {
+        /**
+         * Inserts the event. 
+         * 
+         * @global mysqli $ident the database connection
+         * @param DateTime $startDate the start date of the event
+         * @param String $type the type of the event
+         * @param String $name the name of the event
+         * @param Boolean $isCurrent whether this is the current event
+         * @param String $locat the location of the event
+         * @param type $endDate the End date of the event or set to the string "null"
+         * @return String the event code of the event
+         */
+        function insert_Event(DateTime $startDate,$type,$name,$isCurrent,$locat, $endDate) {
             global $ident;
             $event_code=$startDate->format(EVENT_CODE_DATE).$type;                //make event code, and test it
            $query ="SELECT EVENT_CODE FROM EVENT WHERE EVENT_CODE='$event_code'";
@@ -210,8 +240,6 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                $query ="SELECT EVENT_CODE FROM EVENT WHERE EVENT_CODE='$event_code'";
            $num_results= numRows(Query($query, $ident));                                   //keep trying until gets an original one
            }
-           //TODO unset PREVEIOUS CURRENT EVENT 
-           //TODO ALLOW FOR SUBEVENTS
            if($isCurrent=="true") {                            //if is current unsets old ones
                Query("UPDATE EVENT SET IS_CURRENT=FALSE", $ident);
            }
@@ -222,7 +250,7 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
            else
                $query.="null,";
            if($locat!="null")              //if the locat isn't null then use it
-               $query.="'$locat','";
+               $query.="'$locat',";
            else                         //else insert a null locat
                $query.="null,";
            if($endDate!="null")
@@ -232,17 +260,29 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
            Query($query, $ident);
            return $event_code;
         }
-        function parse_Sub_events(array $input, $count=10) {
+        /**
+         * Parses the the sube event input and inserts it
+         * 
+         * @param array $input the Input array, usually $_POST
+         * @return array an array of the parsed inputs index is order of the input, the content is the subevent code.
+         */
+        function parse_Sub_events(array $input) {
             $parsed=array();
-            for($i=0;$i<$count;$i++) {
-                //TODO double check length
-                $buffer=$input["SubEvent$i"];
-                if(!is_null($buffer)&&$buffer!="null") {
-                    array_push($parsed,cleanInputString($buffer, 3, "subevnet$i",true));
+            for($i=0;$i<count($input['subevent']);$i++) {
+                $buffer=$input["subevent"][$i];
+                if(!is_null($buffer)&&$buffer!="null"&&$buffer!==null) {
+                    array_push($parsed,cleanInputString($buffer, 3, "subevenet$i",true));
                 }
             }
             return $parsed;
          }
+         /**
+          * Takes the input subevent array, and inserts it into the database
+          * 
+          * @global type $ident the database connection
+          * @param type $event_Code the event code of the event that the subevents are for
+          * @param array $subEvents the subevents that are being inserted
+          */
          function insert_Subevents($event_Code, array $subEvents) {
              global $ident;
              $stmt=prepare_statement($ident,"INSERT INTO SUBEVENT(PARENT_EVENT_CODE, SUBEVENT_CODE)
@@ -254,6 +294,13 @@ $ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
              }
              close_stmt($stmt);
          }
+         /**
+          * Creates a new type of subevent
+          * 
+          * @global mysqli $ident the database connection
+          * @param array $subEvents the array of new subevents to make
+          * @return array returns all of the codes of the new created subevents
+          */
          function insert_other_Subevents(array $subEvents) {
              global $ident;
              $codes=array();
