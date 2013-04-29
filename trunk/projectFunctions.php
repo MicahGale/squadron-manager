@@ -30,8 +30,7 @@
  * **********************FOR v. .10*****************************
  * TODO enforce CAPR110-1 password policy
  * TODO ban terminated members
- * TODO close DB connections
- * TODO create testing controls and entering
+ * TODO debug promotion report
  * TODO create notifications
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
@@ -878,7 +877,7 @@ function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null,
 /**
  * Parse the input from the promotion sign-up and insert it
  * 
- * Inserts the promotion information into the SQL database.
+ * Inserts the promotion information into                                                                           qqqqq the SQL database.
  * @param mysqli $ident The resource for a SQL connection
  * @param array $input the input array to be inserted 
  * @return Void
@@ -1244,6 +1243,7 @@ class member {
                         WHERE B.ACHIEV_CODE='$achiev'
                         AND A.ACHIEV_NUM <= B.ACHIEV_NUM))ORDER BY TYPE_NAME"; //get the requirements for the header
                     $header=  allResults(Query($query, $ident));    //get headers
+                    $_SESSION['header']=$header;   //store it for use later.                                                  
                     array_push($header,array("TYPE_NAME"=>'Promotion','TYPE_CODE' =>'PRO'));
                     echo "<tr><td align=\"center\">    
                         <table border =\"1\" cellspacing=\"1\" width=\"900\">
@@ -1889,6 +1889,40 @@ class member {
                 }
             }
         }
+    }
+    /**
+     * Parses and inputs a complete member promotion report.
+     * 
+     * Hands the input 1 achievement at a time to $this->parsePromoEdit() to parse all inputs.
+     * 
+     * @param type $ident the database connection
+     * @param array $input the input array from POST or other submission method
+     */
+    function parseWholeEdit($ident, array $input) {
+        $approve=  prepare_statement($ident, "UPDATE PROMOTION_SIGN_UP SET APPROVED=?
+        WHERE CAPID=? AND ACHIEV_CODE=?");  //create a prepared statement to approve one 
+        $insert =  prepare_statement($ident,"INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET,PASSED_DATE,PERCENTAGE)
+            VALUES(?,?,?,?,?,?)");         //create prepared statement to insert requirements
+        $update = prepare_statement($ident,"UPDATE REQUIREMENTS_PASSED
+            SET PASSED_DATE=?, PERCENTAGE=?
+            WHERE CAPID=? AND ACHIEV_CODE=? AND REQUIREMENT_TYPE=?");
+        $deleteTest =  prepare_statement($ident,"DELETE FROM TESTING_SIGN_UP
+            WHERE CAPID=? AND REQUIRE_TYPE=?");
+        $signUps=$_SESSION['signUps'];
+        $header=$_SESSION['header'];
+        $query = "SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A, ACHIEVEMENT B
+            WHERE B.ACHIEV_CODE='".$this->achievement."' AND
+                A.ACHIEV_NUM<=B.ACHIEV_NUM
+                ORDER BY A.ACHIEV_NUM";                                 //get all the achievements needed in order
+        $achiev=  allResults(Query($ident, $query));
+        for($i=0;$i<count($achiev);$i++) {                     //cycles through all the achievements and parses them seperately
+            $buffer=$achiev[$i]['ACHIEV_CODE'];
+           $this->parsePromoEdit($insert,$update,$deleteTest,$header,$input,$buffer);   //parses the information for real this time 
+        }
+         close_stmt($approve);
+        close_stmt($insert);
+        close_stmt($update);
+        close_stmt($deleteTest);
     }
     /**
      * Checks if all requirements for promotion are passed
