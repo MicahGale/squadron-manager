@@ -5,7 +5,9 @@
  * All the APIs for the project.  This is never directly displayed, nor can,
  * but is included in the all the pages, and its functions are invoked by the 
  * other pages.
- * @package Squadron-Manager 
+ * @package Squadron-Manager
+ * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
+ * @copyright (c) 2013, Micah Gale
  */
 /* Copyright 2013 Micah Gale
  *
@@ -27,9 +29,8 @@
 /*
  * **********************FOR v. .10*****************************
  * TODO enforce CAPR110-1 password policy
- * TODO change subevent drop downs to checkboxes
- 
  * TODO ban terminated members
+ * TODO close DB connections
  * TODO create testing controls and entering
  * TODO create notifications
  * TODO consider cadet oath and grooming standards
@@ -462,11 +463,6 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
         return false;
     }
     return $locat;
-}
-function create_AES_256_key($password, $td) {
-    $ks = mcrypt_enc_get_key_size($td);                    //gets key size
-    $key = substr(hash("sha512", $password), 0, $ks);          //creates the key from SHA512
-    return $key;
 }
 function session_secure_start($capid=null) {
     session_start();                     //starts the session
@@ -1234,10 +1230,20 @@ class member {
                     <?php
                     }
                     echo"</td></tr>";               //center header
-                    $header = allResults(Query("SELECT TYPE_NAME, TYPE_CODE FROM REQUIREMENT_TYPE
-                        WHERE MEMBER_TYPE='".$this->memberType."'
-                        OR MEMBER_TYPE IS NULL
-                        ORDER BY TYPE_CODE", $ident));    //QUERY TO get requirement types
+                    $query= "SELECT NEXT_ACHIEV FROM ACHIEVEMENT
+                        WHERE ACHIEV_CODE='".$this->achievement."'";
+                    $result=  allResults(Query($query, $ident));
+                    if(count($result)>=1)
+                        $achiev=$result[0]['NEXT_ACHIEV'];
+                    else
+                        $achiev=$this->achievement;
+                   $query ="SELECT TYPE_CODE, TYPE_NAME FROM
+                        REQUIREMENT_TYPE WHERE (MEMBER_TYPE='".$this->memberType."' OR MEMBER_TYPE IS NULL)
+                        AND TYPE_CODE IN ( SELECT REQUIREMENT_TYPE FROM PROMOTION_REQUIREMENT 
+                        WHERE ACHIEV_CODE IN(SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A, ACHIEVEMENT B
+                        WHERE B.ACHIEV_CODE='$achiev'
+                        AND A.ACHIEV_NUM <= B.ACHIEV_NUM))ORDER BY TYPE_NAME"; //get the requirements for the header
+                    $header=  allResults(Query($query, $ident));    //get headers
                     array_push($header,array("TYPE_NAME"=>'Promotion','TYPE_CODE' =>'PRO'));
                     echo "<tr><td align=\"center\">    
                         <table border =\"1\" cellspacing=\"1\" width=\"900\">

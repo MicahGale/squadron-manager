@@ -148,7 +148,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php'),
         ('EVI','Insert attendance for an Event','EV','attendance/add.php'),
         ('TSE','View Testing Sign-up','TP','testing/testSignUp'),
         ('PSE','Promotion Sign-up','TP','testing/promotionSign.php'),
-        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php');
+        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php'),
+        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php');
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -160,7 +161,8 @@ VALUES('CTO','MEA')
         ('CTO','EVI'),
         ('CTO','TSE'),
         ('CTO','PSE'),
-        ('CTO','PTT');
+        ('CTO','PTT'),
+        ('CTO','PRR');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
