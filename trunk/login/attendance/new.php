@@ -13,7 +13,7 @@
  * attend- checkbox - insert attendance of an event after creation
  * subevent[]-checkbox array- all the subevents for that event
  * 
- * @package Squadron Manager
+ * @package Squadron-Manager
  * @copyright (c) 2013, Micah Gale
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
  */

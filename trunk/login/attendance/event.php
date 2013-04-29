@@ -64,11 +64,11 @@ $ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
                 WHERE C.EVENT_CODE='$event'";
             $result=  allResults(Query($query, $ident));
             echo "<strong>Events Done: </strong>";
-            if(count($result)>1) {                                //if more than 2 results than cycle to 2nd to last
+            if(count($result)>=1) {                                //if more than 2 results than cycle to 2nd to last
                 for($i=0;$i<count($result)-1;$i++) {
                     echo $result[$i]['SUBEVENT_NAME'].", ";
                 }
-                echo $result[$i+1]['SUBEVENT_NAME'];  //display last one
+                echo $result[$i]['SUBEVENT_NAME'];  //display last one uses the offset jump from the last loop of the for loop
             } else if(count($result)==1)                      //if only 1 then display it 
                 echo $result[0]['SUBEVENT_NAME'];
             echo "<br><br>\n";
