@@ -1,5 +1,12 @@
 <?php
-/* * Copyright 2012 Micah Gale
+/**
+ * Displays the home page for the login section.
+ * 
+ * Also displays notifications of important things such as test sign ups and security breaches
+ * These notifications are based on the tasks they are able to use. This uses a class
+ * which content is created from shares outside the document root.
+ */
+/*  Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -18,6 +25,7 @@
  */
 include("projectFunctions.php");
 session_secure_start();
+$ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
 ?>
 <!DOCTYPE html>
 <html>
@@ -28,11 +36,44 @@ session_secure_start();
     </head>
     <body>
         <?php
-        $ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
         include("squadManHeader.php");
-        //TODO figure out notifications
+        //TODO create a sandboxed notification db user
+        /**
+         * The class for notifications for a user
+         * 
+         * Presidence scale: 0-3
+         * 0: high priority- security breech
+         * 1: System administration needed
+         * 2:High-priority membership administration
+         * 3:low-priority membership administration
+         */
+        class notification {
+            private $query;  //the query to run that will be displayed
+            private $display_text;  //the text that will be displayed, uses special syntax to bring in db results if any.
+            private $presidence;   //the priority of the notification 0-3 scale:
+            private $display;      //whether or not to display this notification
+            private $results;     //the query results
+            /*0: high priority- security breech
+             * 1: System administration needed
+             * 2:High-priority membership administration
+             * 3:low-priority membership administration
+             */
+            /**
+             * Creates a new notification object
+             * 
+             * WARNING:INPUT cannot be cleaned because queries are being parsed. Do not create a notification from user input, use ONLY 
+             * input from the included file
+             * 
+             * @param array $input- the array created for this notification from the parsed share query=>the query to run text=>the text to be displayed with special syntax prior=> the presidence of the notification 0-3 scale
+             */
+            function __construct(array $input) {
+                $this->query = $input['query'];
+                $this->display_text=$input['text'];
+                $this->presidence =$input['prior'];
+            }
+            
+        }
         include("squadManFooter.php");
         ?>
-        <a href="encrypt.php">Encryption test</a>
     </body>
 </html>

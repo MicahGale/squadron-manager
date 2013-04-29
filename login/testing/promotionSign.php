@@ -1,4 +1,18 @@
 <?php
+/**
+ * Displays all promotion requests, and the neccessary promotion requirements, and if they are passed.
+ * It also allows staff to modify the promotion record for that promotion, and approve the promotion thereof.
+ * 
+ * INPUTS
+ * $_POST
+ * filter - the member type to limit the report to
+ * save- saves the inputs
+ * the input from the promotion record function
+ * 
+ * @package Squadron-Manager
+ * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
+ * @copyright (c) 2013, Micah Gale
+ */
 /* * Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager

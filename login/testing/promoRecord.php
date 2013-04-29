@@ -10,6 +10,10 @@
  * submit- saves the inputs
  * the input from the promotion record function
  * 
+ * SESSION
+ * microscope- the member who's report is being edited
+ * header- the test types being displayed
+ * 
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
  * @copyright (c) 2013, Micah Gale
@@ -51,7 +55,16 @@ if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect 
         <?php
         require("squadManHeader.php");
         $capid = cleanInputInt($_GET['capid'],6, 'capid');
-        $member = new member($capid,4,$ident);
+        if(!isset($_SESSION['microscope'])) {                      //if not saved yet make it
+            $member = new member($capid,4,$ident);
+            $_SESSION['microscope']=$member;
+        } else {                                        // if saved load it up
+            $member=$_SESSION['microscope'];
+            if($member->getCapid()!=$capid) {            //if not the same member switch it up
+                $member = new member($capid,4,$ident);
+                $_SESSION['microscope']=$member;
+            }
+        }
         ?>
         <form method="post">
             <table><tr><td style="text-align: center">
@@ -63,7 +76,9 @@ if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect 
             <input type="submit" name="submit" value="save"/>
         <?php
         $member->promotionReport($ident,true,true,true);
-        //todo parse promotion input!
+        if(isset($_POST['submit'])) { // if saving do so.
+            $member->parseWholeEdit($ident, $_POST);         //parse and save, done!
+        }
         ?>
             <input type="submit" name="submit" value="save"/>
                     </td></tr></table>
