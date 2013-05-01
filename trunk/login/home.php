@@ -30,9 +30,10 @@ $ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Squadron Manager Home Page</title>
+        <title>Squadron Manager</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
+         <link rel="stylesheet" type="text/css" href="/main.css">
     </head>
     <body>
         <?php
@@ -71,7 +72,19 @@ $ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
                 $this->display_text=$input['text'];
                 $this->presidence =$input['prior'];
             }
-            
+            /**
+             * Checks if this notification has anything to display. 
+             * It also runs the query and preps for the display.
+             * 
+             * WARNING: Do not use the User's database connection use the sandboxed one 
+             * instead.  These will be executing queries that may be tampered with.
+             * 
+             * @param mysqli $idnet the database connection of the SANDBOXED user
+             * @return boolean-Returns true if this will be displayed, false otherwise
+             */
+            function check_display($idnet) {
+                
+            }
         }
         include("squadManFooter.php");
         ?>
