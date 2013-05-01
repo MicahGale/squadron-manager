@@ -5,6 +5,8 @@
  * Also displays notifications of important things such as test sign ups and security breaches
  * These notifications are based on the tasks they are able to use. This uses a class
  * which content is created from shares outside the document root.
+ * 
+ * No Inputs
  */
 /*  Copyright 2012 Micah Gale
  *
@@ -83,7 +85,14 @@ $ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
              * @return boolean-Returns true if this will be displayed, false otherwise
              */
             function check_display($idnet) {
-                
+                $display=false;
+                $results= allResults(Query($this->query, $idnet));      //run the query
+                if(count($results)>0) {           //if blank results then say it won't show
+                    
+                }
+                $this->results=$results;
+                $this->display=$display;
+                return $display;
             }
         }
         include("squadManFooter.php");
