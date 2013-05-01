@@ -1256,9 +1256,10 @@ class member {
                         WHERE A.MEMBER_TYPE='".$this->memberType."'   
                         AND A.ACHIEV_CODE <> '0'
                         AND A.ACHIEV_NUM <= ( SELECT 
-                        ACHIEV_NUM FROM ACHIEVEMENT B
+                        D.ACHIEV_NUM FROM ACHIEVEMENT D, ACHIEVEMENT B
                         JOIN MEMBER C ON C.ACHIEVEMENT=B.ACHIEV_CODE
-                        WHERE C.CAPID='".$this->capid."')
+                        WHERE C.CAPID='".$this->capid."'
+                        AND B.NEXT_ACHIEV=D.ACHIEV_CODE)
                         ORDER BY ACHIEV_NUM";
                     $achievements = allResults(Query($query, $ident));    //get all the achievements ^
                     for($i=0;$i<count($achievements);$i++) {      //loop through rows
@@ -1908,13 +1909,12 @@ class member {
             WHERE CAPID=? AND ACHIEV_CODE=? AND REQUIREMENT_TYPE=?");
         $deleteTest =  prepare_statement($ident,"DELETE FROM TESTING_SIGN_UP
             WHERE CAPID=? AND REQUIRE_TYPE=?");
-        $signUps=$_SESSION['signUps'];
         $header=$_SESSION['header'];
         $query = "SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A, ACHIEVEMENT B
             WHERE B.ACHIEV_CODE='".$this->achievement."' AND
                 A.ACHIEV_NUM<=B.ACHIEV_NUM
                 ORDER BY A.ACHIEV_NUM";                                 //get all the achievements needed in order
-        $achiev=  allResults(Query($ident, $query));
+        $achiev=  allResults(Query($query,$ident));
         for($i=0;$i<count($achiev);$i++) {                     //cycles through all the achievements and parses them seperately
             $buffer=$achiev[$i]['ACHIEV_CODE'];
            $this->parsePromoEdit($insert,$update,$deleteTest,$header,$input,$buffer);   //parses the information for real this time 

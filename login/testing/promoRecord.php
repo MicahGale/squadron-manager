@@ -42,6 +42,17 @@ if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect 
     header("refresh:0;url=/login/member/search.php?redirect=/login/testing/promoRecord.php"); //refresh
     exit;
 }
+$capid = cleanInputInt($_GET['capid'],6, 'capid');
+if(!isset($_SESSION['microscope'])) {                      //if not saved yet make it
+    $member = new member($capid,4,$ident);
+    $_SESSION['microscope']=$member;
+} else {                                        // if saved load it up
+    $member=$_SESSION['microscope'];
+    if($member->getCapid()!=$capid) {            //if not the same member switch it up
+        $member = new member($capid,4,$ident);
+        $_SESSION['microscope']=$member;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,22 +60,13 @@ if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css">
-        <title></title>
+        <title>Promotion Report for:
+        <?php echo $member->title();
+        ?></title>
     </head>
     <body>
         <?php
         require("squadManHeader.php");
-        $capid = cleanInputInt($_GET['capid'],6, 'capid');
-        if(!isset($_SESSION['microscope'])) {                      //if not saved yet make it
-            $member = new member($capid,4,$ident);
-            $_SESSION['microscope']=$member;
-        } else {                                        // if saved load it up
-            $member=$_SESSION['microscope'];
-            if($member->getCapid()!=$capid) {            //if not the same member switch it up
-                $member = new member($capid,4,$ident);
-                $_SESSION['microscope']=$member;
-            }
-        }
         ?>
         <form method="post">
             <table><tr><td style="text-align: center">
