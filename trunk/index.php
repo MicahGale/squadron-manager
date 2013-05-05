@@ -16,6 +16,11 @@
  *
  * 
  */
+session_start();              //if already loged in go to home page
+if(isset($_SESSION['home'])) {
+    header("refresh:0;url=/login/home.php"); 
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html>

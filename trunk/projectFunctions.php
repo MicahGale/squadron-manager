@@ -31,21 +31,18 @@
  * TODO enforce CAPR110-1 password policy
  * TODO ban terminated members
  * TODO debug promotion report
- * TODO create notifications
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
  * TODO create reports: emergency contact info, and eservices
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO allow to change password
- * TODO notifications
  * TODO finish populating db
  * TODO check old TODO tags
  * ***************************Debug/fix*******************************************
  * TODO consider promo boards for all
  * TODO fix member-side queries
  * TODO debug session hijacking resign-in keep post input
- * TODO make main page redirect to home if signed-in
  * 
  * *******************FOR LATER******************************
  *TODO populate pictures
@@ -58,6 +55,7 @@
  * TODO regulations page and update regsupdater
  * TODO add statistics esp. for attendance
  * TODO use css  
+ * TODO make colorblind safe options
  */
 /*Unix specific functions
  * cleanUploadFile-path delimeter /
@@ -98,6 +96,7 @@
  define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
  define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
  define('PROFILE_PATH',"/usr/share/www/profile");  //the path to the profile pictures stored outside document root
+ define('NOTIF_PATH','/usr/share/www/notifications.csv');  //the csv that holds the notification information
 function auditLog($ip, $type) {
     $time = date('o-m-d H:i:s');
     $ident= Connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
@@ -814,13 +813,13 @@ function promotionAprove($ident,$memberType) {
         WHERE ACHIEV_CODE IN(SELECT ACHIEV_CODE FROM PROMOTION_SIGN_UP))ORDER BY TYPE_NAME"; //get the requirements for the header
     $header=  allResults(Query($query, $ident));    //get headers
     ?>
-    <table border="1">
-        <tr><th>Member</th><th>Promotion to:</th>
+    <table class="promotion">
+        <tr><th class="promotion">Member</th><th class="promotion">Promotion to:</th>
     <?php
     for($i=0;$i<count($header);$i++) {  //displays the headers
-        echo "<th>".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
+        echo "<th class=\"promotion\">".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
     }
-    echo "<th>Approved</th></tr>\n";   //display approval header
+    echo "<th class=\"promotion\">Approved</th></tr>\n";   //display approval header
     for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
         echo "<tr>";
         $signUps[$i][0]->displayPromoRequest($header,true,true,$signUps[$i][3]);
@@ -1218,7 +1217,7 @@ class member {
     }
     public function promotionReport($ident, $header=true, $date=false,$edit=false) {
         ?>
-        <table border="0" width="900"><tr><td valign="top" align="center">
+        <table style="text-align: center"><tr><td>
                     <strong>Promotion Report
                     <?php
                     if($header) {                  //show who its for if it's wanted 
@@ -1245,11 +1244,11 @@ class member {
                     $header=  allResults(Query($query, $ident));    //get headers
                     $_SESSION['header']=$header;   //store it for use later.                                                  
                     array_push($header,array("TYPE_NAME"=>'Promotion','TYPE_CODE' =>'PRO'));
-                    echo "<tr><td align=\"center\">    
-                        <table border =\"1\" cellspacing=\"1\" width=\"900\">
-                        <tr><th>Achievement</th>";                     //creates headers of rows based on requirement types
+                    echo "<tr><td>    
+                        <table class=\"promotion\">
+                        <tr><th class=\"promotion\">Achievement</th>";                     //creates headers of rows based on requirement types
                     for ($row = 0; $row < count($header); $row++) { 
-                        echo "<th>" .$header[$row]["TYPE_NAME"] . "</th>";  //make them into headers
+                        echo "<th class=\"promotion\">" .$header[$row]["TYPE_NAME"] . "</th>";  //make them into headers
                     }
                     echo "</tr>\n";
                     $query = "SELECT A.ACHIEV_NAME, A.ACHIEV_CODE FROM ACHIEVEMENT A
@@ -1264,7 +1263,7 @@ class member {
                     $achievements = allResults(Query($query, $ident));    //get all the achievements ^
                     for($i=0;$i<count($achievements);$i++) {      //loop through rows
                         $this->getPromotionInfo($achievements[$i]['ACHIEV_CODE'], $ident);
-                        echo '<tr><td>'.$achievements[$i]['ACHIEV_NAME'].'</td>';
+                        echo '<tr><td class="promotion">'.$achievements[$i]['ACHIEV_NAME'].'</td>';
                         $this->displayPromoRequest($header, $date, $edit,null,true);
                     }
                     ?>
@@ -1793,15 +1792,15 @@ class member {
      */
     function displayPromoRequest(array $header, $disPlayDates=false, $canEdit=false ,$approved=null,$showPromo=false) {
         if(!$showPromo) {
-            echo "<td>".$this->link_report()."</td>";   //show member
+            echo "<td class=\"promotion\">".$this->link_report()."</td>";   //show member
         }
         if(isset($this->promoRecord['NAME'])&&$this->promoRecord['NAME']!=null)
-            echo "<td>".$this->promoRecord['NAME']."</td>";
+            echo "<td class=\"promotion\">".$this->promoRecord['NAME']."</td>";
         for($j=0;$j<count($header);$j++) {              //TODO actually display stuff
             $index=$header[$j]['TYPE_CODE'];   //get the current requirement
             if(isset($this->promoRecord[$index])) {  //if has that requirement do stuff
                 $current=$this->promoRecord[$index];  //load it
-                echo '<td class="'.$current[0].'">';
+                echo '<td class="promotion '.$current[0].'">';
                 $displayText = true;
                 if($disPlayDates) {       //if displaying dates
                     if($canEdit) {
@@ -1833,7 +1832,7 @@ class member {
                 }
                 echo "</td>";
             } else  {            //else just leave blank
-                echo "<td>n/a</td>";
+                echo '<td class="promotion">n/a</td>';
             }
             
         }   //display yes bubble if allowed to edit info

@@ -24,7 +24,7 @@
         <img src="/patch.gif"></a></td>
         <td><table border="0" width="700">
                 <tr>
-                    <td valign="top" align ="center"><h1>Boise Composite Squadron</h1></td>
+                    <td style="text-align: center; vertical-align: top"><h1>Boise Composite Squadron</h1></td>
                 </tr>
                 <tr>
                     <td align="right" valign="bottom">
@@ -52,7 +52,7 @@
                     echo "<br><a href=\"/login/".$result[$row]["URL"]."\">>".$result[$row]["TASK_NAME"]."</a>\n";
                 }
             } else {
-                $query ="SELECT A.TYPE_NAME, B.TASK_NAME, B.URL 
+                $query ="SELECT A.TYPE_NAME, B.TASK_NAME,B.TASK_CODE, B.URL 
                     FROM SQUADRON_INFO.TASK_TYPE A JOIN
                     SQUADRON_INFO.TASKS B ON
                     A.TYPE_CODE=B.TYPE_CODE

@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>Squadron-Manager » \commander</title>
+<title>Squadron-Manager » \notification</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -59,22 +59,11 @@
 <li class="nav-header">
 <i class="icon-custom icon-method"></i> Methods
                     <ul>
-<li class="method public "><a href="#method___construct" title="__construct :: "><span class="description">__construct()
-        </span><pre>__construct()</pre></a></li>
-<li class="method public "><a href="#method___destruct" title="__destruct :: "><span class="description">__destruct()
-        </span><pre>__destruct()</pre></a></li>
-<li class="method public "><a href="#method_add_sub" title="add_sub :: "><span class="description">add_sub()
-        </span><pre>add_sub()</pre></a></li>
-<li class="method public "><a href="#method_display" title="display :: "><span class="description">display()
-        </span><pre>display()</pre></a></li>
-<li class="method public "><a href="#method_get_Capid" title="get_Capid :: "><span class="description">get_Capid()
-        </span><pre>get_Capid()</pre></a></li>
-<li class="method public "><a href="#method_get_next" title="get_next :: "><span class="description">get_next()
-        </span><pre>get_next()</pre></a></li>
-<li class="method public "><a href="#method_get_num_sub" title="get_num_sub :: "><span class="description">get_num_sub()
-        </span><pre>get_num_sub()</pre></a></li>
-<li class="method public "><a href="#method_get_pos_name" title="get_pos_name :: "><span class="description">get_pos_name()
-        </span><pre>get_pos_name()</pre></a></li>
+<li class="method public "><a href="#method___construct" title="__construct :: Creates a new notification object"><span class="description">Creates a new notification object</span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method_check_display" title="check_display :: Checks if this notification has anything to display."><span class="description">Checks if this notification has anything to display.</span><pre>check_display()</pre></a></li>
+<li class="method public "><a href="#method_display" title="display :: Displays the actual link if it needs to"><span class="description">Displays the actual link if it needs to</span><pre>display()</pre></a></li>
+<li class="method public "><a href="#method_get_presid" title="get_presid :: "><span class="description">get_presid()
+        </span><pre>get_presid()</pre></a></li>
 </ul>
 </li>
 <li class="nav-header">
@@ -83,125 +72,158 @@
 </li>
 <li class="nav-header private">» Private
                     <ul>
-<li class="property private "><a href="#property_member" title="$member :: "><span class="description"></span><pre>$member</pre></a></li>
-<li class="property private "><a href="#property_next_index" title="$next_index :: "><span class="description"></span><pre>$next_index</pre></a></li>
-<li class="property private "><a href="#property_num_sub_pos" title="$num_sub_pos :: "><span class="description"></span><pre>$num_sub_pos</pre></a></li>
-<li class="property private "><a href="#property_pos_code" title="$pos_code :: "><span class="description"></span><pre>$pos_code</pre></a></li>
+<li class="property private "><a href="#property_display" title="$display :: "><span class="description"></span><pre>$display</pre></a></li>
+<li class="property private "><a href="#property_display_text" title="$display_text :: "><span class="description"></span><pre>$display_text</pre></a></li>
+<li class="property private "><a href="#property_presidence" title="$presidence :: "><span class="description"></span><pre>$presidence</pre></a></li>
+<li class="property private "><a href="#property_query" title="$query :: "><span class="description"></span><pre>$query</pre></a></li>
+<li class="property private "><a href="#property_results" title="$results :: "><span class="description"></span><pre>$results</pre></a></li>
+<li class="property private "><a href="#property_task_code" title="$task_code :: "><span class="description"></span><pre>$task_code</pre></a></li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="span8">
-<a id="\commander"></a><ul class="breadcrumb">
+<a id="\notification"></a><ul class="breadcrumb">
 <li>
 <a href="../index.html"><i class="icon-custom icon-class"></i></a><span class="divider">\</span>
 </li>
 <li><a href="../namespaces/global.html">global</a></li>
 <li class="active">
-<span class="divider">\</span><a href="../classes/commander.html">commander</a>
+<span class="divider">\</span><a href="../classes/notification.html">notification</a>
 </li>
 </ul>
-<div class="element class"><div class="details">
+<div class="element class">
+<p class="short_description">The class for notifications for a user.</p>
+<div class="details">
+<div class="long_description"><p>The notifications are associated with a staff task from the table TASKS
+these are the pages the staff allowed to see.
+If a staff member has permissions for that task he will have that notication.</p>
+
+<p>The display string of the text has a special syntax.  Any normal text will be simply displayed
+to display a query result enclose the column name (if renamed use the renamed column name) in **
+Only the first row (0) will be used</p>
+
+<p>if the column name contains DATE it will be parsed as a dateTime, and will follow the display constants for this project</p>
+
+<p>i.e. There are <em>COUNT</em> testing requests
+There was a request by <em>REQUEST_NAME</em> to clear the system log on <em>DATE</em>.</p>
+
+<p>Presidence scale: 0-3
+0: high priority- security breech
+1: System administration needed
+2:High-priority membership administration
+3:low-priority membership administration</p></div>
 <h3>
 <i class="icon-custom icon-method"></i> Methods</h3>
 <a id="method___construct"></a><div class="element clickable method public method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
-<h2>__construct()
-        </h2>
-<pre>__construct($capid, $pos_code, $ident, $next_index) </pre>
+<h2>Creates a new notification object</h2>
+<pre>__construct(String $query, String $text, int $prior, string $code) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
+<div class="long_description"><p>WARNING:INPUT cannot be cleaned because queries are being parsed. Do not create a notification from
+user input, use ONLY input from the csv file</p></div>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$capid</h4></div>
-<div class="subelement argument"><h4>$pos_code</h4></div>
-<div class="subelement argument"><h4>$ident</h4></div>
-<div class="subelement argument"><h4>$next_index</h4></div>
+<div class="subelement argument">
+<h4>$query</h4>
+<code>String</code><p>-the query to run</p>
+</div>
+<div class="subelement argument">
+<h4>$text</h4>
+<code>String</code><p>text - the text to be displayed with special syntax
+* The display string of the text has a special syntax.  Any normal text will be simply displayed
+to display a query result enclose the column name (if renamed use the renamed column name) in **
+Only the first row (0) will be used
+if the column name contains DATE it will be parsed as a dateTime, and will follow the display constants for this project
+i.e. There are <em>COUNT</em> testing requests
+There was a request by <em>REQUEST_NAME</em> to clear the system log on <em>DATE</em>.</p>
+</div>
+<div class="subelement argument">
+<h4>$prior</h4>
+<code>int</code><ul>
+<li>the presidence of the notification 0-3 scale</li>
+</ul>
+</div>
+<div class="subelement argument">
+<h4>$code</h4>
+<code>string</code><p>-the task code for this notification from the database</p>
+</div>
 </div></div>
 </div>
-<a id="method___destruct"></a><div class="element clickable method public method___destruct" data-toggle="collapse" data-target=".method___destruct .collapse">
-<h2>__destruct()
-        </h2>
-<pre>__destruct() </pre>
+<a id="method_check_display"></a><div class="element clickable method public method_check_display" data-toggle="collapse" data-target=".method_check_display .collapse">
+<h2>Checks if this notification has anything to display.</h2>
+<pre>check_display($ident) : \boolean-Returns</pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method_add_sub"></a><div class="element clickable method public method_add_sub" data-toggle="collapse" data-target=".method_add_sub .collapse">
-<h2>add_sub()
-        </h2>
-<pre>add_sub() </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>It also runs the query and preps for the display.</p>
+
+<p>WARNING: Do not use the User's database connection use the sandboxed one
+instead.  These will be executing queries that may be tampered with.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$ident</h4></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>\boolean-Returns</code>true if this will be displayed, false otherwise</div>
+</div></div>
 </div>
 <a id="method_display"></a><div class="element clickable method public method_display" data-toggle="collapse" data-target=".method_display .collapse">
-<h2>display()
-        </h2>
-<pre>display($ident) </pre>
+<h2>Displays the actual link if it needs to</h2>
+<pre>display(\mysqli $ident) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$ident</h4></div>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
 </div></div>
 </div>
-<a id="method_get_Capid"></a><div class="element clickable method public method_get_Capid" data-toggle="collapse" data-target=".method_get_Capid .collapse">
-<h2>get_Capid()
+<a id="method_get_presid"></a><div class="element clickable method public method_get_presid" data-toggle="collapse" data-target=".method_get_presid .collapse">
+<h2>get_presid()
         </h2>
-<pre>get_Capid() </pre>
+<pre>get_presid() </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method_get_next"></a><div class="element clickable method public method_get_next" data-toggle="collapse" data-target=".method_get_next .collapse">
-<h2>get_next()
-        </h2>
-<pre>get_next() </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method_get_num_sub"></a><div class="element clickable method public method_get_num_sub" data-toggle="collapse" data-target=".method_get_num_sub .collapse">
-<h2>get_num_sub()
-        </h2>
-<pre>get_num_sub() </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method_get_pos_name"></a><div class="element clickable method public method_get_pos_name" data-toggle="collapse" data-target=".method_get_pos_name .collapse">
-<h2>get_pos_name()
-        </h2>
-<pre>get_pos_name($ident) </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
-<div class="subelement argument"><h4>$ident</h4></div>
-</div></div>
 </div>
 <h3>
 <i class="icon-custom icon-property"></i> Properties</h3>
-<a id="property_member"> </a><div class="element clickable property private property_member" data-toggle="collapse" data-target=".property_member .collapse">
+<a id="property_display"> </a><div class="element clickable property private property_display" data-toggle="collapse" data-target=".property_display .collapse">
 <h2></h2>
-<pre>$member </pre>
+<pre>$display </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_next_index"> </a><div class="element clickable property private property_next_index" data-toggle="collapse" data-target=".property_next_index .collapse">
+<a id="property_display_text"> </a><div class="element clickable property private property_display_text" data-toggle="collapse" data-target=".property_display_text .collapse">
 <h2></h2>
-<pre>$next_index </pre>
+<pre>$display_text </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_num_sub_pos"> </a><div class="element clickable property private property_num_sub_pos" data-toggle="collapse" data-target=".property_num_sub_pos .collapse">
+<a id="property_presidence"> </a><div class="element clickable property private property_presidence" data-toggle="collapse" data-target=".property_presidence .collapse">
 <h2></h2>
-<pre>$num_sub_pos </pre>
+<pre>$presidence </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_pos_code"> </a><div class="element clickable property private property_pos_code" data-toggle="collapse" data-target=".property_pos_code .collapse">
+<a id="property_query"> </a><div class="element clickable property private property_query" data-toggle="collapse" data-target=".property_query .collapse">
 <h2></h2>
-<pre>$pos_code </pre>
+<pre>$query </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-</div></div>
+<a id="property_results"> </a><div class="element clickable property private property_results" data-toggle="collapse" data-target=".property_results .collapse">
+<h2></h2>
+<pre>$results </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_task_code"> </a><div class="element clickable property private property_task_code" data-toggle="collapse" data-target=".property_task_code .collapse">
+<h2></h2>
+<pre>$task_code </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="row"><footer class="span12">

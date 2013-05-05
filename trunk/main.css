@@ -6,11 +6,39 @@
         Purpose of the stylesheet follows.
 */
 body {color:black;}
-td { border-color: black; }
-p.P {color:green}
-p.I {color:orange}
-p.F {color:red}
-td.P {color:green}
-td.I {color:orange}
-td.F {color:red}
-
+.P {color:green}
+.I {color:orange}
+.F {color:red}
+.promotion .P {
+    color:green;
+}
+.promotion .F {
+    color:orange;
+}
+.promotion .I {
+    color:red;
+}
+.promotion {
+    font-size:15px;
+    vertical-align:top;
+    text-align: center;
+    width:900px;
+    border:1px solid black;
+    border-collapse: collapse;
+}
+th.promotion {
+    font-size: 12px;
+    border:1px solid black;
+}
+a.pres0 {
+    color: #CC0000;
+}
+a.pres1 {
+    color:#FF6600;
+}
+a.pres2 {
+    color:#FFCC00;
+}
+a.pres3 {
+    color:blue
+}
