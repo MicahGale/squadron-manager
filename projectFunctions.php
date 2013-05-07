@@ -39,6 +39,7 @@
  * TODO allow to change password
  * TODO finish populating db
  * TODO check old TODO tags
+ * TODO edit member information
  * ***************************Debug/fix*******************************************
  * TODO consider promo boards for all
  * TODO fix member-side queries
@@ -1995,6 +1996,19 @@ class member {
         if(count($results)>0)
             return $results[0]['NEXT_ACHIEV'];
         return false;
+    }
+    /**
+     * displays the emergency contact information in tabular form the emergency contact report
+     */
+    function display_Emergency() {
+        $emergency=$this->emergencyContacts;
+        $num=count($emergency);
+        for($i=0;$i<$num;$i++) {
+            echo "<tr><td></td>";   //displays empty cell for asthetics
+            $buffer=$emergency[$i];
+            echo "<td>".$buffer->getName()."- ".$buffer->getRelation."</td>";  //shows name
+            echo "<td>".$buffer->getPhone."</td></tr>";   //displays phone number
+        }
     }
 }
 class unit {

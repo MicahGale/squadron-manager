@@ -1,0 +1,33 @@
+/* 
+    Document   : print
+    Created on : May 7, 2013, 8:13:54 AM
+    Author     : 2011083465
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: page;
+    position: static;
+}
+body {
+    margin:0; 
+    padding:0; 
+    line-height: 1.4em; 
+    word-spacing:1px; 
+    letter-spacing:0.2px; 
+/*    font: 13px Arial, Helvetica,"Lucida Grande", serif; */
+    color: #000;
+}
+table {
+    border-collapse: collapse;
+}
+td {
+    width: 33%;
+    border-bottom: 1px solid black;
+}
+td.header{
+    columns: 3;
+    border-bottom: thick solid black;
+}
+
