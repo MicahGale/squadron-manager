@@ -30,7 +30,7 @@
  * **********************FOR v. .10*****************************
  * TODO enforce CAPR110-1 password policy
  * TODO ban terminated members
- * TODO debug promotion report
+ * TODO debug promotion report and check accuracy, including time
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
  * TODO create reports: emergency contact info, and eservices
@@ -41,7 +41,6 @@
  * TODO check old TODO tags
  * TODO edit member information
  * ***************************Debug/fix*******************************************
- * TODO consider promo boards for all
  * TODO fix member-side queries
  * TODO debug session hijacking resign-in keep post input
  * 
@@ -92,14 +91,34 @@
   */
  define("PHP_TO_MYSQL_FORMAT","Y-m-d");   
  define( "SQL_DATE_FORMAT", "%d-%m-%Y");  //php display except at mysql level
+ /**
+  * The format for inserting a complete date time into SQL
+  */
+ define("SQL_INSERT_DATE_TIME","o-m-d H:i:s");
  define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
  define("CPFT_RUNNING_REQ",1);            //the amount of running events that must be passed
  define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
  define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
  define('PROFILE_PATH',"/usr/share/www/profile");  //the path to the profile pictures stored outside document root
  define('NOTIF_PATH','/usr/share/www/notifications.csv');  //the csv that holds the notification information
+ /**
+  * The constant for how long to have an account in SQL time format
+  */
+ define("LOCK_TIME","00:30:00");
+ /**
+  * The maximum number of bad login attempts in account lockout time before the account is locked
+  */
+ define("MAX_LOGIN",8);
+ /**
+  * Stores and auditable event to the AUDIT_LOG table.
+  * If we have the user's CAPID that will be stored along with the log
+  * 
+  * @param String $ip the IP address of the client
+  * @param String $type - the type of event from the table INTRUSION_TYPE
+  * @return String the date and time of the Event formatted for SQL
+  */
 function auditLog($ip, $type) {
-    $time = date('o-m-d H:i:s');
+    $time = date(SQL_INSERT_DATE_TIME);
     $ident= Connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
     mysqli_query($ident,"INSERT INTO AUDIT_LOG(TIME_OF_INTRUSION, INTRUSION_TYPE, PAGE,IP_ADDRESS)
         VALUES('$time','$type','".$_SERVER['SCRIPT_NAME']."','$ip')");
@@ -109,23 +128,45 @@ function auditLog($ip, $type) {
     }
     return $time;
 }
+/**
+ * Inserts pertinant information for auditable event into AUDIT_DUMP
+ * 
+ * @param String $time the time of the event returned from auditLog
+ * @param String $fieldName the name of the value being stored, i.e. CAPID, input
+ * @param String $fieldValue the actual value of the field. i.e. 123456
+ */
 function auditDump($time, $fieldName, $fieldValue) {
     $ident=connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf',"localhost");
     mysqli_query($ident,"INSERT INTO AUDIT_DUMP(TIME_OF_INTRUSION, FIELD_NAME, FIELD_VALUE)
         VALUES('$time','$fieldName','$fieldValue')");
     close($ident);
 }
+/**
+ * Logs login attempts, successful or not to LOGIN_LOG.
+ * @param Int $capid the USERs CAPID that the login was for
+ * @param boolean $success True if they were able to login false if they're login failed
+ */
 function logLogin($capid, $success) {
     $capid= cleanInputInt($capid,6,'capid');
-    $time = date('o-m-d H:i:s');
+    $time = date(SQL_INSERT_DATE_TIME);
     $ident=connect( 'Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
     $ip = $_SERVER['REMOTE_ADDR'];
     Query("INSERT INTO LOGIN_LOG(TIME_LOGIN, CAPID, IP_ADDRESS, SUCEEDED)
                  VALUES('$time','$capid','$ip','$success')", $ident);
     close($ident);
 }
+/**
+ * Checks if an account is locked from too many bad logins
+ * Checks ACCOUNT_LOCKS and LOGIN_LOG
+ * 
+ * This will first if their is ACCOUNT_LOCK in place already from said table, and verifies the lock
+ * is still in effect.  If there isn't one it checks the number of bad logins,and will place a block
+ * Uses the constant MAX_LOGIN for the maximum number of logins in the time from LOCK_TIME
+ * 
+ * @param Int $capid the user's CAPID you are checking
+ * @return boolean true if there is no lock false if there is a lock
+ */
 function checkAccountLocks($capid) {
-    $maxLogin = 8;
     $capid=  cleanInputInt($capid,6,'CAPID');
     $ident = connect('ViewNext', 'oiu34wioejnkfvlkmse39ijfdokfdyuhjf','localhost');   //logon to view account locks
     $results = Query("SELECT VALID_UNTIL FROM ACCOUNT_LOCKS
@@ -144,19 +185,26 @@ function checkAccountLocks($capid) {
                     WHERE SUCEEDED=FALSE
                     AND FACTORED=TRUE
                     AND CAPID='$capid'
-                    AND TIME_LOGIN >=(SUBTIME(NOW(),'00:30:00'))";
+                    AND TIME_LOGIN >=(SUBTIME(NOW(),'".LOCK_TIME."'))";
         $results=Query($query,$ident);
-        if(Result($results,0, "COUNT(*)")>=$maxLogin) {             //if tried too many times then lock it
+        if(Result($results,0, "COUNT(*)")>=MAX_LOGIN) {             //if tried too many times then lock it
             $ident =connect('Logger', 'alkjdn332lkj4230932324hwndsfkldsfkjldf','localhost');
             Query("INSERT INTO ACCOUNT_LOCKS(CAPID, VALID_UNTIL)
-                VALUES('$capid',ADDTIME(NOW(),'00:30:00'))", $ident);
+                VALUES('$capid',ADDTIME(NOW(),'".LOCK_TIME."'))", $ident);
             return false;
         } else {                                //else says it's fine
             return true;
         }
     }
 }
-function newMember($identifier, $page,$capid) {                                              //if no members allow to create new member
+/**
+ * Creates an input form for creating a new member
+ * 
+ * @param mysqli $identifier the Datebase connection
+ * @param String $page the target page for the form
+ * @param Int $capid the CAPID if specified to display as the defualt CAPID
+ */
+function newMember($identifier, $page,$capid=null) {                                              //if no members allow to create new member
     //displays table for input
     echo "<form action=\"$page\" method=\"post\">";
     //displays input fields
@@ -179,6 +227,13 @@ function newMember($identifier, $page,$capid) {                                 
     echo "<br><br><strong>Also add at least One emergency Contact</strong>";
     newContact(FALSE, $identifier);
 }
+/**
+ * Creates a form to input emergency contact information
+ * 
+ * @param Boolean $submit whether or not to have it's own form 
+ * @param mysqli $identifier the database connection
+ * @param String $page the target page if $submit is true
+ */
 function newContact($submit, $identifier, $page = null) {
     if ($submit) {
         echo"<form action=\"$page\" method=\"post\">";
@@ -197,6 +252,12 @@ function newContact($submit, $identifier, $page = null) {
         echo"<input type=\"submit\" value=\"Add Emergency Contacts\"/></form>";
     }
 }
+/**
+ *Creates a form to create a new Unit
+ *  
+ * @param mysqli $identifier the database connection
+ * @param String $page the target page for the form
+ */
 function newUnit($identifier, $page) {
     echo "<br>Please enter the new unit's information below:<br>\n";
     echo"<form action=\"$page\" method=\"post\">\n";
@@ -207,12 +268,24 @@ function newUnit($identifier, $page) {
     dropDownMenu("SELECT WING, WING_NAME FROM WING", "wing", $identifier, false);
     echo "<br>\n<input type=\"submit\" value=\"Add new Unit\"/></form>";
 }
+/**
+ * Form to create a new Emergency Contact relationship
+ * 
+ * @param String $page the target page
+ */
 function newContactType($page) {
     echo"<br>Please enter the new type of Contact below\n";
     echo "<form action=\"$page\" method=\"post\">";
     echo "Contact Type: <input type=\"text\" name=\"contact\"/><br>\n";
     echo "<input type=\"submit\" value=\"add contact type\"/><br></form>";
 }
+/**
+ * Creates a form for inputing a new visitor to our unit
+ * 
+ * @param String $page the target page
+ * @param String $defaultFname the first name from the input to display by defualt
+ * @param String $defaultLname the last name from input to display by default
+ */
 function newVisitor($page, $defaultFname = null, $defaultLname = null) {
     echo "<form action=\"$page\" method=\"post\">\n";
     echo "First Name:<input type=\"text\" name=\"Fname\" size=\"5\" default=\"$defaultFname\"/><br>\n";
@@ -222,12 +295,23 @@ function newVisitor($page, $defaultFname = null, $defaultLname = null) {
     echo "Emergency Contact Phone Number:<input type=\"text\" name=\"ContPhone\" size=\"5\"/><br>\n";
     echo "<input type=\"submit\" value=\"Finish\"/></form>\n";
 }
+/**
+ * Creates a drop down <select> menu from a database query
+ * 
+ * The first column needs to be the code for the variable to input to the server, column 2 is the text to display in the drop down
+ * @param String $query the Query to run
+ * @param String $name the name of the input for the form
+ * @param mysqli $identifier the database connection
+ * @param boolean $hasotherfield true to allow users to select an other value
+ * @param String $default the code of the option to show by default
+ * @param boolean $hasNoSelect allows the user to not put input
+ */
 function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default = null, $hasNoSelect=false) {      //drop down menu 1st field is code 2nd is name
     $results = Query($query, $identifier);                     //TODO include error handlin
     $row = 0;
     echo "<select name=\"$name\">";
     if($hasNoSelect==true) {                          //if has no select show empty drop down
-        echo '<option selected="selected" value="null">-Please Select One-</option>';
+        echo '<option selected="selected" value="null">-This input is optional-</option>';
     }
     while ($row < numRows($results)) {
         $code = Result($results, $row, 0);
@@ -244,6 +328,15 @@ function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default
     }
     echo "</select>";
 }
+/**
+ * Logs a database error, and displays an error message to the user
+ * 
+ * WARNING: for development displays the error code, and more information, this needs
+ * to be removed for production servers
+ * 
+ * @param String $errorno the Mysql error 
+ * @param String $error the error text from Mysql
+ */
 function reportDbError($errorno,$error) {
     $time = auditLog( $_SERVER['REMOTE_ADDR'], 'ER');
     auditDump($time, 'Error Code', $errorno);
@@ -256,6 +349,17 @@ function reportDbError($errorno,$error) {
     echo"<br><strong>Page:</strong>".$_SERVER['SCRIPT_NAME']."<br>\n";
     echo"<strong>IP:</strong>" . $_SERVER['REMOTE_ADDR'] . "<br>";
 }
+/**
+ * Runs a SQL query, and handles the database errors
+ * 
+ * Use this function for all your queries, and not mysqli_query. This allows easy 
+ * portability to other DBMS's
+ * 
+ * @param String $query the query to run
+ * @param mysqli $ident the database connection
+ * @param String $message a message to display on success
+ * @return type for Select returns the mysqli_result, for UPdate, etc returns true on success false for failures
+ */
 function Query($query, mysqli $ident, $message = null) {         //kill $page sig on all queries
     $results = mysqli_query($ident, $query);
     if ($results == false) {
@@ -265,8 +369,18 @@ function Query($query, mysqli $ident, $message = null) {         //kill $page si
     }
     return $results;
 }
+/**
+ * Connects to a database.
+ * 
+ * Use this function allow easy portability to other DBMSs
+ * 
+ * @param String $username the username
+ * @param String $password the password
+ * @param String $server the server you are connecting to 
+ * @param String $db the default database to use
+ * @return mixed the mysqli connection on success false on failure
+ */
 function connect($username,$password,$server="localhost",$db="SQUADRON_INFO") {
-//    echo "<br>user:$username<Br><br>$password<br><br>$server<br>";
     $connection=  mysqli_connect($server, $username, $password, $db);
     if(!$connection) {                         //if had error
         reportDbError(mysqli_connect_errno(), mysqli_connect_error());
