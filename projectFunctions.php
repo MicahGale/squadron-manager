@@ -1140,9 +1140,27 @@ function parseMinutes($input) {
     $seconds=$exploded[1];
     return $minute+$seconds/60;
 }
+/**
+ * The class for all members, use this whenever working with members or CAPIDS
+ * 
+ * Inits levels are used to get different levels of information
+ * levels -1= all from input 0=capid 1=capid+name+gender+achievement 2=1+text+member_type+picture 3=2+dates 4=3+emergency+unit
+ */
 class member {
+    /**
+     *
+     * @var int the member's CAPID
+     */
     private $capid;
+    /**
+     *
+     * @var String the member's Last Name
+     */
     private $name_last;
+    /**
+     *
+     * @var String the Member's First Name
+     */
     private $name_first;
     private $gender;
     private $DoB;
