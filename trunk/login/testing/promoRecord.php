@@ -77,10 +77,10 @@ if(!isset($_SESSION['microscope'])) {                      //if not saved yet ma
                 <a href="/help/inputPercentages.php" target="_blank">How to Input Percentages</a>
             <input type="submit" name="submit" value="save"/>
         <?php
-        $member->promotionReport($ident,true,true,true);
         if(isset($_POST['submit'])) { // if saving do so.
             $member->parseWholeEdit($ident, $_POST);         //parse and save, done!
         }
+        $member->promotionReport($ident,true,true,true);
         ?>
             <input type="submit" name="submit" value="save"/>
                     </td></tr></table>

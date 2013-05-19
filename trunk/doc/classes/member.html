@@ -22,6 +22,7 @@
 <li><a>Packages</a></li>
 <li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
 <li><a href="../packages/Squadron-Manager.html"><i class="icon-folder-open"></i> Squadron-Manager</a></li>
+<li><a href="../packages/Squadron-manager.html"><i class="icon-folder-open"></i> Squadron-manager</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -32,10 +33,10 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">234</span></a></li>
+                <span class="label label-info">200</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
-                <span class="label label-info">11</span>
+                <span class="label label-info">12</span>
 </li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
@@ -80,6 +81,7 @@
         </span><pre>displayPromoRequest()</pre></a></li>
 <li class="method public "><a href="#method_display_Contact" title="display_Contact :: "><span class="description">display_Contact()
         </span><pre>display_Contact()</pre></a></li>
+<li class="method public "><a href="#method_display_Emergency" title="display_Emergency :: displays the emergency contact information in tabular form the emergency contact report"><span class="description">displays the emergency contact information in tabular form the emergency contact report</span><pre>display_Emergency()</pre></a></li>
 <li class="method public "><a href="#method_editContact" title="editContact :: "><span class="description">editContact()
         </span><pre>editContact()</pre></a></li>
 <li class="method public "><a href="#method_editFields" title="editFields :: "><span class="description">editFields()
@@ -137,8 +139,10 @@
 <li class="method public "><a href="#method_parseWholeEdit" title="parseWholeEdit :: Parses and inputs a complete member promotion report."><span class="description">Parses and inputs a complete member promotion report.</span><pre>parseWholeEdit()</pre></a></li>
 <li class="method public "><a href="#method_promo_board_report" title="promo_board_report :: "><span class="description">promo_board_report()
         </span><pre>promo_board_report()</pre></a></li>
+<li class="method public "><a href="#method_promote" title="promote :: Enters a member promotion."><span class="description">Enters a member promotion.</span><pre>promote()</pre></a></li>
 <li class="method public "><a href="#method_promotionReport" title="promotionReport :: "><span class="description">promotionReport()
         </span><pre>promotionReport()</pre></a></li>
+<li class="method public "><a href="#method_reload" title="reload :: Reloads all the membership information from the database"><span class="description">Reloads all the membership information from the database</span><pre>reload()</pre></a></li>
 <li class="method public "><a href="#method_replaceOther" title="replaceOther :: "><span class="description">replaceOther()
         </span><pre>replaceOther()</pre></a></li>
 <li class="method public "><a href="#method_retrieveCPFTrequire" title="retrieveCPFTrequire :: "><span class="description">retrieveCPFTrequire()
@@ -314,7 +318,7 @@
 <a id="method_displayPromoRequest"></a><div class="element clickable method public method_displayPromoRequest" data-toggle="collapse" data-target=".method_displayPromoRequest .collapse">
 <h2>displayPromoRequest()
         </h2>
-<pre>displayPromoRequest(array $header, boolean $disPlayDates, boolean $canEdit, boolean $approved, $showPromo) </pre>
+<pre>displayPromoRequest(array $header, boolean $disPlayDates, boolean $canEdit, boolean $approved, boolean $showPromo) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -332,7 +336,10 @@
 <div class="subelement argument">
 <h4>$approved</h4>
 <code>boolean</code><p>weather or not the promotion is approved</p></div>
-<div class="subelement argument"><h4>$showPromo</h4></div>
+<div class="subelement argument">
+<h4>$showPromo</h4>
+<code>boolean</code><p>whether or not to show as a whole promotion report, false will show name in the row, true won't</p>
+</div>
 </div></div>
 </div>
 <a id="method_display_Contact"></a><div class="element clickable method public method_display_Contact" data-toggle="collapse" data-target=".method_display_Contact .collapse">
@@ -346,6 +353,12 @@
 <div class="subelement argument"><h4>$ident</h4></div>
 <div class="subelement argument"><h4>$head_name</h4></div>
 </div></div>
+</div>
+<a id="method_display_Emergency"></a><div class="element clickable method public method_display_Emergency" data-toggle="collapse" data-target=".method_display_Emergency .collapse">
+<h2>displays the emergency contact information in tabular form the emergency contact report</h2>
+<pre>display_Emergency() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="method_editContact"></a><div class="element clickable method public method_editContact" data-toggle="collapse" data-target=".method_editContact .collapse">
 <h2>editContact()
@@ -615,7 +628,7 @@
 <a id="method_parsePromoEdit"></a><div class="element clickable method public method_parsePromoEdit" data-toggle="collapse" data-target=".method_parsePromoEdit .collapse">
 <h2>parsePromoEdit()
         </h2>
-<pre>parsePromoEdit(\mysqli_stmt $insert, \mysqli_stmt $update, \mysqli_stmt $delete, array $header, array $input, $achiev) </pre>
+<pre>parsePromoEdit(\mysqli_stmt $insert, \mysqli_stmt $update, \mysqli_stmt $delete, array $header, array $input, $achiev, $ident) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -626,6 +639,7 @@
 <div class="subelement argument"><h4>$header</h4></div>
 <div class="subelement argument"><h4>$input</h4></div>
 <div class="subelement argument"><h4>$achiev</h4></div>
+<div class="subelement argument"><h4>$ident</h4></div>
 </div></div>
 </div>
 <a id="method_parseWholeEdit"></a><div class="element clickable method public method_parseWholeEdit" data-toggle="collapse" data-target=".method_parseWholeEdit .collapse">
@@ -655,6 +669,28 @@
 <div class="subelement argument"><h4>$header</h4></div>
 </div></div>
 </div>
+<a id="method_promote"></a><div class="element clickable method public method_promote" data-toggle="collapse" data-target=".method_promote .collapse">
+<h2>Enters a member promotion.</h2>
+<pre>promote(String $achiev, \dateTime $date, \mysqli $ident) : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>If promotion is most recent update member records</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$achiev</h4>
+<code>String</code><p>the achievement the promotion's for</p>
+</div>
+<div class="subelement argument">
+<h4>$date</h4>
+<code>\dateTime</code><p>the date of the promotion</p></div>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>True on success false on failure</div>
+</div></div>
+</div>
 <a id="method_promotionReport"></a><div class="element clickable method public method_promotionReport" data-toggle="collapse" data-target=".method_promotionReport .collapse">
 <h2>promotionReport()
         </h2>
@@ -667,6 +703,18 @@
 <div class="subelement argument"><h4>$header</h4></div>
 <div class="subelement argument"><h4>$date</h4></div>
 <div class="subelement argument"><h4>$edit</h4></div>
+</div></div>
+</div>
+<a id="method_reload"></a><div class="element clickable method public method_reload" data-toggle="collapse" data-target=".method_reload .collapse">
+<h2>Reloads all the membership information from the database</h2>
+<pre>reload(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
 </div></div>
 </div>
 <a id="method_replaceOther"></a><div class="element clickable method public method_replaceOther" data-toggle="collapse" data-target=".method_replaceOther .collapse">
@@ -906,7 +954,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-05-05T00:35:09-06:00.<br></footer></div>
+            generated on 2013-05-11T14:06:23-06:00.<br></footer></div>
 </div>
 </body>
 </html>

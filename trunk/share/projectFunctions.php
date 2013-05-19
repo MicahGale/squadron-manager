@@ -30,12 +30,13 @@
  * **********************FOR v. .10*****************************
  * TODO enforce CAPR110-1 password policy
  * TODO ban terminated members
- * TODO debug promotion report and check accuracy, including time
+ * TODO check accuracy, including time
  * TODO consider cadet oath and grooming standards
  * TODO add admin to add other users and grant privelidges
  * TODO create reports: emergency contact info, and eservices
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
+ * TODO add ribbon request stuff, and supply stuff
  * TODO allow to change password
  * TODO finish populating db
  * TODO check old TODO tags
@@ -109,6 +110,10 @@
   * The maximum number of bad login attempts in account lockout time before the account is locked
   */
  define("MAX_LOGIN",8);
+ /**
+  * the interval that must be waited between promotions
+  */
+ define("PROMOTION_WAIT",5184000);
  /**
   * Stores and auditable event to the AUDIT_LOG table.
   * If we have the user's CAPID that will be stored along with the log
@@ -340,7 +345,7 @@ function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default
 function reportDbError($errorno,$error) {
     $time = auditLog( $_SERVER['REMOTE_ADDR'], 'ER');
     auditDump($time, 'Error Code', $errorno);
-    auditDump($time, 'Error Message', $error);
+    auditDump($time, 'Error Message', mysql_real_escape_string($error));  //escape the ''
     echo"<br><strong>there was an error with processing the request</strong><br>
         Please give the following information to you Squadron's IT Officer(s)<br>
         <strong>error:</strong>\n";
@@ -389,6 +394,14 @@ function connect($username,$password,$server="localhost",$db="SQUADRON_INFO") {
         return $connection;                    //else just give them the resource
     }
 }
+/**
+ * Returns a single result from a query
+ * 
+ * @param mysqli_result $result the result to be parsed
+ * @param type $row the row you are looking for
+ * @param type $field the column you want 
+ * @return string returns the cell
+ */
 function Result(mysqli_result $result,$row,$field) {
     if(is_int($field)) {                          //if number was given number then get field name
         $temp=  mysqli_fetch_field_direct($result,$field);
@@ -410,6 +423,15 @@ function Result(mysqli_result $result,$row,$field) {
         }
     }
 }
+/**
+ * Creates a 2-d array from a query result
+ * 
+ * The first level of the array is the row, and the second the column
+ * $result[0]['hi'] would be the column hi for the first row.
+ * 
+ * @param mysqli_result $result the query result being parsed
+ * @return Array
+ */
 function allResults(mysqli_result $result) {
     $array=array();
     for($row=0;$row<mysqli_num_rows($result);$row++) {       //get all the rows and gett array
@@ -417,69 +439,124 @@ function allResults(mysqli_result $result) {
     }
     return $array;
 }
+/**
+ * Returns the number of rows in a mysql_result
+ * 
+ * @param mysqli_result $result the result to count
+ * @return int the number of rows returned
+ */
 function numRows(mysqli_result $result) {
     if(!is_bool($result))                  //if is actually a result
         return mysqli_num_rows($result);
     else
         return 0;                //else return 0
 }
+/**
+ * Closes a database connection
+ * 
+ * @param mysqli $ident the database connection to close
+ * @return boolean true on success false otherwise
+ */
 function close(mysqli $ident) {
     return mysqli_close($ident);
 }
+/**
+ * Prepares a prepared-statement from the query provided and the database connection
+ * 
+ * @param mysqli $ident the database connection to use for the prepared statement
+ * @param type $query the query for the prepared statement
+ * @return mysqli_stmt the prepared statement created
+ */
 function prepare_statement(mysqli $ident,$query) {
     $stmt= mysqli_stmt_init($ident);
     if(!mysqli_stmt_prepare($stmt, $query))
         reportDbError (mysqli_errno ($ident), mysqli_error ($ident));
     return $stmt;
 }
-function bind(mysqli_stmt $ident,$types, array $bind) {
+/**
+ * Binds the values to the prepared statement and prepares it for execution.
+ * 
+ * Mysqli_stmt::Bind_param uses referential variables for this, but this function doesn't support that
+ * do not use in a refferential variable way
+ * 
+ * @param mysqli_stmt $stmt the prepared statement being used
+ * @param String $types the string of types being used. see mysqli_stmt::bind_param <http://php.net/manual/en/mysqli-stmt.bind-param.php>
+ * @param array $bind the array of values to actually bind
+ */
+function bind(mysqli_stmt $stmt,$types, array $bind) {
     for($i=0;$i<count($bind);$i++) {
         $buffer[$i]=&$bind[$i];
     }
-    $pass = array_merge(array($ident,$types), $buffer);
+    $pass = array_merge(array($stmt,$types), $buffer);
     call_user_func_array("mysqli_stmt_bind_param", $pass);
 }
-function execute(mysqli_stmt $ident) { 
-    if(!($success=mysqli_stmt_execute($ident))) {                       //if there was an error with the execution
-        reportDbError (mysqli_stmt_errno ($ident), mysqli_stmt_error($ident));
+/**
+ * Executes a prepared Statement
+ * 
+ * You need to bind the parameters before executing this.
+ * 
+ * @param mysqli_stmt $stmt the prepared statement to execute.
+ * @return mixed for Select a mysqli_result, else true for success and false on failure
+ */
+function execute(mysqli_stmt $stmt) { 
+    if(!($success=mysqli_stmt_execute($stmt))) {                       //if there was an error with the execution
+        reportDbError (mysqli_stmt_errno ($stmt), mysqli_stmt_error($stmt));
     } else {
-        if(($result=mysqli_stmt_get_result($ident))!=false) {
+        if(($result=mysqli_stmt_get_result($stmt))!=false) {
             return $result;
         }
     }
     return $success;       //if no results then return the success
 }
+/**
+ * Closes a prepared Statement
+ * 
+ * @param mysqli_stmt $stmt the statement to close
+ * @return bool true on success false on failure
+ */
 function close_stmt(mysqli_stmt $stmt) {
-    mysqli_stmt_close($stmt);                 //closes the prepared statement
+    return mysqli_stmt_close($stmt);                 //closes the prepared statement
 }
 /**
  * CleanInputInt-cleans input number
  * 
  * This cleans input numbers against SQL injection, XSS, and remote Execution and file traversing.
  * It uses the mysqli_real_escape_string htmlspecialchars, and escapshellcmd to do this.
- * It also checks lenght, and parses it as a number to prevent other issues. Any issues and the event will be 
+ * It also checks length, and parses it as a number to prevent other issues. Any issues and the event will be 
  * logged along with the sanatized form of the input
  * 
  * This 
  * @param String $input the raw Input
- * @param Int $length the absolute length the number must be 
+ * @param Int $length the absolue length or maximum lenght the number must be, depending on $exact 
  * @param String $fieldName the name of the input field used for logging
+ * @param bool true for $length to be exact false for $length to be the max length
  * @return float The Input Number parsed and cleaned as a floating point 
  */
-function cleanInputInt($input, $length, $fieldName) {
+function cleanInputInt($input, $length, $fieldName,$exact=true) {
     $link = mysqli_connect();
     $clean = escapeshellcmd(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
-    if (strlen($clean) > $length || !is_numeric($clean) || $clean != $input) {
+    if (strlen($clean)!= $length&&$exact||  strlen($clean)>$length&&!$exact || !is_numeric($clean) || $clean != $input) {
         $time = auditLog( $_SERVER['REMOTE_ADDR'], "SI");
         auditDump($time, $fieldName, $clean);
         echo "<font color=\"red\">$fieldName is not a valid number it must be $length digits long.</font><br>";
-        if (strlen($clean) >= $length || !is_numeric($clean)) {          //nulls if wrong type
+        if (strlen($clean) > $length || !is_numeric($clean)) {          //nulls if wrong type
             $clean = null;
         }
     }
     $clean = floatval($clean);                                            //cast it to int
     return $clean;
 }
+/**
+ * Cleans an input String
+ * 
+ * See cleanInputInt for how it cleans the text
+ * 
+ * @param String $input The raw input
+ * @param Int $length the maximum allowed length
+ * @param String $fieldName the field name to be logged
+ * @param bool $empty false if the String can't be empty, true if it can be empty
+ * @return String returns the cleaned text
+ */
 function cleanInputString($input, $length, $fieldName, $empty) {                      //clean and log numbers
     $link= mysqli_connect();
     $clean = escapeshellcmd(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
@@ -491,22 +568,32 @@ function cleanInputString($input, $length, $fieldName, $empty) {                
         }
          $time = auditLog( $_SERVER['REMOTE_ADDR'], 'SI');
         auditDump($time, "$fieldName", $clean);
-        $badInput = true;
         if (strlen($clean) > $length) {
             $clean = null;
         }
     }
     return $clean;
 }
+/**
+ * Cleans an input text and matches its pattern against a regular expression
+ * 
+ * See CleanInputInt for how the text is cleaned, except this does not use 
+ * cleanShellargs()
+ * 
+ * @param String $input the Raw input
+ * @param String $regex the regular expression to check the pattern against
+ * @param int $length the maximum length of the field
+ * @param String $fieldName the field name for logging purposed
+ * @return String the cleaned input or null if it doesn't match the regex or is too long
+ */
 function cleanInputDate($input, $regex, $length, $fieldName) {                      //clean and log numbers
     $link = mysqli_connect();
-    $clean = escapeshellarg(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
-    if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean) != 1)) {
+    $clean = htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8');
+    if (strlen($clean) > $length || $clean != $input || (preg_match($regex, $clean)!==1)) {
         echo "<font color=\"red\"> $fieldName is not a valid date.</font><br>";
         $time = auditLog($_SERVER['SCRIPT_NAME'], $_SERVER['REMOTE_ADDR'], 'SI');
         auditDump($time, $fieldName, $input);
-        $badInput = true;
-        if (strlen($clean) > $length || (preg_match($regex, $clean)) || strtotime($clean) == false) {
+        if (strlen($clean) > $length || (preg_match($regex, $clean))) {
             $clean = null;
         }
     }
@@ -577,6 +664,17 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
     }
     return $locat;
 }
+/**
+ * Starts a session, and checks for foul play
+ * 
+ * This checks first for session hijacking by checking the request is from the 
+ * right IP address, it will also update the session key. It will then check if
+ * the user is allowed to view this page using a list from session_predict_path.
+ * If there is a threat it will force the user to resign in.
+ * 
+ * @param Int $capid the capid of the user for creating the session should be used only
+ * by /login/index.php
+ */
 function session_secure_start($capid=null) {
     session_start();                     //starts the session
     if (!isset($_SESSION['ip_addr'])) {       //if starting the session
@@ -639,6 +737,18 @@ function session_secure_start($capid=null) {
         }
     }
 }
+/**
+ * Creates an array of pages the user is allowed to see.
+ * 
+ * The pages the user has permissions are added. Then pages that are allowed to be seen
+ * after the page the user is on. i.e. the page to confirm a member deletion from 
+ * the member delete page.
+ * 
+ * @param type $ident The databse connection of user ViewNext
+ * @param type $capid The user we're looking at only for establishing sessions
+ * @param type $page The page to create the list for if not the current page
+ * @return array the pages allowed to be seen.
+ */
 function session_predict_path($ident,$capid=null,$page=null) {     //creates an array of pages that the user may visit next    
     $results=array();
     if($page==null)                          //if page isn't specified use current page
@@ -691,7 +801,12 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
     }
     array_push($_SESSION['predicted'], $_SERVER['SCRIPT_NAME']);  //push current page onto predicted
 }
-function session_resign_in($keepPost) {                        //requires person to resign in
+/**
+ * Forces a user to resign in if there is a threat against their session.
+ * 
+ * @param boolean $keepPost true to keep all the post inputs, false otherwise
+ */
+function session_resign_in($keepPost=false) {                        //requires person to resign in
     if ($keepPost) {                 //if want to keep post store post info to session 
         $_SESSION['GET'] = $_GET;
         $_SESSION['POST'] = $_POST;
@@ -700,6 +815,13 @@ function session_resign_in($keepPost) {                        //requires person
 //    header("refresh:0;url=/login/reSignIn.php"); //redirect to resign in and exit
 //    exit;
 }
+/**
+ * Creates a input for entering a date
+ * 
+ * @param bool $sameLine true to have all the inputs inline, false stacks them
+ * @param String $append any string to add to the end of the input name to distinguish multiple date inputs
+ * @param DateTime $default the Default date to show if neccessary
+ */
 function enterDate($sameLine = true, $append = null, DateTime $default = null) {
     $months = monthArray();
     if ($append == null) {
@@ -739,6 +861,13 @@ function enterDate($sameLine = true, $append = null, DateTime $default = null) {
         echo " value=\"" . $default->format('Y') . "\"";
     echo"/>";
 }
+/**
+ * Parses and cleans the input from an enterDate() form
+ * 
+ * @param array $input the array input usually $_POST
+ * @param Strin $append the string that was appended in enterDate()
+ * @return null|DateTime null if there was no input the DateTime object if a date was given
+ */
 function parse_date_input(array $input, $append = null) {
     if(!isset($input['Date'.$append]))
             return null;
@@ -756,6 +885,10 @@ function parse_date_input(array $input, $append = null) {
     }
     return $buffer;
 }
+/**
+ * Returns an array of the months for enterDate
+ * @return array of the months
+ */
 function monthArray() {
     return array(1 => "January",
         2 => "February",
@@ -770,6 +903,11 @@ function monthArray() {
         11 => 'November',
         12 => 'December');
 }
+/**
+ * Displays the input form to search for a specific event.
+ * 
+ * @param type $ident The database connection
+ */
 function display_event_search_in($ident){   //if doesn't have an event selected then allow them to search for it
     ?>
 <font size="6">Search for An event</font><br><br>
@@ -785,6 +923,17 @@ function display_event_search_in($ident){   //if doesn't have an event selected 
 </form>
 <?php
 }
+/**
+ * Searchs for an event from the display_event_search_in()
+ * 
+ * If there is a single result it will call the specified function. Otherwise it
+ * will display the results as links to link.  The links will have the event codes as a get field
+ * ?eCode=9Mar13M
+ * 
+ * @param type $ident The database Connection
+ * @param type $callable the function to call on a single result
+ * @param type $link the link to go to if there are mutliple results
+ */
 function searchEvent($ident,$callable,$link="/login/attendance/event.php"){      //if didn't provide complete then search
     ?>
 <table border="1" cellpadding="0"><tr><th>Event Date</th><th>Event Type</th><th>Event Location</th></tr>
@@ -832,6 +981,22 @@ function searchEvent($ident,$callable,$link="/login/attendance/event.php"){     
      </table>
     <?php
 }
+/**
+ * Gets a list of passed promotion requirements that are attendance based.
+ * 
+ * This includes:
+ * Squadron Activities
+ * Safety classes
+ * Character Development
+ * Encampment
+ * 
+ * @param type $ident The database connection
+ * @param type $capid the user you're researching
+ * @return DateTime[] an array of the dates passed
+ * The first level is the promotion it is for  the second level is the event type
+ * AC= squadron activity
+ * the subevent code from SUbevent_Types for the others
+ */
 function getEventPromo($ident,$capid) {
     $query ="SELECT A.ACHIEVEMENT, A.DATE_PROMOTED
             FROM PROMOTION_RECORD A JOIN ACHIEVEMENT B
@@ -1045,23 +1210,23 @@ function parsePromoInput(mysqli $ident,array $input) {
  * @return null|boolean|float returns null if no input, false if incorrect, and the percentage as a float
  */
 function parsePercent($append, array $inputs, $passing) {
-    if(isset($inputs['percentage'.$append])&&$inputs['percentage'.$append])
+    if(isset($inputs['percentage'.$append]))
         $input = $inputs['percentage'.$append];
     else 
         return null;
     if($input=="") 
         return null;
     $input= str_replace("%","", $input);      //strips out percent signs
-    if(strpos($input,"/")==false) {          //if there is no / assume decimal or percent
-        $percent=  cleanInputInt($input,5,"percentage".$append); //clean and parse as num
+    if(strpos($input,"/")===false) {          //if there is no / assume decimal or percent
+        $percent=  cleanInputInt($input,5,"percentage".$append,false); //clean and parse as num
         if($percent>1) {         //if was a percent i.e. >1 and a big num
             $percent = $percent/100;
         }  //else assume is decimal and is all good
     } else {
        $input =  cleanInputDate($input,"#^[0-9]+/[0-9]+$#",strlen($input),"percentage$append");
        $input = explode("/", $input);   //split into numerator and denominator
-       $numerator = cleanInputInt($input[0],3,"numerator$append");    //take the numerator from first thing
-       $denominator = cleanInputInt($input[1],3, 'denominator'.$append);  //take the denom from second position
+       $numerator = cleanInputInt($input[0],3,"numerator$append",false);    //take the numerator from first thing
+       $denominator = cleanInputInt($input[1],3, 'denominator'.$append,false);  //take the denom from second position
        $percent=$numerator/$denominator;
     }
     if($percent>1||$percent<$passing) { //check if the percent is legit
@@ -1140,27 +1305,9 @@ function parseMinutes($input) {
     $seconds=$exploded[1];
     return $minute+$seconds/60;
 }
-/**
- * The class for all members, use this whenever working with members or CAPIDS
- * 
- * Inits levels are used to get different levels of information
- * levels -1= all from input 0=capid 1=capid+name+gender+achievement 2=1+text+member_type+picture 3=2+dates 4=3+emergency+unit
- */
 class member {
-    /**
-     *
-     * @var int the member's CAPID
-     */
     private $capid;
-    /**
-     *
-     * @var String the member's Last Name
-     */
     private $name_last;
-    /**
-     *
-     * @var String the Member's First Name
-     */
     private $name_first;
     private $gender;
     private $DoB;
@@ -1384,9 +1531,10 @@ class member {
                         echo "<th class=\"promotion\">" .$header[$row]["TYPE_NAME"] . "</th>";  //make them into headers
                     }
                     echo "</tr>\n";
-                    $query = "SELECT A.ACHIEV_NAME, A.ACHIEV_CODE FROM ACHIEVEMENT A
+                    $query = "SELECT CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS ACHIEV_NAME, A.ACHIEV_CODE FROM ACHIEVEMENT A, GRADE B 
                         WHERE A.MEMBER_TYPE='".$this->memberType."'   
                         AND A.ACHIEV_CODE <> '0'
+                        AND B.GRADE_ABREV=GRADE
                         AND A.ACHIEV_NUM <= ( SELECT 
                         D.ACHIEV_NUM FROM ACHIEVEMENT D, ACHIEVEMENT B
                         JOIN MEMBER C ON C.ACHIEVEMENT=B.ACHIEV_CODE
@@ -1396,6 +1544,12 @@ class member {
                     $achievements = allResults(Query($query, $ident));    //get all the achievements ^
                     for($i=0;$i<count($achievements);$i++) {      //loop through rows
                         $this->getPromotionInfo($achievements[$i]['ACHIEV_CODE'], $ident);
+                        $promo_wait=null;
+                        if(isset($this->promoRecord['PRO']))
+                            $promo_wait=$this->promoRecord['PRO'][1];
+                        $is_ok=$this->check_promotion_wait($ident, $achievements[$i]['ACHIEV_CODE'], $promo_wait);
+                        if($is_ok!=true)
+                            echo '<tr><td class="promotion" style="col-span:'.count($header)+2 .';color:red">The time since last promotion is too short: You must wait until:'.$is_ok->format(PHP_DATE_FORMAT)."</td></tr>";
                         echo '<tr><td class="promotion">'.$achievements[$i]['ACHIEV_NAME'].'</td>';
                         $this->displayPromoRequest($header, $date, $edit,null,true);
                     }
@@ -1870,6 +2024,8 @@ class member {
         $promotion=  allResults(Query($query, $ident));        //get the promotion date
         if(count($promotion)>0) {
             $this->promoRecord['PRO']=array('P',new DateTime($promotion[0]['DATE_PROMOTED']));   //get the date promoted
+        } else {                                //else get the field to display the input
+            $this->promoRecord['PRO']=array('I',null);
         }
         $specialRequires= specialPromoRequire($ident);            //the type of requirements that need event attendance
         $eventAttendance = getEventPromo($ident, $this->capid);
@@ -1922,6 +2078,7 @@ class member {
      * @param boolean $disPlayDates weather or not to display the dates for promotions
      * @param boolean $canEdit   weather or not they can change the information or if read-only
      * @param boolean $approved weather or not the promotion is approved
+     * @param boolean $showPromo whether or not to show as a whole promotion report, false will show name in the row, true won't
      */
     function displayPromoRequest(array $header, $disPlayDates=false, $canEdit=false ,$approved=null,$showPromo=false) {
         if(!$showPromo) {
@@ -1935,14 +2092,15 @@ class member {
                 $current=$this->promoRecord[$index];  //load it
                 echo '<td class="promotion '.$current[0].'">';
                 $displayText = true;
-                if($disPlayDates) {       //if displaying dates
+                if($disPlayDates) {       //if displaying date
                     if($canEdit) {
                         $date=null;
                         $percent=null;
-                        if(isset($current[1]))       //if date and percent set get it
+                        if(isset($current[1])) {       //if date and percent set get it
                             $date = $current[1];
-                        if(isset($current[2])) 
+                        }if(isset($current[2])) { 
                             $percent=$current[2];
+                        }
                         $displayText=promoRequireInput($this->capid,$index, $date, $percent,$this->promoRecord['achiev']);  //display the input
                     } if(!$canEdit||($displayText)) {            //if can't edit
                         if($current[0]=="P") {
@@ -2000,25 +2158,30 @@ class member {
         } 
         for($i=0;$i<count($header);$i++) {      //cycle through the requirements and parse them
             $type=$header[$i]['TYPE_CODE'];
-            $append = $this->capid.$type.$achiev;            //the appended string
-            $percent = parsePercent($append, $input, $this->promoRecord[$type]["percent"]); //parse the percentage
-            $date=  parse_date_input($input, $append);                 //parse the date
-            if($date!=null&&$percent!=false) {         //if date is valid and the percent is valid
-                switch($this->promoRecord[$type][0]) {                     //switchfor choosing which prepared satement
-                    case "P":
-                        bind($update,"sdiss",array($date->format(PHP_TO_MYSQL_FORMAT),$percent,$this->capid,$achiev_code,$type));
-                        execute($update);
-                        break;
-                    case "I":
-                    Case "F":
-                        bind($insert,"issssd",array($this->capid,$achiev_code,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent));           //insert 
-                        execute($insert);
-                        $this->promoRecord[$type][0]='P';     //set it to passed to easily checked if passed all requirements
-                        if($this->promoRecord[$type][0]=='F') 
-                            break;  //break if they didn't sign up
-                        bind($delete,'is',array($this->capid,$type));
-                        execute($delete);            //execute and delete the sign-up
-                        break;
+            if(isset($this->promoRecord[$type])) {
+                $append = $this->capid.$type.$achiev;            //the appended string
+                $has_percent=isset($this->promoRecord[$type]['percent']);
+                if($has_percent)
+                    $percent = parsePercent($append, $input, $this->promoRecord[$type]["percent"]); //parse the percentage
+                $date=  parse_date_input($input, $append);                 //parse the date
+                //if date isn't null and (percent isn't specified or if it is and is valid
+                if($date!=null&&($has_percent&&$percent!=false&&$this->promoRecord[$type]['percent']!==null||!$has_percent||$this->promoRecord[$type]['percent']===null)) {         //if date is valid and the percent is valid
+                    switch($this->promoRecord[$type][0]) {                     //switchfor choosing which prepared satement
+                        case "P":
+                            bind($update,"sdiss",array($date->format(PHP_TO_MYSQL_FORMAT),$percent,$this->capid,$achiev,$type));
+                            execute($update);
+                            break;
+                        case "I":
+                        Case "F":
+                            bind($insert,"issssd",array($this->capid,$achiev,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent));           //insert 
+                            execute($insert);
+                            $this->promoRecord[$type][0]='P';     //set it to passed to easily checked if passed all requirements
+                            if($this->promoRecord[$type][0]=='F') 
+                                break;  //break if they didn't sign up
+                            bind($delete,'is',array($this->capid,$type));
+                            execute($delete);            //execute and delete the sign-up
+                            break;
+                    }
                 }
             }
         }
@@ -2042,14 +2205,21 @@ class member {
         $deleteTest =  prepare_statement($ident,"DELETE FROM TESTING_SIGN_UP
             WHERE CAPID=? AND REQUIRE_TYPE=?");
         $header=$_SESSION['header'];
-        $query = "SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A, ACHIEVEMENT B
+        $query = "SELECT A.ACHIEV_CODE FROM ACHIEVEMENT A, ACHIEVEMENT B, ACHIEVEMENT C
             WHERE B.ACHIEV_CODE='".$this->achievement."' AND
-                A.ACHIEV_NUM<=B.ACHIEV_NUM
+                C.ACHIEV_CODE=B.NEXT_ACHIEV AND
+                A.ACHIEV_NUM<=C.ACHIEV_NUM
                 ORDER BY A.ACHIEV_NUM";                                 //get all the achievements needed in order
         $achiev=  allResults(Query($query,$ident));
         for($i=0;$i<count($achiev);$i++) {                     //cycles through all the achievements and parses them seperately
             $buffer=$achiev[$i]['ACHIEV_CODE'];
-           $this->parsePromoEdit($insert,$update,$deleteTest,$header,$input,$buffer);   //parses the information for real this time 
+            $this->getPromotionInfo($buffer, $ident);                //store the right promotion information and requirements
+            $this->parsePromoEdit($insert,$update,$deleteTest,$header,$input,$buffer);   //parses the information for real this time 
+            $append=$this->capid.'PRO'.$buffer;
+            $date=  parse_date_input($input, $append);  //get the date
+            if($this->checkPassing($ident,$date)&&$date!==null) {
+                    $this->promote($buffer,$date,$ident);
+            }
         }
          close_stmt($approve);
         close_stmt($insert);
@@ -2058,14 +2228,48 @@ class member {
     }
     /**
      * Checks if all requirements for promotion are passed
+     * @param mysqli $ident the database connection
+     * @param dateTime $date the date for the promotion
      * @return boolean true if and only if all requirements are passed false otherwise
      */
-    function checkPassing() {
+    function checkPassing($ident,  DateTime $date=null) {
         foreach($this->promoRecord as $key=>$buffer) {
-            if($buffer[0]!='P'&&$key!='PRO')  //if not passed and isn't the promotion tell them they didn't pass
+            if($buffer[0]!='P'&&!in_array($key, array('PRO','achiev','NAME'))) { //if not passed and isn't the promotion tell them they didn't pass
                 return false;
+            }
         }
-        return true;   //if found nothing then
+        if($this->check_promotion_wait($ident,$this->promoRecord['achiev'],$date))
+            return true;   //if found nothing then
+//        return false;
+    }
+    /**
+     * Checks if there is the regulation required waiting period between a promtion
+     * and the one before it.
+     * 
+     * @param type $ident the databse connection
+     * @param type $achiev the achievement your checking for
+     * @param dateTime the date to check for this 
+     * @return booleann|dateTime returns true if enough time has passed, otherwise returns a dateTime of when it will 
+     * be enough time
+     */
+    function check_promotion_wait($ident,$achiev=null,  DateTime $date=null) {
+        if($ident==null)
+            $achiev=$this->get_next_achiev ($ident);
+        if($date==null)
+                $date=new DateTime();
+        $query="SELECT DATE_PROMOTED FROM PROMOTION_RECORD A, ACHIEVEMENT B
+            WHERE A.ACHIEVEMENT=B.ACHIEV_CODE
+            AND A.CAPID='".$this->capid."'
+            AND B.NEXT_ACHIEV='$achiev'";
+        $results=  allResults(query($query,$ident));
+        if(count($results)==0)  //if no promotion date assume it's fine
+            return true;
+        $last_promo=new dateTime($results[0]['DATE_PROMOTED']);
+        $interval=PROMOTION_WAIT;
+        if(($date->format("U")-$last_promo->format("U"))<$interval) { //if under time say so
+            return $last_promo->add(DateInterval::createFromDateString(PROMOTION_WAIT." seconds"));    //returns the date you need to wait to
+        }
+        return true;
     }
     /**gets the cpft requirements for the member
      * 
@@ -2117,6 +2321,52 @@ class member {
         return $this->achievement;
     }
     /**
+     * Enters a member promotion. If promotion is most recent update member records
+     * 
+     * @param String $achiev the achievement the promotion's for
+     * @param dateTime $date the date of the promotion
+     * @param mysqli $ident the database connection
+     * @return boolean True on success false on failure
+     */
+    function promote($achiev, dateTime $date, mysqli $ident) {
+        $insert=true;           //if need to insert the promotion
+        $complete=false;        //if we need to hit everything for most recent promotion
+        $success=true;
+        if($this->get_next_achiev($ident)==$achiev) {            //if this is the most recent one hit with oodles
+            $insert=true;
+            $complete=true;
+        } else {
+            $query="SELECT COUNT(*) AS COUNT FROM PROMOTION_RECORD 
+                WHERE CAPID = ".$this->capid." AND  ACHIEVEMENT = '$achiev'";  //checks if we have it on record already
+            $result=  allResults(Query($query, $ident));
+            if($result[0]['COUNT']>0)
+                $insert=false;
+        }
+        if($insert) {          //if just needs a clean insert
+            $query="INSERT INTO PROMOTION_RECORD(CAPID, ACHIEVEMENT, DATE_PROMOTED)
+                VALUES('".$this->capid."','$achiev','".$date->format(PHP_TO_MYSQL_FORMAT)."')";  //insert
+            if(!Query($query, $ident))
+                    $success=false;
+        } else {
+            $query="UPDATE PROMOTION_RECORD SET DATE_PROMOTED='".$date->format(PHP_TO_MYSQL_FORMAT).
+                "' WHERE CAPID='".$this->capid."' AND ACHIEVEMENT='$achiev'";  //update the promotion date
+            if(!Query($query, $ident))
+                    $success=false;
+        }
+        if($complete) {
+            $query="DELETE FROM PROMOTION_SIGN_UP
+                WHERE CAPID='".$this->capid."' AND ACHIEV_CODE='$achiev'";  //delete the promotion request
+            if(!Query($query, $ident))
+                    $success=false;
+            $query="UPDATE MEMBER SET ACHIEVEMENT='".$this->get_next_achiev($ident).
+                    "' WHERE CAPID='".$this->capid."'";                //update the member's file for the promotion
+            if(!Query($query, $ident))
+                    $success=false;
+        }
+        $this->reload($ident);
+        return $success;
+    }
+    /**
      * 
      * @param type $ident the ident for the 
      * @return String the next achievement code false on an error
@@ -2141,6 +2391,15 @@ class member {
             echo "<td>".$buffer->getName()."- ".$buffer->getRelation."</td>";  //shows name
             echo "<td>".$buffer->getPhone."</td></tr>";   //displays phone number
         }
+    }
+    /**
+     * Reloads all the membership information from the database
+     * @param mysqli $ident the database connection
+     */
+    function reload($ident) {
+        $init=$this->initLevel;
+        $this->initLevel=0;
+        $this->init($init,$ident);
     }
 }
 class unit {

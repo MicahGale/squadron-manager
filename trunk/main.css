@@ -13,10 +13,10 @@ body {color:black;}
     color:green;
 }
 .promotion .F {
-    color:orange;
+    color:red;
 }
 .promotion .I {
-    color:red;
+    color: orange;
 }
 .promotion {
     font-size:15px;
