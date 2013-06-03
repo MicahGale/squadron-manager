@@ -33,7 +33,7 @@
             auditLog($_SERVER["REMOTE_ADDR"],"DC");
             echo"<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=/signIn/?CAPID=\">";
         } else {
-            $ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+            $ident=Connect('Sign-in');
             $member= $_SESSION["member"];
             if($member->editFields($_POST,$ident)) {             //if contact update succeeded then say so else say so
                 echo "<strong>Your Contact Information Updates have been sucessfully saved</strong><br/>\n";

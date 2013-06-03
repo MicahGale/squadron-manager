@@ -23,7 +23,7 @@
  */
 require('projectFunctions.php');
 session_secure_start();
-$ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
+$ident=  connect('login');
 header("Content-type: text/csv");
 $now =new DateTime();
 header("Content-Disposition: attachment; filename=cpft_test_".$now->format(EVENT_CODE_DATE).".csv");

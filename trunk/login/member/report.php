@@ -29,7 +29,7 @@ session_secure_start();
     </head>
     <body>
         <?php
-        $ident = Connect($_SESSION['member']->getCapid(), $_SESSION['password'],'localhost');
+        $ident = Connect('login');
         include('squadManHeader.php');
         ?>
         <table border="0" width="880">

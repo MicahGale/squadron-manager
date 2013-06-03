@@ -28,7 +28,7 @@
         <?php
         include("header.php");
         include("projectFunctions.php");
-        $ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost'); //connect
+        $ident=Connect('Sign-in'); //connect
         session_start();
         if(!isset($_SESSION["member"])) {           //if no member given redirect out and log
             auditLog($_SERVER["REMOTE_ADDR"],'DC');

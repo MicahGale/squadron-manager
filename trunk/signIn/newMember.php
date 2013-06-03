@@ -27,7 +27,7 @@
     <body>
         <?php include("header.php"); 
         include("projectFunctions.php");
-        $ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+        $ident=Connect('Sign-in');
         $otherUnit=false;        //TODO figure out persistance
         $otherContact = false;
         if($_POST["unit"]=="other") {   //if other unit set null to prevent construct errors

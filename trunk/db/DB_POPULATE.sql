@@ -132,24 +132,28 @@ INSERT INTO TASK_TYPE (TYPE_CODE, TYPE_NAME)
 VALUES('ME','Membership Action'),
     ('TP','Testing and Promotions'),
     ('EV','Event Management'),
-    ('DA','Discipline action');
+    ('DA','Discipline action'),
+    ('RE','Squadron Reports'),
+    ('AD','Administration');
 ###############################insert staff positions for permissions#########
 INSERT INTO STAFF_POS_PERM(STAFF_CODE, STAFF_NAME)
 VALUES('AD','Administrator'),
         ('AL','All');
 ##############################insert tasks#################################
-INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL)
-VALUES('MEA','Approve Added Members','ME','member/approve.php'),
-        ('HOM','Home','ME','home.php'),
-        ('MSE','Member Search','ME','member/search.php'),
-        ('DDE','Find Discipline Event','DA','discipline/details.php'),
-        ('EVR','Find Event Report','EV','attendance/event.php'),
-        ('NEV','Create a new Event','EV','attendance/new.php'),
-        ('EVI','Insert attendance for an Event','EV','attendance/add.php'),
-        ('TSE','View Testing Sign-up','TP','testing/testSignUp'),
-        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php'),
-        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php'),
-        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php');
+INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL, NEW_TAB)
+VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE),
+        ('HOM','Home','ME','home.php',FALSE),
+        ('MSE','Member Search','ME','member/search.php',FALSE),
+        ('DDE','Find Discipline Event','DA','discipline/details.php',FALSE),
+        ('EVR','Find Event Report','EV','attendance/event.php',FALSE),
+        ('NEV','Create a new Event','EV','attendance/new.php',FALSE),
+        ('EVI','Insert attendance for an Event','EV','attendance/add.php',FALSE),
+        ('TSE','View Testing Sign-up','TP','testing/testSignUp',FALSE),
+        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php',FALSE),
+        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE),
+        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE),
+        ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true),
+        ('PAS','Change your Password','AD','adminis/pswdChange.php',false);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -162,7 +166,9 @@ VALUES('CTO','MEA')
         ('CTO','TSE'),
         ('CTO','PSE'),
         ('CTO','PTT'),
-        ('CTO','PRR');
+        ('CTO','PRR'),
+        ('CTO','EMR'),
+        ('AL','PAS');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
@@ -180,7 +186,8 @@ VALUES('CC','Squadron Commander'),
         ('CDC','Cadet Deputy Commander'),
         ('CXO','Cadet Executive Officer'),
         ('FLC','Flight Commander'),
-        ('FLS','Flight Sergeant');
+        ('FLS','Flight Sergeant'),
+        ('AL','All staff positions','A');
 INSERT INTO CHAIN_OF_COMMAND(POS_CODE, STAFF_CODE, FLIGHT, ELEMENT, NEXT_IN_CHAIN)
 VALUES('CC','CC',null,null,null),
         ('DCC','DCC',null,null,'CC'),

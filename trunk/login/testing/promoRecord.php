@@ -37,7 +37,7 @@
  */
 require("projectFunctions.php");
 session_secure_start();
-$ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
+$ident=  connect('login');
 if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect to the member search
     header("refresh:0;url=/login/member/search.php?redirect=/login/testing/promoRecord.php"); //refresh
     exit;

@@ -18,7 +18,7 @@
  */
 require("projectFunctions.php");
 session_secure_start();
-$ident = connect($_SESSION['member']->getCapid(), $_SESSION['password']);
+$ident = connect('login');
 if(in_array("Search", $_POST)) {             //if searched for member save input, then redirect to search
     $_SESSION['input']= array();
    for($i=0;$i<$_SESSION['number'];$i++) {      //loop through to find which one was searched for and save the input

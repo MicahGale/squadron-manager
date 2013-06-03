@@ -6,9 +6,6 @@
         Purpose of the stylesheet follows.
 */
 body {color:black;}
-.P {color:green}
-.I {color:orange}
-.F {color:red}
 .promotion .P {
     color:green;
 }
@@ -30,7 +27,7 @@ th.promotion {
     font-size: 12px;
     border:1px solid black;
 }
-a.pres0 {
+a.pres0 {                /*The precidances for the notification system*/
     color: #CC0000;
 }
 a.pres1 {
@@ -41,4 +38,7 @@ a.pres2 {
 }
 a.pres3 {
     color:blue
+}
+.warning {
+    color: red;
 }

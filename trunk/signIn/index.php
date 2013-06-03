@@ -28,7 +28,7 @@
 <?php
 include("header.php");
 include("projectFunctions.php");
-$ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+$ident=Connect('Sign-in');
 $member = new member($_GET["CAPID"],2,$ident);
 if($member->badInput) {
     echo " please search again

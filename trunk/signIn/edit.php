@@ -14,7 +14,7 @@
             auditLog($_SERVER["REMOTE_ADDR"],"DC");
             echo"<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=../signIn/?CAPID=\">";
         }
-       $ident =Connect( 'Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+       $ident =Connect( 'Sign-in');
         $member=$_SESSION["member"];
        $member->init(4,$ident);
         $member->editInformation("/signIn/finishEdit.php",$ident);

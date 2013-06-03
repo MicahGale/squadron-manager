@@ -25,7 +25,7 @@
  */
 include("projectFunctions.php");
 session_secure_start();
-$ident=  Connect( $_SESSION['member']->getCapid(), $_SESSION['password'],'localhost');
+$ident=  Connect('login');
 if(isset($_GET['redirect'])) {
     checkPath();
 }
