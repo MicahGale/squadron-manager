@@ -28,7 +28,7 @@
         <?php
         include("header.php");
         include("projectFunctions.php");
-         $ident=Connect('Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+         $ident=Connect('Sign-in');
          session_start();       //connect to db and continue session
          $newUnit = new unit($_POST["charter"],$_POST["region"],$_POST["wing"]);
          $newUnit->insert_unit($ident,"<strong>New Unit Successfully added</strong><br>\n");

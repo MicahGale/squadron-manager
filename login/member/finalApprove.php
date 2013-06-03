@@ -28,7 +28,7 @@ session_secure_start();
     </head>
     <body>
         <?php
-        $ident = Connect( $_SESSION['member']->getcapid(), $_SESSION['password'],'localhost');
+        $ident = Connect('login');
         include('squadManHeader.php');
         $added = true;
         $members=null;

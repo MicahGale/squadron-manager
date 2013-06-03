@@ -38,7 +38,7 @@ if(isset($_SESSION['home'])) {
                     <p><strong>Today is:</strong> 
                         <?php 
                         echo date(PHP_DATE_FORMAT)."</p>\n"; 
-                        $connection= Connect('Viewer',"2438iuoewjkld--[p0xfdkuu,zcxmeeeeem4e8m, cxpondsvlkc m,ryfsdhPOJLKNUHKJN<",'localhost');
+                        $connection= Connect('Viewer');
                         $rowLocal=0;
                         $max = 10;
                         if($connection!=false) {

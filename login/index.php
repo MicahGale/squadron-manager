@@ -17,24 +17,26 @@
  * 
  */
  include("projectFunctions.php");
+ $passes=  parse_ini_file(PSSWD_INI);
+ $salt=$passes['salt'];
+ $ident=  connect('ViewNext');
 if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
-    $banned = array('root',"Useless","Logger",'ViewNext','Sign-in','Viewer');   //list of forbidden users
+    $banned = array('root',"Useless","Logger",'ViewNext','Sign-in','Viewer','login');   //list of forbidden users
     $capid=  cleanInputInt($_POST['CAPID'],6,"CAPID",false);  //clean inputs
-    $password = cleanInputString($_POST['password'],256,"password",false);
-    $ident = false;
+    $password = $_POST['password'];                        //don't clean the password, because of the hash
     if(!in_array($capid, $banned)&&$capid!=null&&$capid!='') {   //logins in if not a banned user, not null, and not empty
         $unlocked = true;                     //says if account is locked
         if(!checkAccountLocks($capid)) {       //if account is locked stop and say it's locked
             $unlocked=false;
         }
-        if($unlocked)
-            $ident = Connect( $capid,$password,"localhost");   //connects
-        if($ident!=false) {        //if the connection didn't fail
-            logLogin($capid,true);
-            session_secure_start($capid);       //starts session
-            $_SESSION["member"]= new member($capid,2,$ident);
-            $_SESSION["password"] = $password;
-            header("REFRESH:0;url=/login/home.php");  //redirect wa to main page for login
+        if($unlocked) {
+            $member=new member($capid, 1, $ident);
+            if($member->check_password($ident, $password, $salt)) {  //checks the password
+                logLogin($capid,true);
+                session_secure_start($capid);       //starts session
+                $_SESSION["member"]= new member($capid,2,$ident);
+                header("REFRESH:0;url=/login/home.php");  //redirect wa to main page for login
+            }
         }
     }
 }
@@ -48,13 +50,13 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
     </head>
     <body>
         <?php
-         
+         include('header.php');
         if(isset($unlocked)&&!$unlocked) {
         ?>
             <font style="color:red">This Account is currently locked. Please wait 30 minutes, or contact you administrator</font>
         <?php
         }
-        if(isset($ident)&&$ident===false) {                  //if couldn't log on
+        if(!isset($_SESSION['member'])) {                  //if couldn't log on
             logLogin($capid,false);
             ?>
             <font color="red">We were not able to log you in</font>
@@ -65,7 +67,6 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
             <?php
                 
         }
-    include('header.php');
     if(!array_key_exists("CAPID", $_POST)||  !array_key_exists("password", $_POST)) {
         ?>
         <form method="post">

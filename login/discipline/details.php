@@ -28,7 +28,7 @@ session_secure_start();
     </head>
     <body>
         <?php
-        $ident = Connect($_SESSION['member']->getCapid(), $_SESSION['password'],'localhost');
+        $ident = Connect('login');
         include("squadManHeader.php");
         if(isset($_GET['ToA'])&&!isset($_GET['month'])) {              //if has ToA field then show exact details
             ?>

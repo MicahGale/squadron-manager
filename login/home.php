@@ -28,7 +28,7 @@
  */
 include("projectFunctions.php");
 session_secure_start();
-$ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
+$ident = Connect('login');
 ?>
 <!DOCTYPE html>
 <html>
@@ -70,8 +70,9 @@ $ident = Connect($_SESSION["member"]->getCapid(),$_SESSION["password"]);
             }
         }
         usort($hold,"compare_notif");  //sort the array
+        $notif_ident=connect('notif');
         foreach($hold as $buffer) {
-            $buffer->display($ident);
+            $buffer->display($notif_ident);
         }
         fclose($file);
         /**

@@ -36,7 +36,7 @@
  */
 include_once("projectFunctions.php");
 session_secure_start();
-$ident= connect($_SESSION['member']->getCapid(), $_SESSION['password']);
+$ident= connect('login');
 ?>
 <!DOCTYPE html>
 <html>

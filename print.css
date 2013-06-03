@@ -5,10 +5,10 @@
     Description:
         Purpose of the stylesheet follows.
 */
-
-root { 
-    display: page;
-    position: static;
+@media screen {
+    body {
+        font: 13px Arial, Helvetica,"Lucida Grande", serif
+    }
 }
 body {
     margin:0; 
@@ -16,18 +16,30 @@ body {
     line-height: 1.4em; 
     word-spacing:1px; 
     letter-spacing:0.2px; 
-/*    font: 13px Arial, Helvetica,"Lucida Grande", serif; */
+    width:8.5in;
     color: #000;
+    position: static;
 }
 table {
+    width:8.5in;
     border-collapse: collapse;
 }
 td {
-    width: 33%;
-    border-bottom: 1px solid black;
+    width: 37.5%;
+    font-size:small;
+    border-bottom: 1px dashed black;
 }
 td.header{
-    columns: 3;
-    border-bottom: thick solid black;
+        font-size:medium;
+        font-weight:bold;
+        border-bottom: 2px solid black;
+    }
+td.blank{
+    border:none;
+    width:15%;
 }
-
+@media print {
+    body {
+        font-family:times,serif;font-size:10px;
+    }
+}

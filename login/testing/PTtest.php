@@ -42,7 +42,7 @@
  */
 require("projectFunctions.php");
 session_secure_start();
-$ident=  connect($_SESSION['member']->getCapid(), $_SESSION['password']);
+$ident=  connect('login');
 $query="SELECT TEST_CODE, TEST_NAME FROM CPFT_TEST_TYPES ORDER BY TEST_NAME";
 $header=  allResults(Query($query, $ident));
 $_SESSION['header']=$header;

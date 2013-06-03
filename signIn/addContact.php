@@ -28,7 +28,7 @@
         <?php
         include("header.php");
         include("projectFunctions.php");
-        $ident=Connect( 'Sign-in','ab332kj2klnnfwdndsfopi320932i45n425l;kfoiewr','localhost');
+        $ident=Connect( 'Sign-in');
         $row =0;
         session_start();
         $member = $_SESSION["member"];
