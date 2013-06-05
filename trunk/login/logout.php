@@ -1,5 +1,8 @@
  <?php
- /* * Copyright 2012 Micah Gale
+ /**
+  * This file logs members out, by destroying their session. It also logs the time that they signed out at 
+  */
+ /* Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -16,8 +19,18 @@
  *
  * 
  */
-        session_start();
-        session_destroy();
+ require('projectFunctions.php');
+session_start();
+$ident=  connect("Logger");  //connect
+$time = date(SQL_INSERT_DATE_TIME);
+$log_in_time=date(SQL_INSERT_DATE_TIME,$_SESSION['log_time']);
+$query="UPDATE LOGIN_LOG SET LOG_OFF='$time'
+        WHERE TIME_LOGIN='$log_in_time'
+        AND CAPID='".$_SESSION['member']->getCapid()."'
+        AND IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
+Query($query, $ident);
+close($ident);
+session_destroy();
     ?>
 <!DOCTYPE html>
 <html>

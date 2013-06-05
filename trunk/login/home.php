@@ -44,7 +44,7 @@ $ident = Connect('login');
         ?>
         <h1>Notifications</h1>
         <?php
-        //TODO create a sandboxed notification db user
+        
         if(($file= fopen(NOTIF_PATH,'r'))!==false) {    //opens the csv file
             fgetcsv($file,10);            //skips the first line
             $hold=array();        //the read notifications
@@ -68,6 +68,10 @@ $ident = Connect('login');
                     
                 }
             }
+            $time=$_SESSION['member']->check_pass_life($ident);
+            if($time<=PASSWORD_NOTIF) {  //if the passwords about to expire
+                array_push($hold, new notification("SELECT 1=1 AS COUNT", "Your Password will expire in $time days.", 1,"PAS"));
+        }
         }
         usort($hold,"compare_notif");  //sort the array
         $notif_ident=connect('notif');

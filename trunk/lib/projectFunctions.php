@@ -28,10 +28,8 @@
  */
 /*
  * **********************FOR v. .10*****************************
- * TODO enforce CAPR110-1 password policy
- * TODO change login system
+ * TODO Add capid of tester to all records
  * TODO ban terminated members
- * TODO add logoff times
  * TODO add admin to add other users and grant privelidges
  * TODO create reports: and eservices, and attendance
  * TODO check promoboard halts on sign-up and promo report
@@ -117,7 +115,15 @@
  /**
   * the interval that must be waited between promotions
   */
- define("PROMOTION_WAIT",5184000);
+ define("PROMOTION_WAIT",4838400);
+ /**
+  * The maximum password life
+  */
+ define('PASSWORD_LIFE',180);
+ /**
+  * The days to wait to notify the password experiation
+  */
+ define('PASSWORD_NOTIF',14);
  /**
   * Stores and auditable event to the AUDIT_LOG table.
   * If we have the user's CAPID that will be stored along with the log
@@ -160,8 +166,8 @@ function logLogin($capid, $success) {
     $time = date(SQL_INSERT_DATE_TIME);
     $ident=connect( 'Logger');
     $ip = $_SERVER['REMOTE_ADDR'];
-    Query("INSERT INTO LOGIN_LOG(TIME_LOGIN, CAPID, IP_ADDRESS, SUCEEDED)
-                 VALUES('$time','$capid','$ip','$success')", $ident);
+    Query("INSERT INTO LOGIN_LOG(TIME_LOGIN, CAPID, IP_ADDRESS, SUCEEDED,LOG_OFF)
+                 VALUES('$time','$capid','$ip','$success',NULL)", $ident);
     close($ident);
 }
 /**
@@ -742,6 +748,7 @@ function session_secure_start($capid=null) {
             if ($_SESSION['intruded']) {                       //if someone has tried to intrude make resign in
                 session_resign_in(true);               //has them resign in and keep the post stuff
             }
+            header("refresh:1800;url=/login/logout.php");     //auto logout after 30 minutes
         }
     }
 }
@@ -1321,9 +1328,10 @@ function parseMinutes($input) {
  * 
  * @param String $pass
  * @param String $retype
+ * @param String $old - the old password to check the passwords did change
  * @return array 0=>boolean, true passed, false otherwise, 1=>the password on success,1+=> the error message(s) otherwise each message it's own index
  */
-function checkPassword($pass, $retype) {
+function verify_password($pass, $retype,$old) {
     $passes=true;
     $errors=array();
     if($pass!=$retype) {             //if the passwords din't match exit out
@@ -1333,19 +1341,23 @@ function checkPassword($pass, $retype) {
             $passes=false;
             array_push($errors, "Password must be at least 8 characters");
         }
-        $groups=array('[a-z]','[A-Z]','[0-9]','[(\~\`!@\#\$%\^\&amp\;\*\(\)+=_-\{\}\[\]\\\\\|:\;\\\&quot\;\\\&\#039\;\?/\&lt\;\&gt\;,.\)]');
+        if($pass===$old) {
+            $passes=false;
+            array_push($errors,'Password can not be your old password');
+        }   
+        $groups=array('#[a-z]#','#[A-Z]#','#[0-9]#','~[`\!@#\$%\^&\*\(\)\+\=_\-\{\}\[\]\\\|\:;"\'\?/\<\>,\.]~');
         $count=0;
         for($i=0;$i<count($groups);$i++) {  //checks all the various classs requirements
-            if(preg_match($groups[$i],$pass)===true) {  //if found one of the criteria
+            if(preg_match($groups[$i],$pass)===1) {  //if found one of the criteria
                 $count++;
             }
             if($count>=3)
                 break;
         }
-        if($count>=3)
+        if($count>=3&&$passes)
             return array(true,$pass);
         else
-            array_push($errors,"Did not have three of the items");
+            array_push($errors,"Did not have three of the four categories");
         return array_merge(array(false),$errors);  //returns the errors
     }
 }
@@ -2470,6 +2482,32 @@ class member {
         if(count($passes)>0)
             return $passes[0]['PASS_HASH']==$this->hash_password ($pass, $salt);
         return false;
+    }
+    /**
+     *Changes the password in the database.
+     *  
+     * @param mysqli $ident the database connection
+     * @param String $hash the hash of the password from hash_password()
+     * @return Boolean true on success.
+     */
+    function set_password($ident,$hash) {
+        $query="UPDATE MEMBER SET PASS_HASH='$hash', LAST_PASS_CHANGE=CURDATE() WHERE CAPID='".$this->capid."'";
+        return Query($query, $ident);
+    }
+    /**
+     * Checks if the member's password is expired
+     * 
+     * @param  mysqli $ident the database connection
+     * @return mixed true if the password is expired, otherwise the number of days to the expiration
+     */
+    function check_pass_life($ident) {
+        $query="SELECT DATEDIFF(CURDATE(),LAST_PASS_CHANGE) AS DIFF FROM MEMBER WHERE CAPID='".$this->capid."'";
+        $results = allResults(Query($query, $ident));
+        $diff=$results[0]['DIFF'];
+        if($diff>=PASSWORD_LIFE)
+            return true;
+        else 
+            return PASSWORD_LIFE-$diff;
     }
 }
 class unit {

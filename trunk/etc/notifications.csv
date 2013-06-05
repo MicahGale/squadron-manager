@@ -3,3 +3,4 @@ TSE,*COUNT* new testing sign-up(s).,SELECT COUNT(*) AS COUNT FROM TESTING_SIGN_U
 MEA,"*COUNT* New Member(s) have been added, and need approval.",SELECT COUNT(*) AS COUNT FROM MEMBER WHERE APPROVED=FALSE,3
 PSE,*COUNT* New Promotion Request(s),SELECT COUNT(*) AS COUNT FROM PROMOTION_SIGN_UP,2
 PTT,*COUNT* CPFT request(s).,SELECT COUNT(*) AS COUNT FROM TESTING_SIGN_UP WHERE REQUIRE_TYPE='PT',3
+PAS,Your Password will expire in *TIME* days.,,1
