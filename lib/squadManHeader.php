@@ -82,7 +82,6 @@
                             $oldSection = $result[$row]['TYPE_NAME'];  //set to new section
                         }           //echo link
                         echo "<br><a href=\"/login/".$result[$row]["URL"]."\" ";
-                        var_dump($result[$row]['NEW_TAB']);
                         if($result[$row]['NEW_TAB']===true)              //if should open in a new table do so
                             echo 'target="blank"';
                         echo">>".$result[$row]["TASK_NAME"]."</a>\n";

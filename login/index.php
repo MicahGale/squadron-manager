@@ -35,9 +35,38 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
                 logLogin($capid,true);
                 session_secure_start($capid);       //starts session
                 $_SESSION["member"]= new member($capid,2,$ident);
-                header("REFRESH:0;url=/login/home.php");  //redirect wa to main page for login
+                $_SESSION['log_time']=time();  //keep track of the start of the login
+                if($_SESSION['member']->check_pass_life($ident)!==true) {  //if the password is still valid
+                    header("REFRESH:0;url=/login/home.php");  //redirect wa to main page for login
+                    exit;
+                } else {
+                    $reCreate=true;
+                }
             }
         }
+    }
+}
+if(isset($_POST['current'])) {  //if they give a password do stuff
+    session_secure_start();
+    close($ident);
+    $ident = connect("login");
+    if($_SESSION['member']->check_password($ident,$_POST['current'],$salt)) {  // get the current password and check it
+        $good_pass=true;   //record it was a good pass
+        $message=  verify_password($_POST['new'], $_POST['repeat'],$_POST['current']);
+        if($message[0]) {                 //if the password was good
+            $pass_require=true;
+            $hash= $_SESSION['member']->hash_password($_POST['new'],$salt);  //hash the password
+            if($_SESSION['member']->set_password($ident,$hash)) {             //if password changed properly
+                header("refresh:0;url=/login/home.php");          //exit
+                $failed=false;
+            } else {
+                $failed=true;                  //display that it failed
+            }    
+        } else {
+            $pass_require=false;
+        }
+    } else {
+        $good_pass=false;
     }
 }
 ?>
@@ -47,6 +76,7 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
         <title>Staff Login</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css">
     </head>
     <body>
         <?php
@@ -56,8 +86,8 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
             <font style="color:red">This Account is currently locked. Please wait 30 minutes, or contact you administrator</font>
         <?php
         }
-        if(!isset($_SESSION['member'])) {                  //if couldn't log on
-            logLogin($capid,false);
+        if(!isset($_SESSION['member'])&&isset($capid)) {                  //if couldn't log on
+                logLogin($capid,false);
             ?>
             <font color="red">We were not able to log you in</font>
             <form method="post">
@@ -67,13 +97,69 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
             <?php
                 
         }
-    if(!array_key_exists("CAPID", $_POST)||  !array_key_exists("password", $_POST)) {
+    if((!array_key_exists("CAPID", $_POST)||  !array_key_exists("password", $_POST))&&!isset($_POST['current'])) {
         ?>
         <form method="post">
             Capid: <input type="text" name="CAPID" size="5"/><br>
             Password: <input type="password" name="password" size="5"/> <br>
             <input type="submit" value="Sign-in"/>
         </form>
+        <?php
+    }
+    if(isset($reCreate)||isset($_POST['new'])) {
+        ?>
+            <table><tr><td>
+        <h2 class="warning">Your password is expired, you must change it</h2>
+        Your password must meet all of the following requirements:
+        <?php
+        if(isset($failed)) {
+            if($failed)
+                echo '<div class="warning">There was an error changing your password</div>';
+            else
+                echo "<h2>Your password has been changed. We will redirect you now, please wait.</h2>";
+        }
+        ?>
+        <ul>
+            <li>Be at least eight(8) characters in length</li>
+            <li>Be memorized, it cannot be written down.</li>
+            <li>contain at least three of the following</li>
+            <ol>
+                <li>Uppercase letter</li>
+                <li>Lowercase letter</li>
+                <li>Digit (0-9)</li>
+                <li>Special Character (~`!@#$%^&amp;*()+=_-{}[]\|:;&quot;&#039;?/&lt;&gt;,.) </li>
+            </ol>
+    </ul>
+        Your password cannot contain:
+        <ul>
+            <li>contain a common proper name, login ID, e-mail address, initials, first, middle or last name </li>
+        </ul>
+                </td>
+                <td style="font-weight: bold">
+                    <form method="post">
+                        Current Password<br>
+                        <?php
+                        if(isset($good_pass)&&!$good_pass)
+                            echo '<div class="warning">Incorrect Password</div>';
+                        ?>
+                        <input type="password" size="10" maxlength="256" name="current"/><br><br>
+                        New Password<br>
+                        <?php
+                        if(isset($pass_require)&&!$pass_require) {
+                            echo '<ul class="warning">';
+                            for($i=1;$i<count($message);$i++) {
+                                echo "<li>".$message[$i]."</li>";      //show the errors
+                            }
+                            echo "</ul>\n";
+                        }
+                        ?>
+                        <input type="password" size="10" maxlength="256" name="new"/><br>
+                        confirm<br>
+                        <input type="password" name="repeat" size="10" maxlength="256"/><br>
+                        <input type="submit" value="Change your Password"/>
+                    </form>
+                </td></tr>
+        </table>
         <?php
     }
     include("footer.php");
