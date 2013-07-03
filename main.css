@@ -6,24 +6,28 @@
         Purpose of the stylesheet follows.
 */
 body {color:black;}
-.promotion .P {
+ .P {
     color:green;
 }
-.promotion .F {
+ .F {
     color:red;
 }
-.promotion .I {
+ .I {
     color: orange;
 }
-.promotion {
+tr:nth-of-type(even).table {
+    background-color:  	#E0E0E0;
+}
+.table {
     font-size:15px;
     vertical-align:top;
     text-align: center;
     width:900px;
     border:1px solid black;
     border-collapse: collapse;
+    padding: 2px;
 }
-th.promotion {
+th.table {
     font-size: 12px;
     border:1px solid black;
 }

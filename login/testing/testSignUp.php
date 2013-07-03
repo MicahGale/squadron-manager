@@ -35,6 +35,7 @@ $ident=  connect('login');
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css">
         <title>View testing Sign-up and enter Scores</title>
     </head>
     <body>
@@ -53,10 +54,11 @@ $ident=  connect('login');
                         ?>
                         <input type="submit" name="filter" value="filter"/><br><br>
                         <input type="submit" name="save" value="save"/><br><br>
-                        <input type="submit" name="check" value="Check percentages"/>
-                    <table border="1" cellpadding="0">
+                        <input type="submit" name="check" value="Check percentages"/><br>
+                        Tester:<input type="text" size="2" disabled="disabled" value="<?php echo $_SESSION['member']->getcapid();?>"/>
+                    <table class="table">
                         <tr>
-                            <th>Member</th><th>Test type</th><th>Test</th><th>Passed</th><th>Percentage<a href="/help/inputPercentages.php" target="_blank">?</a></th><th>On Eservices</th><th>Remove</th>
+                            <th class="table">Member</th><th class="table">Test type</th><th class="table">Test</th><th class="table">Passed</th><th class="table">Percentage<a href="/help/inputPercentages.php" target="_blank">?</a></th><th class="table">On Eservices</th><th class="table">Remove</th>
                         </tr>
                         <?php
                         if(isset($_POST['check'])) {           //if checking percentage
@@ -73,8 +75,8 @@ $ident=  connect('login');
                         }
                         if(isset($_POST['save'])) {                       //if saved is requested then save it
                             $results=$_SESSION['results'];
-                            $query="INSERT INTO REQUIREMENTS_PASSED(CAPID,ACHIEV_CODE,REQUIREMENT_TYPE,TEXT_SET,PASSED_DATE,ON_ESERVICES,PERCENTAGE)
-                                VALUES(?,?,?,?,CURDATE(),?,?)";
+                            $query="INSERT INTO REQUIREMENTS_PASSED(CAPID,ACHIEV_CODE,REQUIREMENT_TYPE,TEXT_SET,PASSED_DATE,ON_ESERVICES,PERCENTAGE, TESTER)
+                                VALUES(?,?,?,?,CURDATE(),?,?,".$_SESSION['member']->getcapid().")";
                             $stmt=  prepare_statement($ident, $query);        //prepare statement to insert data
                             $success = true;
                             $toRemove = array();               //array to tell what testing sign ups to remove
@@ -155,20 +157,20 @@ $ident=  connect('login');
                         $_SESSION['results']=$results;  //stores the results so they may be used later
                         $size=count($results);
                         for($i=0;$i<$size;$i++) {            //display testing requests
-                            echo "<tr><td>";
+                            echo "<tr><td class=\"table\">";
                             $member=new member($results[$i]["CAPID"],1, $ident);
                             echo $member->link_report();
-                            echo "</td><td>".$results[$i]['TYPE_NAME']."</td><td>".$results[$i]['TEST_NAME']."</td>";
-                            echo '<td><input type="checkbox" name="passed[]" value="'.$i.'" ';
+                            echo "</td><td class=\"table\">".$results[$i]['TYPE_NAME'].'</td><td class="table">'.$results[$i]['TEST_NAME']."</td>";
+                            echo '<td class="table"><input type="checkbox" name="passed[]" value="'.$i.'" ';
                             if($percent[$i])
                                 echo "checked";
                                 echo'/></td>';
-                            echo '<td><input type="text" size="1" maxlength="10" name="percentage'.$i.'"';
+                            echo '<td class="table"><input type="text" size="1" maxlength="10" name="percentage'.$i.'"';
                             if(isset($input[$i]))
                                 echo 'value="'.$input[$i].'"';
                             echo'/></td>';
-                            echo '<td><input type="checkbox" name="eservices[]" value="'.$i.'"/></td>';
-                            echo '<td><input type="checkbox" name="remove[]" value="'.$i."\"/></td></tr>\n";
+                            echo '<td class="table"><input type="checkbox" name="eservices[]" value="'.$i.'"/></td>';
+                            echo '<td class="table"><input type="checkbox" name="remove[]" value="'.$i."\"/></td></tr>\n";
                         }
                         ?>
                     </table>

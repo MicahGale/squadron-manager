@@ -74,7 +74,7 @@ if(!isset($_SESSION['microscope'])) {                      //if not saved yet ma
                 <p class="P">████=Completed task, and passed</p>
                 <p class="I">████=Signed up to test, but hasn't been entered</p>
                 <p class="F">████=Hasn't passed, and isn't signed up to test</p>
-                <a href="/help/inputPercentages.php" target="_blank">How to Input Percentages</a>
+                <a href="/help/inputPercentages.php" target="_blank">How to Input Percentages</a><br>
             <input type="submit" name="submit" value="save"/>
         <?php
         if(isset($_POST['submit'])) { // if saving do so.

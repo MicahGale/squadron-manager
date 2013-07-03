@@ -10,15 +10,22 @@
  * achiev the code they are testing for
  * multi 0 is for individual 1 is for testing signup
  * upload 0 if uploading files 1 when the file has been uploaded
+ * field the field the capid is for- tester the tester testee the testee
  * 
  * $_POST
  * capid the person (text)
+ * tester the capid of the tester
  * *TEST_CODE* the input for the CPFT test (text)
  * search clicking on search for jumping to member search (submit)
  * save saves the input (submit)
  * *capid* the pass/fail of the member pass=passed fail=failed (radio)
  * waive[$i]=*capid* waiving the cpft for the capid (checkbox)
  * 
+ * $_SESSION
+ * date- the date of the test
+ * achiev- the achievement an individual test is for
+ * capid- the capid of the testee 
+ * tester- the capid of the tester
  * 
  * @package Squadron-manager
  * @copyright (c) 2013, Micah Gale
@@ -46,17 +53,23 @@ $ident=  connect('login');
 $query="SELECT TEST_CODE, TEST_NAME FROM CPFT_TEST_TYPES ORDER BY TEST_NAME";
 $header=  allResults(Query($query, $ident));
 $_SESSION['header']=$header;
-
-if(isset($_POST['search'])) {  //if searched then save it
+if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save it
     $_SESSION['date']=  parse_date_input($_POST);
-    $_SESSION['achiev']=$_REQUEST['achiev'];
+    $_SESSION['achiev']=  cleanInputString($_REQUEST['achiev'],2,'Achievement',false);
+    $_SESSION['capid']=  cleanInputInt($_POST['capid'],6, 'capid');
+    $_SESSION['tester']=  cleanInputInt($_POST['tester'], 6,'tester');
     for($i=0;$i<count($_SESSION['header']);$i++) {
         $_SESSION['CPFT'][$_SESSION['header'][$i]['TEST_CODE']]=$_POST[$_SESSION['header'][$i]['TEST_CODE']];
     }
-    header("refresh:0;url=/login/member/search.php?redirect=/login/testing/PTtest.php");  //refresh
+    if(isset($_POST['searchT']))
+        $field='tester';
+    else
+        $field='testee';
+    header("refresh:0;url=/login/member/search.php?redirect=/login/testing/PTtest.php&field=$field");  //refresh
     exit;
 } if(isset($_POST['save'])&&$_GET['multi']==0) {
     $capid = cleanInputInt($_REQUEST['capid'],6,"Capid");
+    $tester= cleanInputInt($_POST['tester'], 6, 'Tester Capid',true);
     $buffer=new member($capid,1,$ident);
     $requirements=$buffer->retrieveCPFTrequire($ident);  //get the requirements from
     $actual=array();  //parse the input as an array
@@ -79,21 +92,22 @@ if(isset($_POST['search'])) {  //if searched then save it
             $waive="TRUE";
         else
             $waive="FALSE";
-        $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIRE_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICE, WAIVER)
-            VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."',false,'$waive')";
+        $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIRE_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICE, WAIVER,TESTER)
+            VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."',false,'$waive','$tester')";
         Query($query, $ident);
-        unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev']);
+        unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['capid'],$_SESSION['tester']);
         header("refresh:0;url=/login/testing/PTtest.php");
         exit;
     }
     unset($_SESSION['csv']);   //clear the csv parsed data
 }
 if(isset($_POST['save'])&&$_GET['multi']==1) {
+    $tester=  cleanInputInt($_POST['tester'], 6, 'Tester capid');
     $query="INSERT INTO CPFT_ENTRANCE(CAPID, ACHIEV_CODE,TEST_TYPE, SCORE)
             VALUES(?,?,?,?)";
     $score_insert=  prepare_statement($ident, $query);
-    $query="INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, WAIVER)
-        VALUES(?,?,'PT',?,?,?)";
+    $query="INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, WAIVER,TESTER)
+        VALUES(?,?,'PT',?,?,?,'$tester')";
     $log= prepare_statement($ident, $query);
     $query="DELETE FROM TESTING_SIGN_UP WHERE REQUIRE_TYPE='PT' AND CAPID=?";
     $delete = prepare_statement($ident, $query);
@@ -182,12 +196,24 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
         <?php
         } else if(isset($_GET['capid'])||(isset($_GET['multi'])&&$_GET['multi']==0)) {
             echo '<form method="post">';
-            if(isset($_GET['capid']))
-                $capid=  cleanInputInt($_GET['capid'],6, 'capid');
-            echo 'Enter member CAPID:<input type="text" size="5" maxlength="100" name="capid" ';
+            if(isset($_SESSION['capid']))
+                $capid=$_SESSION['capid'];
+            if(isset($_SESSION['tester']))
+                $tester=$_SESSION['tester'];
+            if(isset($_GET['capid'])) {
+                if($_GET['field']=='testee')
+                    $capid=  cleanInputInt($_GET['capid'],6, 'capid');
+                else 
+                    $tester=  cleanInputInt ($_GET['capid'], 6, 'capid');
+            }
+            echo 'Enter member CAPID:<input type="text" size="5" maxlength="10" name="capid" ';
             if(isset($capid))
                 echo 'value="'.$capid.'"';
-            echo '/>or<input type="submit" name="search" value="search for a member"/><br><br>'."\n";
+            echo '/>or<input type="submit" name="search" value="search for a member"/><br>'."\n";
+            if(!isset($tester))
+                $tester=$_SESSION['member']->getCapid ();
+            echo 'Enter Tester CAPID:<input type="text" size="5" maxlength="10" name="tester" value="'.$tester.'"/>';
+            echo 'or<input type="submit" name="searchT" value="search for a member"/><br><br>';
             echo "Select achievement test is for:";
             if(isset($_REQUEST['achiev']))
                 $_SESSION['achiev']=  cleanInputString ($_REQUEST['achiev'],5,'achievement',true);
@@ -291,6 +317,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
                 AND B.REQUIRE_TYPE='PT'
                 ORDER BY A.NAME_LAST, A.NAME_FIRST";
             $results=  allResults(Query($query, $ident));
+            $tester=$_SESSION['member']->getCapid ();
             for($i=0;$i<count($results);$i++) {  //loop through the results
                 $capid=$results[$i]['CAPID'];
                 if(!isset($_SESSION['csv'][$capid])) {  //if isn't set already make an array
@@ -299,13 +326,15 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
                 }
             }
             ?>
-            <input type="submit" name="save" value="save"/><br><br>
-        <table border="1"><tr><th>Name</th><th>Gender</th><th>Age</th>
+            <table><tr><td style="text-align: center">
+            <input type="submit" name="save" value="save"/><br>
+            Tester:<input type="text" name="tester" value="<?php echo $tester;?>" size="3" maxlength="6"/><br><br>
+        <table class="table"><tr><th class="table">Name</th><th class="table">Gender</th><th class="table">Age</th>
             <?php
             for($i=0;$i<count($_SESSION['header']);$i++) { //crate headers
-                echo "<th>".$_SESSION['header'][$i]['TEST_NAME'].'</th>';
+                echo '<th class="table">'.$_SESSION['header'][$i]['TEST_NAME'].'</th>';
             }
-            echo "<th>CPFT Waiver</th><th>Passing</th>";
+            echo "<th class=\"table\">CPFT Waiver</th><th class=\"table\">Passing</th>";
             ?>
             </tr>
             <?
@@ -319,10 +348,10 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             }
             array_multisort($last_name, SORT_STRING,$first_name, SORT_STRING, $capid, SORT_NUMERIC);  //sort it
             foreach($capid as $id) {
-                echo "<tr><td>";
+                echo "<tr><td class=\"table\">";
                 $buffer=$_SESSION['csv'][$id];
-                echo $buffer['member']->getName_Last()." , ".$buffer['member']->getName_first()."</td><td>";
-                echo $buffer['member']->get_gender()."</td><td>";
+                echo $buffer['member']->link_report().'</td><td class="table">';
+                echo $buffer['member']->get_gender().'</td><td class="table">';
                 echo $buffer['age']."</td>";
                 if(isset($buffer['standards']))
                     $requirements=$buffer['standards'];
@@ -330,7 +359,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
                     $requirements=$buffer['member']->retrieveCPFTrequire ($ident);
                 for($i=0;$i<count($_SESSION['header']);$i++) {
                     $code=$header[$i]['TEST_CODE'];
-                    echo '<td><input type="text" size="1" maxlength="5" name="'.$code.$id.'"';
+                    echo '<td class="table"><input type="text" size="1" maxlength="5" name="'.$code.$id.'"';
                     if (isset($buffer['actual'][$code])) {
                         if($code=='MR')
                             echo ' value="'.minutesFromDecimal ($buffer['actual'][$code]).'"';
@@ -345,10 +374,10 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
                             echo minutesFromDecimal ($requirements[$code])."</td>";
                     }
                 }
-                echo '<td><input type="checkbox" name="waive[]" value="'.$id.'"';
+                echo '<td class="table"><input type="checkbox" name="waive[]" value="'.$id.'"';
                 if(isset($buffer['waive'])&&$buffer['waive']===true)
                     echo " checked ";
-                echo ' /></td><td><label for="pass">Pass</label><input type="radio" name="'.$id.'" value="pass" id="pass"';
+                echo ' /></td><td class="table"><label for="pass">Pass</label><input type="radio" name="'.$id.'" value="pass" id="pass"';
                 if(isset($buffer['waive'])&& $buffer['pass']===true)
                     echo ' checked ';
                 echo ' /><br><label for="fail">Fail</label><input type="radio" name="'.$id.'" value="fail" id="fail"';
@@ -359,6 +388,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             ?>
             </table><br>
             <input type="submit" name="save" value="save"/>
+                    </td></tr></table>
             <?php
         }
         ?>
