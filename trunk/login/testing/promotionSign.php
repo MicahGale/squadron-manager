@@ -67,6 +67,7 @@ $ident=  connect('login');
                         </form>
                         <form method="post">
                             <input type="submit" name="save" value="Save"/><br>
+                            Approver: <input type="text" value="<?php echo $_SESSION['member']->getcapid();?>" disabled="disabled" size="1"/>
                             <?php
                             if(isset($_POST)&&isset($_POST['save'])) {  //if has post and not filter parse it and save it
                                 parsePromoInput($ident, $_POST);

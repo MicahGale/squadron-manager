@@ -31,7 +31,8 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
         }
         if($unlocked) {
             $member=new member($capid, 1, $ident);
-            if($member->check_password($ident, $password, $salt)) {  //checks the password
+            //if the right password and the member isn't terminated
+            if($member->check_password($ident, $password, $salt)&&!$member->check_terminated($ident)) {  //checks the password
                 logLogin($capid,true);
                 session_secure_start($capid);       //starts session
                 $_SESSION["member"]= new member($capid,2,$ident);
@@ -85,6 +86,9 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
         ?>
             <font style="color:red">This Account is currently locked. Please wait 30 minutes, or contact you administrator</font>
         <?php
+        }
+        if(isset($member)&&$member->check_terminated($ident)) {
+            echo '<span class="F">Your membership is terminated, and you cannot log in.</span><br>';
         }
         if(!isset($_SESSION['member'])&&isset($capid)) {                  //if couldn't log on
                 logLogin($capid,false);

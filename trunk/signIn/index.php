@@ -22,7 +22,8 @@
     <head>
         <title>Sign-in</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="../patch.ico">
+        <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css">
     </head>
     <body>
 <?php
@@ -38,14 +39,17 @@ if($member->badInput) {
                     </form>";
     break;
 }    
-    if($member->exists()){                   //if a member exists displays member info
-        echo"<strong>We found this person from the entered CAPID:</strong><br><br>\n";
+    if($member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
+        echo"<strong>We found this member from the entered CAPID:</strong><br><br>\n";
         echo "<table border =\"1\" cellspacing=\"1\"><tr><th>CAPID</th><th>Last Name</th><th>First Name</th><th>Grade</th></tr>\n";
         echo "<tr><td>".$member->getCapid()."</td><td>".$member->getName_Last()."</td><td>".$member->getName_first()."</td><td>".$member->getGrade($ident,'signin/index.php')."</td></tr></table><br>";  
         $member->testSign_up($ident, "finishSignin.php","signin/index.php");
         session_start();
         $_SESSION["member"]=$member;
-    } else {
+    } else if($member->check_terminated($ident)) {
+        echo '<span class="F">Your membership is terminated, and you cannot log in.</span>';
+    }
+    else {
         echo "<strong>We didn't find anyone with that CAPID</strong><br>";    //if no member ask to search or make new member
         echo "Search again<br>";
         echo"<form action=\"../signIn\" method=\"get\">

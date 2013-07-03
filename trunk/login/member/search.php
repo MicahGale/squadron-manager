@@ -38,7 +38,7 @@ if(isset($_POST['input'])) {
 }
 function checkPath() {                      //keep redirect path and clean it up
     global $ident;
-    $redirect=  cleanInputString($_GET['redirect'], 128,'redirect page', false);
+    $redirect=  cleanInputString($_GET['redirect'], 128,'redirect page', false,false);
     $redirect_no_login=  substr($redirect, strpos($redirect,"/", 1));
     $pages= session_predict_path($ident,null, $redirect_no_login);
     if(!in_array($redirect, $pages)) {                    //if wasn't in safe paths
