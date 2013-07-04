@@ -153,7 +153,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE),
         ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE),
         ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE),
         ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true),
-        ('PAS','Change your Password','AD','adminis/pswdChange.php',false);
+        ('PAS','Change your Password','AD','adminis/pswdChange.php',false),
+        ('NME','Create Staff Member','AD','adminis/newMember.php',false);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -168,7 +169,8 @@ VALUES('CTO','MEA')
         ('CTO','PTT'),
         ('CTO','PRR'),
         ('CTO','EMR'),
-        ('AL','PAS');
+        ('AL','PAS'),
+        ('CTO','NME');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),

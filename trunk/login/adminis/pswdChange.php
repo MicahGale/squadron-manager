@@ -79,15 +79,15 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
             <li>Be memorized, it cannot be written down.</li>
             <li>contain at least three of the following</li>
             <ol>
-                <li>Uppercase letter</li>
-                <li>Lowercase letter</li>
+                <li>Uppercase letter(A-Z)</li>
+                <li>Lowercase letter(a-z)</li>
                 <li>Digit (0-9)</li>
                 <li>Special Character (~`!@#$%^&amp;*()+=_-{}[]\|:;&quot;&#039;?/&lt;&gt;,.) </li>
             </ol>
     </ul>
         Your password cannot contain:
         <ul>
-            <li>contain a common proper name, login ID, e-mail address, initials, first, middle or last name </li>
+            <li>a common proper name, login ID, e-mail address, initials, first, middle or last name </li>
         </ul>
                 </td>
                 <td style="font-weight: bold">

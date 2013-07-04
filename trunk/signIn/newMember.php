@@ -39,39 +39,7 @@
         $newMember = new member($_POST['CAPID'],-1,$ident,$_POST['Lname'],$_POST["Fname"],$_POST['Gender'],$DoB,$_POST["member"],
                 $_POST["achiev"],$_POST["text"],$_POST["unit"],$DoJ);
         $badInput = $newMember->badInput;  //checks if had bad input
-        $row =0;
-        $numberContacts=0;
-        $contact=array();
-        while($row<5) {                              //stores to array name
-            if($_POST["contName$row"]!=null) {
-                $contact[$numberContacts] = cleanInputString($_POST["contName$row"],32,"Contact's Name #$row",false);
-            }
-            $row++;
-        }
-        $row =0;                 
-        $numberContacts = 0;
-        $relation =array();           //force to be array type
-        while($row<5) {                 //stores to array relations
-            if($_POST["relation$row"]!= null){
-                if($_POST["relation$row"]=="other"){        
-                    $otherContact = true;                    
-                }
-                $relation[$numberContacts] =$_POST["relation$row"];
-                $numberContacts++;
-            }
-            $row++;
-        }
-        $numberContacts=0;
-        $row =0;                            //stores phone numbers to array
-        $phoneNum = array();                 //forces to be array type
-        while($row<5) {
-            if($_POST["number$row"]!=null) {
-                $phoneNum[$numberContacts] = $_POST["number$row"];
-                $numberContacts++;
-            }
-            $row++;
-        }
-        $newMember->addEmeregencyContactArray($contact,$relation,$phoneNum);
+        $newMember->addEmeregencyContactArray($_POST);
         if($badInput) {
             newMember($ident,"signin/newMember.php");
         }                                                 //insert member
