@@ -29,8 +29,12 @@
 /*
  * **********************FOR v. .10*****************************
  * TODO js check for caps lock
- * TODO add admin grant privelidges
+ * TODO audit_log page
+ * TODO account log page
+ * TODO INSERT DISCIPLINE EVEN promo boards
+ * TODO create page for cadet oath and stufff, and box in DCC and DCS on promo
  * TODO create reports: and eservices, and attendance
+ * TODO allow adding to an event
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO add ribbon request stuff, and supply stuff
@@ -55,7 +59,7 @@
  * TODO add edit member and add picture
  * TODO regulations page and update regsupdater
  * TODO add statistics esp. for attendance
- * TODO use css  
+ * TODO use css more and js
  * TODO create a ical parsing script
  * TODO make colorblind safe options
  */
@@ -2105,8 +2109,12 @@ class member {
         $chain = new chain_of_command($ident,$this->capid);
         $chain->display($ident);
     }
-    public function link_report() {
-        return '<a href="/login/member/report.php?capid='.$this->capid.'">'.$this->title().'</a>';
+    public function link_report($new_tab=false) {
+        $buffer= '<a href="/login/member/report.php?capid='.$this->capid.'"';
+        if($new_tab)
+            $buffer.= ' target="_blank"';
+        $buffer.='>'.$this->title().'</a>';
+        return $buffer;
     }
     public function get_text() {
         return $this->text_set;
