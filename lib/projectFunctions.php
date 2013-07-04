@@ -29,12 +29,11 @@
 /*
  * **********************FOR v. .10*****************************
  * TODO js check for caps lock
- * TODO add admin to add other users and grant privelidges
+ * TODO add admin grant privelidges
  * TODO create reports: and eservices, and attendance
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO add ribbon request stuff, and supply stuff
- * TODO allow to change password
  * TODO finish populating db
  * TODO add settings table?
  * TODO check old TODO tags
@@ -224,18 +223,20 @@ function newMember($identifier, $page,$capid=null) {                            
     //displays table for input
     echo "<form action=\"$page\" method=\"post\">";
     //displays input fields
-    echo "CAPID:<input type=\"text\" name=\"CAPID\" value=\"$capid\" size=\"1\"/><br>   
-        Last Name:<input type=\"text\" name=\"Lname\" size=\"4\"/><br>
-        First Name:<input type=\"text\" name=\"Fname\" size=\"4\"/><br>
-        Gender:<select name=\"Gender\"><option value=\"M\">Male</option><option value=\"F\">Female</option></select><br>
-        Date of Birth:\n";
+    ?>
+    CAPID:<input type="text" name="CAPID" value="<?php echo $capid?>" size="1"/><br>   
+    Last Name:<input type="text" name="Lname" size="4"/><br>
+    First Name:<input type="text" name="Fname" size="4"/><br>
+    Gender:<select name="Gender"><option value="M">Male</option><option value="F">Female</option></select><br>
+    Date of Birth:
+    <?php
     enterDate(true,'DoB');
     echo "<br>CAP Grade"; //SELECT A.ACHIEV_CODE, CONCAT(A.ACHIEV_CODE,'-',B.GRADE_NAME) FROM ACHIEVEMENT A JOIN SQAUDRON_INFO.GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY B.GRADE_NUM
     dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "achiev", $identifier, false);
     echo "<br>Member Type";
     dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'", "member", $identifier, false);  //creates drop down menu for membership types
     echo "<br>Textbook Set";
-    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL'", 'text', $identifier, false);  //creates drop down menu for text sets
+    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier, false,'L2L');  //creates drop down menu for text sets
     echo "<br>Unit Charter Number:";
     dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,'RMR-ID-073');  //creates drop down menu for text sets
     echo "<br>Date Joined CAP:";
@@ -254,13 +255,13 @@ function newContact($submit, $identifier, $page = null) {
     if ($submit) {
         echo"<form action=\"$page\" method=\"post\">";
     }
-    echo "<table border=\"1\" cellspacing=\"1\"><tr>
-            <th>Contact Name</th><th>Contact's Relation</th><th>Contact's Phone Number</th></tr>\n";
+    echo '<table class="table"><tr>
+            <th class="table">Contact Name</th><th class="table">Contact\'s Relation</th><th class="table">Contact\'s Phone Number</th></tr>'."\n";
     $row = 0;
     while ($row < 5) {
-        echo "<tr><td><input type=\"text\" name=\"ContName$row\" size=\"7\"/></td><td>";
+        echo '<tr class="table"><td class="table"><input type="text" name="ContName'.$row.'" size="7"/></td><td class="table">';
         dropDownMenu("SELECT RELATION_CODE,RELATION_NAME FROM CONTACT_RELATIONS", "relation$row", $identifier, true);
-        echo "</td><td><input type=\"text\" name=\"number$row\" size=\"16\"/></td>\n";
+        echo "</td><td class=\"table\"><input type=\"text\" name=\"number$row\" size=\"16\"/></td>\n";
         $row++;
     }
     echo "</tr></table><br>";
@@ -1373,9 +1374,10 @@ function parseMinutes($input) {
  * @param String $pass
  * @param String $retype
  * @param String $old - the old password to check the passwords did change
+ * @param Boolean $checkOld true to check the old password, false if this the first password
  * @return array 0=>boolean, true passed, false otherwise, 1=>the password on success,1+=> the error message(s) otherwise each message it's own index
  */
-function verify_password($pass, $retype,$old) {
+function verify_password($pass, $retype,$old,$checkOld=true) {
     $passes=true;
     $errors=array();
     if($pass!=$retype) {             //if the passwords din't match exit out
@@ -1385,7 +1387,7 @@ function verify_password($pass, $retype,$old) {
             $passes=false;
             array_push($errors, "Password must be at least 8 characters");
         }
-        if($pass===$old) {
+        if($checkOld&&$pass===$old) {
             $passes=false;
             array_push($errors,'Password can not be your old password');
         }   
@@ -1453,20 +1455,19 @@ class member {
      */
     public function __construct($capid, $level, $ident, $name_last = null, $name_first = null, $gender = null, dateTime $DoB = null, $memberType = null, $achievement = null, $text_set = null, $unit = null, DateTime $Date_of_Join = null) {
         $this->capid = cleanInputInt($capid, 6, "CAPID");
-        if ($level == -1) {             //levels -1= all from input 0=capid 1=capid+name+gender+achievement 2=1+text+member_type+picture 3=2+dates 4=3+emergency+unit         
+        if ($level == -1) {             //levels -1= all from input 0=capid 1=capid+name+gender+achievement 2=1+text+member_type 3=2+dates 4=3+emergency+unit         
             $this->badInput = false;
             $this->capid = $capid;
             $this->name_last = $name_last;
             $this->name_first = $name_first;
             $this->gender = $gender;
             $this->DoB = $DoB;
-            $this->memberType = new memberType(cleanInputString($memberType, 1, "Member Type"));
+            $this->memberType = new memberType(cleanInputString($memberType, 1, "Member Type",false),$ident);
             $this->achievement = $achievement;
             $this->text_set = $text_set;
-            $this->unit = new unit(cleanInputString($unit, 10, "unit"));
+            $this->unit = new unit(cleanInputString($unit, 10, "unit",false),$ident);
             $this->Date_of_Join = $Date_of_Join;
-            $this->cleanFields();
-            $this->initLevel();
+            $this->initLevel=4;
         } else {
             $this->init($level, $ident);
         }
@@ -1474,30 +1475,36 @@ class member {
     public function addEmergencyContact($Name, $relation, $number) {
         array_push($this->emergencyContacts, new Contact($Name, $relation, $number, true));
     }
-    public function addEmeregencyContactArray(array $Name, array $Relation, array $phone) {
-        $index = 0;
-        while ($index < count($Name)) {
-            if ($Name != null) {
-                array_push($this->emergencyContacts, new contact($Name[$index], $Relation[$index], $phone[$index], true));
+    public function addEmeregencyContactArray(array $input) {
+        for($i=0;$i<5;$i++) {
+            if(isset($input["ContName$i"],$input["relation$i"],$input["number$i"])) {
+                if($input["ContName$i"]!=""&&$input["relation$i"]!=""&&$input["number$i"]!="") {
+                    $name=  cleanInputString($input["ContName$i"],32,"Contact Name $i", false);
+                    $relation=  cleanInputString($input["relation$i"],2,"Relation $i",false);
+                    $phone= cleanInputString($input["number$i"],12, "contact number $i",false,true);
+                    array_push($this->emergencyContacts,new contact($name,$relation,$phone));
+                }
             }
-            $index++;
         }
     }
     public function insertMember($ident) {
         $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED)
-            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender',STR_TO_DATE('" . date(PHP_DATE_FORMAT, $this->DoB) . "','" . $sqlDateFormat . "'),'$this->achievement','" . $this->memberType->getCode . "','$this->textset','" . $this->unit->getCharter() . "',STR_TO_DATE('" . date(PHP_DATE_FORMAT, $this->DoJ) . "','" . SQL_DATE_FORMAT . "'))";
+            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."','" . $this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."')";
         return Query($query, $ident);
     }
     public function insertEmergency($ident) {
         $stmt = prepare_statement($ident, "INSERT INTO EMERGENCY_CONTACT (CAPID,RELATION,CONTACT_NAME,CONTACT_NUMBER) 
-            VALUES('".$this->capid."',?,?)");
+            VALUES('".$this->capid."',?,?,?)");
+        $success=true;
         for ($row=0;$row < count($this->emergencyContacts);$row++) {
-            $con = $this->emergencyContacts[$row]->getName;
-            $relat = $this->emergencyContacts[$row]->getRelation;
-            $num = $this->emergencyContacts[$row]->getPhone;
-            bind($stmt,"sss",$relat,$con,$num);
-            execute($stmt);
+            $con = $this->emergencyContacts[$row]->getName();
+            $relat = $this->emergencyContacts[$row]->getRelation();
+            $num = $this->emergencyContacts[$row]->getPhone();
+            bind($stmt,"sss",array($relat,$con,$num));
+            if(!execute($stmt))
+                $success=false;
         }
+        return $success;
     }
     public function sign_in($ident, $message, $event_code = null) {
         if ($event_code == null) {                         //assume current event
@@ -2587,6 +2594,24 @@ class member {
             return true;
         return false;
     }
+    /**
+     * Insert Staff Positions into the database
+     * 
+     * @param array $input the array of the checked boxes
+     * @param type $ident the database connection
+     * @return boolean true success false if fail!
+     */
+    function insert_staff_position(array $input, $ident) {
+        $success=true;
+        $stmt= prepare_statement($ident,"INSERT INTO STAFF_POSITIONS_HELD(STAFF_POSITION, CAPID)
+            VALUES(?,'".$this->capid."')");
+        for($i=0;$i<count($input);$i++) {
+            bind($stmt,"s",  array(cleanInputString($input[$i],6,"Staff position code",false)));
+            if(!execute($stmt))
+                $success=false;
+        }
+        return $success;
+    }
 }
 class unit {
     private $charter_num;
@@ -2615,9 +2640,9 @@ VALUES('" . $this->charter_num . "','" . $this->region . "','" . $this->wing . "
 class memberType {
     private $code;
     private $name;
-    function __construct($code) {
-        $this->code = cleanInputString($code, 1, "Member Type");
-        $results = Query("SELECT MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE='$this->code'");
+    function __construct($code,$ident) {
+        $this->code = cleanInputString($code, 1, "Member Type",false);
+        $results = Query("SELECT MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE='$this->code'",$ident);
         $this->name = Result($results, 0, "MEMBER_TYPE_NAME");
     }
     function getCode() {

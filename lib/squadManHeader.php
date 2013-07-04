@@ -60,11 +60,10 @@
                     SQUADRON_INFO.TASKS B ON
                     A.TYPE_CODE=B.TYPE_CODE
                     WHERE (B.TASK_CODE IN (
-                        SELECT A.TASK_CODE FROM SQUADRON_INFO.STAFF_PERMISSIONS A
-                        LEFT JOIN SQUADRON_INFO.CHAIN_OF_COMMAND B ON B.STAFF_CODE=A.STAFF_CODE
-                        LEFT JOIN SQUADRON_INFO.STAFF_POSITIONS_HELD C ON B.POS_CODE=C.STAFF_POSITION
-                        WHERE  A.STAFF_CODE = 'AL'
-                        OR C.CAPID='".$_SESSION["member"]->getCapid()."') OR
+                        SELECT C.TASK_CODE FROM SQUADRON_INFO.STAFF_PERMISSIONS C
+                        LEFT JOIN SQUADRON_INFO.STAFF_POSITIONS_HELD D ON D.STAFF_POSITION=C.STAFF_CODE
+                        WHERE  C.STAFF_CODE = 'AL'
+                        OR D.CAPID='".$_SESSION["member"]->getCapid()."') OR
                     B.TASK_CODE IN (
                         SELECT TASK_CODE FROM SQUADRON_INFO.SPECIAL_PERMISSION
                         WHERE CAPID='".$_SESSION["member"]->getCapid()."'))
