@@ -140,21 +140,22 @@ INSERT INTO STAFF_POS_PERM(STAFF_CODE, STAFF_NAME)
 VALUES('AD','Administrator'),
         ('AL','All');
 ##############################insert tasks#################################
-INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL, NEW_TAB)
-VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE),
-        ('HOM','Home','ME','home.php',FALSE),
-        ('MSE','Member Search','ME','member/search.php',FALSE),
-        ('DDE','Find Discipline Event','DA','discipline/details.php',FALSE),
-        ('EVR','Find Event Report','EV','attendance/event.php',FALSE),
-        ('NEV','Create a new Event','EV','attendance/new.php',FALSE),
-        ('EVI','Insert attendance for an Event','EV','attendance/add.php',FALSE),
-        ('TSE','View Testing Sign-up','TP','testing/testSignUp',FALSE),
-        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php',FALSE),
-        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE),
-        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE),
-        ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true),
-        ('PAS','Change your Password','AD','adminis/pswdChange.php',false),
-        ('NME','Create Staff Member','AD','adminis/newMember.php',false);
+INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL, NEW_TAB, UNGRANTABLE)
+VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE),
+        ('HOM','Home','ME','home.php',FALSE,FALSE),
+        ('MSE','Member Search','ME','member/search.php',FALSE,FALSE),
+        ('DDE','Find Discipline Event','DA','discipline/details.php',FALSE,FALSE),
+        ('EVR','Find Event Report','EV','attendance/event.php',FALSE,FALSE),
+        ('NEV','Create a new Event','EV','attendance/new.php',FALSE,FALSE),
+        ('EVI','Insert attendance for an Event','EV','attendance/add.php',FALSE,FALSE),
+        ('TSE','View Testing Sign-up','TP','testing/testSignUp',FALSE,FALSE),
+        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php',FALSE,TRUE),
+        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE,FALSE),
+        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE,TRUE),
+        ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true,FALSE),
+        ('PAS','Change your Password','AD','adminis/pswdChange.php',false,FALSE),
+        ('NME','Create Staff Member','AD','adminis/newMember.php',false,true),
+        ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -170,7 +171,8 @@ VALUES('CTO','MEA')
         ('CTO','PRR'),
         ('CTO','EMR'),
         ('AL','PAS'),
-        ('CTO','NME');
+        ('CTO','NME'),
+        ('CTO','SPM');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
