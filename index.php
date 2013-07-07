@@ -28,11 +28,13 @@ if(isset($_SESSION['home'])) {
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Boise Composite Squadron: RMR-ID-073</title>
         <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css"/>
+        <script type="text/javascript" src="/CAPS_LOCK.js"></script>
     </head>
     <body>
         <?php include("header.php"); 
         include("projectFunctions.php");?>
-        <table border="0" width ="900">  <!table for formatting>
+        <table id="main">  <!table for formatting>
             <tr>                       <!left column>
                 <td style="text-align: left;width: 780px">
                     <p><strong>Today is:</strong> 
@@ -88,14 +90,14 @@ if(isset($_SESSION['home'])) {
                     <font size="2">CAPID<br>
                     <input type="text" name="CAPID" size="5"/> <br>
                     Password<br> </font>
-                    <input type="password" name="password" size="5"/> <br>
+                    <span id="warn" class="F"></span><input type="password" name="password" size="5" onkeypress="check_caps(event)"/> <br>
                     <input type="submit" value="login"/>
                 </form>
                 
                 </td>
             </tr>
             <tr>
-                <td colspan="2" align="center">
+                <td colspan="2">
                     <br><br>
                     <iframe src="https://www.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=rmdltfq8r1lvh7brb7s1ib23k8%40group.calendar.google.com&amp;color=%23182C57&amp;src=ufhvf2qfb8ccsum50kvig52m9k%40group.calendar.google.com&amp;color=%23182C57&amp;src=idahowing%40gmail.com&amp;color=%232F6309&amp;src=en.usa%23holiday%40group.v.calendar.google.com&amp;color=%23691426&amp;ctz=America%2FDenver" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
                 </td>

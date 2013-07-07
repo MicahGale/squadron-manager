@@ -78,6 +78,7 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css">
+        <script type="text/javascript" src="/CAPS_LOCK.js"></script>
     </head>
     <body>
         <?php
@@ -96,7 +97,7 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
             <font color="red">We were not able to log you in</font>
             <form method="post">
                 CAPID:<input type="text" name="CAPID" value="<?php echo $capid; ?>" size="5"/><br>
-                Password:<input type="password" name="password" size="5"/><br>
+                Password:<input type="password" name="password" size="5" onkeypress="check_caps(event)"/><span id="warn" class="F"></span><br>
                 <input type="submit" value="Login"/></form>
             <?php
                 
@@ -105,7 +106,7 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
         ?>
         <form method="post">
             Capid: <input type="text" name="CAPID" size="5"/><br>
-            Password: <input type="password" name="password" size="5"/> <br>
+            Password: <input type="password" name="password" size="5" onkeypress="check_caps(event)"/><span id="warn" class="warning"></span><br>
             <input type="submit" value="Sign-in"/>
         </form>
         <?php
@@ -146,7 +147,7 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
                         if(isset($good_pass)&&!$good_pass)
                             echo '<div class="warning">Incorrect Password</div>';
                         ?>
-                        <input type="password" size="10" maxlength="256" name="current"/><br><br>
+                        <span id="warn" class="F"></span><input type="password" size="10" maxlength="256" name="current" onkeypress="check_caps(event)"/><br><br>
                         New Password<br>
                         <?php
                         if(isset($pass_require)&&!$pass_require) {
@@ -157,9 +158,9 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
                             echo "</ul>\n";
                         }
                         ?>
-                        <input type="password" size="10" maxlength="256" name="new"/><br>
+                        <input type="password" size="10" maxlength="256" name="new" onkeypress="check_caps(event)"/><br>
                         confirm<br>
-                        <input type="password" name="repeat" size="10" maxlength="256"/><br>
+                        <input type="password" name="repeat" size="10" maxlength="256" onkeypress="check_caps(event)"/><br>
                         <input type="submit" value="Change your Password"/>
                     </form>
                 </td></tr>

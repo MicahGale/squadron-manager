@@ -29,8 +29,8 @@
 /*
  * **********************FOR v. .10*****************************
  * TODO js check for caps lock
- * TODO audit_log page
- * TODO account log page
+ * TODO add failed login wait
+ * TODO allow clearing the log
  * TODO INSERT DISCIPLINE EVEN promo boards
  * TODO create page for cadet oath and stufff, and box in DCC and DCS on promo
  * TODO create reports: and eservices, and attendance
@@ -45,14 +45,12 @@
  * TODO create installer
  * ***************************Debug/fix*******************************************
  * TODO fix member-side queries
- * TODO debug session hijacking resign-in keep post input
- * 
+ * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php)
  * *******************FOR LATER******************************
  *TODO populate pictures
  * TODO create cadet of the month selection
  * TODO create a barcode reader
  *TODO create warning system
- *TODO have javascript resize function
  *TODO create page for units
  * TODO debug commanders and add chain of command
  * TODO  add scheduling
@@ -101,6 +99,7 @@
   * The format for inserting a complete date time into SQL
   */
  define("SQL_INSERT_DATE_TIME","o-m-d H:i:s");
+ define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." H:i:s");  //the datetime format
  define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
  define("CPFT_RUNNING_REQ",1);            //the amount of running events that must be passed
  define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
@@ -128,6 +127,7 @@
   * The days to wait to notify the password experiation
   */
  define('PASSWORD_NOTIF',14);
+ define('LOG_PER_PAGE',40);
  /**
   * Stores and auditable event to the AUDIT_LOG table.
   * If we have the user's CAPID that will be stored along with the log
@@ -739,12 +739,11 @@ function session_secure_start($capid=null) {
             $_SESSION['intruded'] = true;        //says someone has intruded so all need to be reverified
             unset($_SESSION['password']);  //clear password so can't connect to database at all until reverified
             $time = auditLog( $_SERVER['REMOTE_ADDR'], 'SH');  //log it
-            if(isset($_SESSION['member']))
-                auditDump($time, "USER", $_SESSION['member']->getcapid());                //dump username
-            else
+            if(!isset($_SESSION['member']))
                 auditDump ($time, "USER",$capid);
             session_resign_in(false);            //makes resign in
         } else {              //if no foul play set up info for next request
+             header("refresh: 1790;url=/login/logout.php");     //auto logout after 29 minutes 50s
             $_SESSION['last_page'] = $_SERVER['SCRIPT_NAME'];       //allocate last page
             $ident = connect( 'ViewNext');
             if($capid!=null) {
@@ -757,7 +756,6 @@ function session_secure_start($capid=null) {
             if ($_SESSION['intruded']) {                       //if someone has tried to intrude make resign in
                 session_resign_in(true);               //has them resign in and keep the post stuff
             }
-            header("refresh:1790;url=/login/logout.php");     //auto logout after 29 minutes 50s
         }
     }
 }

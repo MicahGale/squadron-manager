@@ -155,7 +155,9 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE),
         ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true,FALSE),
         ('PAS','Change your Password','AD','adminis/pswdChange.php',false,FALSE),
         ('NME','Create Staff Member','AD','adminis/newMember.php',false,true),
-        ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true);
+        ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true),
+        ('ADL','View site Logs','AD','adminis/auditLog.php',false,true),
+        ('LLO','Login Logs and Locks','AD','adminis/loginLog.php',false,true);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -172,7 +174,9 @@ VALUES('CTO','MEA')
         ('CTO','EMR'),
         ('AL','PAS'),
         ('CTO','NME'),
-        ('CTO','SPM');
+        ('CTO','SPM'),
+        ('CTO','ADL'),
+        ('CTO','LLO');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
@@ -181,7 +185,10 @@ VALUES('member/approve.php','member/finalApprove.php'),
         ('attendance/event.php','member/report.php'),
         ('testing/testSignUp.php','member/report.php'),
         ('testing/promotionSign.php','member/report.php'),
-        ('testing/PTtest.php','testing/ptCSV.php');
+        ('testing/PTtest.php','testing/ptCSV.php'),
+        ('adminis/staffPerm.php','member/report.php'),
+        ('adminis/loginLog.php','member/report.php'),
+        ('adminis/auditLog.php','member/report.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),

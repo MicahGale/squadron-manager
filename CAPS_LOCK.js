@@ -1,5 +1,4 @@
-<?php
-/* * Copyright 2012 Micah Gale
+/* Copyright 2013 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -16,18 +15,15 @@
  *
  * 
  */
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Regulation and Publications</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="/patch.ico">
-  </head>
-  <body>
-  <?php
-  include("header.php");
-  include("projectFunctions.php");
-  ?>
-  </body>
-</html>
+function check_caps(e) {     //e is the keypress event object
+//    if(e.key===e.char) {   //if the key is a character    
+//    }  
+      if(e.keyCode!==1) { //if character
+          var kc= e.which;
+          if((kc>=65&&kc<=90&&!e.shiftKey)||(kc>=97&&kc<=122&&e.shiftKey)) {  //if shift is reversed
+              document.getElementById("warn").innerHTML="Caps Lock is on";  //tell them the bad news
+          } else {
+              document.getElementById("warn").innerHTML="";      //else make sure it's clear
+          }
+      }
+}

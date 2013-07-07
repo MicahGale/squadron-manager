@@ -66,11 +66,19 @@ if(isset($_POST['save'])) {  //save the permissions
         WHERE CAPID='".$_SESSION['staffer']->getCapid()."'";  //delete special permissions
     Query($query, $ident);
     if(isset($_POST['perm'])) {
-        $stmt=  prepare_statement($ident, "INSERT INTO SPECIAL_PERMISSION(CAPID, TASK_CODE)
-            VALUES ('".$_SESSION['staffer']->getCapid()."',?)");
-        for($i=0;$i<  count($_POST['perm']);$i++) {   //give the special permissions
-            bind($stmt,'s',array(cleanInputString($_POST['perm'][$i],3,"Task code", false)));
-            execute($stmt);
+            $query= 'SELECT TASK_CODE FROM TASKS
+                WHERE UNGRANTABLE=1';            //checks that these permissions can be be granted
+            $result=  allResults(Query($query, $ident));
+            for($i=0;$i<count($result);$i++) {
+                $result[$i]=$result[$i]['TASK_CODE'];
+            }
+            $stmt=  prepare_statement($ident, "INSERT INTO SPECIAL_PERMISSION(CAPID, TASK_CODE)
+                VALUES ('".$_SESSION['staffer']->getCapid()."',?)");
+            for($i=0;$i<  count($_POST['perm']);$i++) {   //give the special permissions
+                if(!in_array($_POST['perm'][$i],$result)) {          //makes sure they can be granted
+                    bind($stmt,'s',array(cleanInputString($_POST['perm'][$i],3,"Task code", false)));
+                    execute($stmt);
+                }
         }
     }
 }
