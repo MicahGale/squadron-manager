@@ -1,4 +1,4 @@
-<table border="0" width="800">
+<table id="footer">
     <tr>
         <td align="center">
             <strong>FOR OFFICIAL CIVIL AIR PATROL USE ONLY</strong> <br>
