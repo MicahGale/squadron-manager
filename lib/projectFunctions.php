@@ -28,18 +28,15 @@
  */
 /*
  * **********************FOR v. .10*****************************
- * TODO js check for caps lock
- * TODO add failed login wait
- * TODO allow clearing the log
- * TODO INSERT DISCIPLINE EVEN promo boards
  * TODO create page for cadet oath and stufff, and box in DCC and DCS on promo
+ * TODO promo boards, and delete member records
  * TODO create reports: and eservices, and attendance
  * TODO allow adding to an event
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO add ribbon request stuff, and supply stuff
  * TODO finish populating db
- * TODO add settings table?
+ * TODO add settings table?- add log clearing info
  * TODO check old TODO tags
  * TODO edit member information
  * TODO create installer
@@ -107,6 +104,7 @@
  define('PROFILE_PATH',"/usr/share/www/profile");  //the path to the profile pictures stored outside document root
  define('NOTIF_PATH','/etc/squadMan/notifications.csv');  //the csv that holds the notification information
  define("PSSWD_INI",'/etc/squadMan/psswd.ini');
+ define("BAD_LOGIN_WAIT",5);
  /**
   * The constant for how long to have an account in SQL time format
   */

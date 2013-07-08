@@ -157,7 +157,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE),
         ('NME','Create Staff Member','AD','adminis/newMember.php',false,true),
         ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true),
         ('ADL','View site Logs','AD','adminis/auditLog.php',false,true),
-        ('LLO','Login Logs and Locks','AD','adminis/loginLog.php',false,true);
+        ('LLO','Login Logs and Locks','AD','adminis/loginLog.php',false,true),
+        ('CLO','Clear System Logs','AD','adminis/clearLog.php',false,true);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -176,7 +177,8 @@ VALUES('CTO','MEA')
         ('CTO','NME'),
         ('CTO','SPM'),
         ('CTO','ADL'),
-        ('CTO','LLO');
+        ('CTO','LLO'),
+        ('CTO','CLO');
 ###########################INSERT INTO PERMANENT_VISIT##############
 INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
 VALUES('member/approve.php','member/finalApprove.php'),
@@ -188,7 +190,9 @@ VALUES('member/approve.php','member/finalApprove.php'),
         ('testing/PTtest.php','testing/ptCSV.php'),
         ('adminis/staffPerm.php','member/report.php'),
         ('adminis/loginLog.php','member/report.php'),
-        ('adminis/auditLog.php','member/report.php');
+        ('adminis/auditLog.php','member/report.php'),
+        ('adminis/clearLog.php','adminis/deleteIt.php'),
+        ('adminis/clearLog.php','member/research.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),
