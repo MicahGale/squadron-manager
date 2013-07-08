@@ -154,7 +154,6 @@ if(!isset($_GET['time'])) {
         require("squadManHeader.php");
         ?>
         <h1>View Squadron Manager Logs</h1>
-        <a href="/login/adminis/clearLog.php">Clear the System Logs.</a><br>
         <?php if(!isset($_GET['time'])) {?>
             <form method="post">
                 <table class="center">

@@ -20,10 +20,12 @@ function check_caps(e) {     //e is the keypress event object
 //    }  
       if(e.keyCode!==1) { //if character
           var kc= e.which;
-          if((kc>=65&&kc<=90&&!e.shiftKey)||(kc>=97&&kc<=122&&e.shiftKey)) {  //if shift is reversed
-              document.getElementById("warn").innerHTML="Caps Lock is on";  //tell them the bad news
-          } else {
-              document.getElementById("warn").innerHTML="";      //else make sure it's clear
+          if(kc>=65&&kc<=122) {
+              if((kc>=65&&kc<=90&&!e.shiftKey)||(kc>=97&&kc<=122&&e.shiftKey)) {  //if shift is reversed
+                  document.getElementById("warn").innerHTML="Caps Lock is on";  //tell them the bad news
+              } else {
+                  document.getElementById("warn").innerHTML="";      //else make sure it's clear
+              }
           }
       }
 }

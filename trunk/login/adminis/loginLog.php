@@ -114,7 +114,6 @@ if(isset($_POST['filter'])) {
         ?>
         <h2>View Account Login Logs and Account Locks</h2>
         <a href="/login/adminis/loginLog.php?lock=l">View account Locks</a><br>
-        <a href="/login/adminis/clearLog.php">Clear the System Logs</a>
         <?php
         if(isset($_GET['lock'])) {
             ?>

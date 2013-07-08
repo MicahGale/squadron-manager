@@ -3,10 +3,11 @@
     <head>
         <title>Privacy and Legal Information</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="shortcut icon" href="/patch.ico">
     </head>
     <body>
         <?php include("header.php"); ?>
-        <table border="0" width="700">
+        <table id="main">
             <tr>
                 <td align="center">
         <strong>Warning: The information you are receiving is<br>
