@@ -17,7 +17,6 @@
  * 
  */
 ?>
-<?php //include("header.php");?>
 <script type="text/javascript" src="/resize.js"></script>
 <table id="head" style="width:1100px">    
     <tr>
@@ -28,6 +27,7 @@
                 <tr><td style="text-align:center; vertical-align: top"><h1>Boise Composite Squadron</h1></td></tr>
                 <tr><td style="text-align:right; vertical-align: bottom">
                     <a href="http://boisecap.org" target="_blank">Squadron Web-site</a><br>
+                    <a href="http://boisecap.org/calendar/" target="_blank">Squadron Calender</a><br>
                     <a href="http://www.capmembers.com/forms_publications__regulations/" target="_blank">CAP regulations, and forms</a><br>
                     <a href="/login/logout.php">logout</a>
                 </td></tr>
@@ -37,24 +37,13 @@
 </table>
 <table id="main" style="width:1100px">
     <tr>
-        <td align="left" valign="top" style="width:200px">
+        <td style="text-align: left; vertical-align: top; width:20%">
+            <ul class="tasks">
             <?php
             if(isset($_SESSION['home'])) {                  //if already found pages then display
-                $oldSection = "";
                 $result=$_SESSION['home'];
-                $size=count($result);
-                for($row = 0;$row<$size;$row++) {   //loop trhogh all results
-                    if($result[$row]["TYPE_NAME"]!=$oldSection) {   //IF IN NEW section show it
-                        echo "<br><strong>".  $result[$row]['TYPE_NAME']."</strong>\n";
-                        $oldSection = $result[$row]['TYPE_NAME'];  //set to new section
-                    }           //echo link
-                    echo "<br><a href=\"/login/".$result[$row]["URL"]."\" ";
-                    if($result[$row]['NEW_TAB']==="1")              //if should open in a new table do so
-                        echo 'target="blank"';
-                    echo">>".$result[$row]["TASK_NAME"]."</a>\n";
-                }
             } else {
-                $query ="SELECT A.TYPE_NAME, B.TASK_NAME,B.TASK_CODE, B.URL, B.NEW_TAB 
+                $query ="SELECT A.TYPE_NAME, B.TASK_NAME,B.TASK_CODE, B.URL, B.NEW_TAB, B.GET_FIELD
                     FROM SQUADRON_INFO.TASK_TYPE A JOIN
                     SQUADRON_INFO.TASKS B ON
                     A.TYPE_CODE=B.TYPE_CODE
@@ -71,21 +60,25 @@
                 $permissions =  Query($query, $ident);
                 $_SESSION['home']=  allResults($permissions);
                 $result = $_SESSION['home'];
-                if($permissions!= false) {                              //if no errors
-                    $oldSection = "";
-                    $size=count($result);
-                    for($row = 0;$row<$size;$row++) {   //loop trhogh all results
-                        if($result[$row]["TYPE_NAME"]!=$oldSection) {   //IF IN NEW section show it
-                            echo "<br><strong>".  $result[$row]['TYPE_NAME']."</strong>\n";
-                            $oldSection = $result[$row]['TYPE_NAME'];  //set to new section
-                        }           //echo link
-                        echo "<br><a href=\"/login/".$result[$row]["URL"]."\" ";
-                        if($result[$row]['NEW_TAB']===true)              //if should open in a new table do so
-                            echo 'target="blank"';
-                        echo">>".$result[$row]["TASK_NAME"]."</a>\n";
-                    }
+            }
+            if((isset($permissions)&&$permissions!= false)||!isset($permissions)) {                              //if no errors
+                $oldSection = "";
+                $size=count($result);
+                for($row = 0;$row<$size;$row++) {   //loop trhogh all results
+                    if($result[$row]["TYPE_NAME"]!=$oldSection) {   //IF IN NEW section show it
+                        echo "<strong>".  $result[$row]['TYPE_NAME']."</strong>\n";
+                        $oldSection = $result[$row]['TYPE_NAME'];  //set to new section
+                    }           //echo link
+                    echo '<li class="tasks"><a href="/login/'.$result[$row]["URL"];
+                    if(isset($result[$row]['GET_FIELD']))
+                        echo "?lock=".$result[$row]['GET_FIELD'];  //show the get field
+                    echo '"';
+                    if($result[$row]['NEW_TAB']===true)              //if should open in a new table do so
+                        echo ' target="blank"';
+                    echo'>'.$result[$row]["TASK_NAME"]."</a></li>\n";
                 }
             }
             ?>
+            </ul>
         </td>
         <td style="text-align: left; vertical-align: top">

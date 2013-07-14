@@ -130,7 +130,8 @@ if(!isset($_GET['time'])) {
         $end=$_SESSION['end'];
         $where=$_SESSION['where'];
         $filter=$_SESSION['filter'];
-        $ip= $_SESSION['ip'];
+        if(isset($_SESSION['ip']))
+            $ip= $_SESSION['ip'];
         $notif=$_SESSION['notif'];
     } else {
         $order_by = " ORDER BY TIME_OF_INTRUSION DESC";
@@ -270,12 +271,11 @@ if(!isset($_GET['time'])) {
                                 AND TIME_OF_INTRUSION='$time'";
                 $result=  allResults(Query($query, $ident));
                  $date=new DateTime($result[0]['TIME']);
-                echo '<td class="table">'.$date->format(PHP_DATE_FORMAT." G:i:s").'</a></td>';
+                echo '<td class="table">'.$date->format(PHP_DATE_FORMAT." G:i:s").'</td>';
                 echo '<td class="table">'.$result[0]['NAME'].'</td>';
                 echo '<td class="table">'.$result[0]['IP_ADDRESS'].'</td>';
                 echo '<td class="table">'.$result[0]['PAGE']."</td></tr>\n";
                 ?>
-            </tr>
         </table>
         <h3>Specific Details</h3>
         <table class="table">

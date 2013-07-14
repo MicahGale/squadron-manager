@@ -39,20 +39,27 @@ require("projectFunctions.php");
 session_secure_start();
 $ident=  connect('login');
 if(!isset($_GET['capid'])) {  //if the CAPID isn't set to be displayed redirect to the member search
-    header("refresh:0;url=/login/member/search.php?redirect=/login/testing/promoRecord.php"); //refresh
+    $url="/login/member/search.php?redirect=/login/testing/promoRecord.php";
+    if(isset($_GET['lock']))
+        $url.="&lock=".cleanInputString ($_GET['lock'], 1,"member type lock",false);
+    header("refresh:0;url=".$url); //refresh
     exit;
 }
 $capid = cleanInputInt($_GET['capid'],6, 'capid');
-if(!isset($_SESSION['microscope'])) {                      //if not saved yet make it
-    $member = new member($capid,4,$ident);
-    $_SESSION['microscope']=$member;
-} else {                                        // if saved load it up
+if(isset($_SESSION['microscope'])) {                                        // if saved load it up
     $member=$_SESSION['microscope'];
     if($member->getCapid()!=$capid) {            //if not the same member switch it up
-        $member = new member($capid,4,$ident);
-        $_SESSION['microscope']=$member;
+        unset($_SESSION['microscope'],$member);
     }
 }
+if(!isset($_SESSION['microscope'])) {                      //if not saved yet make it
+    $member = new member($capid,4,$ident);
+    if(isset($_GET['lock'])&&$member->get_member_type()!=$_GET['lock']) {  //if member outside the lock
+        header("refresh:0;url=/login/home.php");
+        exit;
+    }
+    $_SESSION['microscope']=$member;
+} 
 ?>
 <!DOCTYPE html>
 <html>

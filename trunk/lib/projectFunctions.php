@@ -22,29 +22,28 @@
  * details.
  *
  * You should have received the GNU General Public License version 3 with this in GPL.txt
- * if not it is available at <http://www.gnu.org/licenses/gpl.txt>.
- *
- * 
+ * if not it is available at <http://www.gnu.org/licenses/gpl.txt>. 
  */
 /*
- * **********************FOR v. .10*****************************
- * TODO create page for cadet oath and stufff, and box in DCC and DCS on promo
- * TODO promo boards, and delete member records
+ * **********************FOR v. 0.10*****************************
  * TODO create reports: and eservices, and attendance
  * TODO allow adding to an event
+ * TODO display options better
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
- * TODO add ribbon request stuff, and supply stuff
  * TODO finish populating db
  * TODO add settings table?- add log clearing info
- * TODO check old TODO tags
+ * TODO create all notifications
+ * TODO check old TODO tags AND hide dorment code and pages
  * TODO edit member information
  * TODO create installer
  * ***************************Debug/fix*******************************************
  * TODO fix member-side queries
- * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php)
+ * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php) and all system_events
  * *******************FOR LATER******************************
+ *  TODO add ribbon request stuff, and supply stuff
  *TODO populate pictures
+ * TODO add drill test links?
  * TODO create cadet of the month selection
  * TODO create a barcode reader
  *TODO create warning system
@@ -57,6 +56,7 @@
  * TODO use css more and js
  * TODO create a ical parsing script
  * TODO make colorblind safe options
+ * TODO allow upload and store documents
  */
 /*Unix specific functions
  * cleanUploadFile-path delimeter /
@@ -696,7 +696,7 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
  * @param Int $capid the capid of the user for creating the session should be used only
  * by /login/index.php
  */
-function session_secure_start($capid=null) {
+function session_secure_start($capid=null) {  //todo do get checks
     session_start();                     //starts the session
     if (!isset($_SESSION['ip_addr'])) {       //if starting the session
         if ($_SERVER['SCRIPT_NAME'] == '/login/index.php') {        //if at the login page
@@ -776,8 +776,9 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
     else 
         $path=$page;
     $path = substr($path, strpos($path, "/", 1) + 1);            //cuts off leading /login/ offset by 1 to ignore first /
-    $query = "SELECT NEXT_URL FROM NEXT_VISIT
-        WHERE LAST_URL='" . $path . "'";                           //query to find next 
+    $query = "SELECT NEXT_URL FROM NEXT_VISIT, TASKS
+        WHERE LAST_CODE=TASK_CODE
+        AND URL='$page'";                           //query to find next 
     $result = allResults(Query($query, $ident));
     $size = count($result);
     for ($i = 0; $i < $size; $i++) {
@@ -1024,13 +1025,13 @@ function getEventPromo($ident,$capid) {
             WHERE CAPID='$capid'
             ORDER BY B.ACHIEV_NUM";
     $promotions= allResults(Query($query, $ident));
-    $query="SELECT B.EVENT_DATE FROM ATTENDANCE A
-            JOIN EVENT B ON A.EVENT_CODE=B.EVENT_DATE
+    $query="SELECT B.EVENT_DATE, B.EVENT_CODE FROM ATTENDANCE A
+            JOIN EVENT B ON A.EVENT_CODE=B.EVENT_CODE
             WHERE A.CAPID='$capid'
             AND B.EVENT_TYPE<>'M'
             AND B.EVENT_DATE BETWEEN ? AND ?";
     $activ=  prepare_statement($ident, $query);
-    $query ="SELECT B.EVENT_DATE, C.SUBEVENT_CODE 
+    $query ="SELECT B.EVENT_DATE, B.EVENT_CODE, C.SUBEVENT_CODE 
         FROM SUBEVENT C, ATTENDANCE A
         JOIN EVENT B ON A.EVENT_CODE=B.EVENT_CODE
         WHERE C.PARENT_EVENT_CODE=A.EVENT_CODE
@@ -1041,31 +1042,50 @@ function getEventPromo($ident,$capid) {
         AND B.EVENT_DATE BETWEEN ? AND ?
         ORDER BY C.SUBEVENT_CODE";
     $subevent= prepare_statement($ident, $query);
+    $query="SELECT BOARD_DATE FROM PROMOTION_BOARD
+        WHERE CAPID='$capid'
+        AND APPROVED=TRUE
+        AND BOARD_DATE BETWEEN ? AND ?";
+    $promo_board=  prepare_statement($ident, $query);
+    $query="SELECT B.EVENT_DATE, B.EVENT_CODE FROM ATTENDANCE A, EVENT B
+        WHERE B.EVENT_CODE=A.EVENT_CODE
+        AND B.EVENT_TYPE='ENC'
+        AND A.CAPID='$capid'";
+    $encampment=  allResults(Query($query, $ident));
     $results=array();
+    if(count($encampment)>0) {             //find encampment
+        $results['BMI']['ENC']=array(new DateTime($encampment[0]['EVENT_DATE']),$encampment[0]['EVENT_CODE']);
+    }
     if(count($promotions)>0) {
         for($i=0;$i<count($promotions)+1;$i++) {
             if($i==0) {                            //if at 0 so the first one try dec 1,1941-first promo
                 bind($activ,"ss", array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
                 bind($subevent,"ss",array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
+              bind($promo_board,"ss",array("1941-12-1",$promotions[$i]['DATE_PROMOTED']));
                 $promoFor=$promotions[$i]['ACHIEVEMENT'];
             } else if($i<count($promotions)) {          //if is less then the count so in bounds then bind by 2 promos
                 bind($activ,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
                 bind($subevent,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
+                bind($promo_board,"ss",array($promotions[$i-1]['DATE_PROMOTED'],$promotions[$i]['DATE_PROMOTED']));
                 $promoFor=$promotions[$i]['ACHIEVEMENT'];
             } else {                                                 //if hit top then try between last promo and now
                 bind($activ,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
                 bind($subevent,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
+                bind($promo_board,'ss',array($promotions[$i-1]['DATE_PROMOTED'],'curdate()'));
                 $query='SELECT NEXT_ACHIEV FROM ACHIEVEMENT 
                     WHERE ACHIEV_CODE=\''.$promotions[$i-1]['ACHIEVEMENT']."'";
                 $promoFor=Result(Query($query, $ident),0,'NEXT_ACHIEV');
             }
             $activity = allResults(execute($activ));                  //execute the prepared statements and get results
             $subs = allResults(execute($subevent));
-            $results[$promoFor]=array();            //create an array for the current promotion
+            $board=  allResults(execute($promo_board));   //execute the promotin board
+            if(count($board)>0) {
+                $results[$promoFor]['PB']=array(new DateTime($board[0]['BOARD_DATE'])); //get the promo board
+            }
             if(count($activity)>0) //if had activity for promo then show it
-                $results[$promoFor]['AC']=new DateTime($activity[0]['EVENT_DATE']);  //shown
+                $results[$promoFor]['AC']=array(new DateTime($activity[0]['EVENT_DATE']),$activity[0]['EVENT_CODE']);  //shown
             for($j=0;$j<count($subs);$j++) {         //parse subevent results
-                $results[$promoFor][$subs[$j]['SUBEVENT_CODE']]=new DateTime($subs[$j]['EVENT_DATE']);//ORGANIZE INTO ARRAY BY SUB_CODE AND STORE DATE
+                $results[$promoFor][$subs[$j]['SUBEVENT_CODE']]=array(new DateTime($subs[$j]['EVENT_DATE']),$subs[$j]['EVENT_CODE']);//ORGANIZE INTO ARRAY BY SUB_CODE AND STORE DATE
             }
         }
     }
@@ -1096,7 +1116,7 @@ function checkEventPromo(array $results, $achiev,$code) {        //checks if the
  * @return Array the type codes of all the promotion requirements that are attendance based.
  */
 function specialPromoRequire($ident) {
-    $results=array('AC');
+    $results=array('AC','PB','EC');
     $query='SELECT TYPE_CODE FROM REQUIREMENT_TYPE
         WHERE IS_SUBEVENT=TRUE';
     $result =  allResults(Query($query, $ident));
@@ -1174,14 +1194,15 @@ function compareSignUp($a,$b) {    //compares the signups based on the number of
  * Displays input tags to get the input for entering a promotion requirement
  * passage.  This only creates the input, and does not parse or handle the input
  * 
- * @param type $capid The capid of who it is
- * @param type $type the requirement type this is for
+ * @param Integer $capid The capid of who it is
+ * @param String $type the requirement type this is for
  * @param DateTime $date The date passed if any
- * @param type $percentage the percentage stored if already passed
- * @param type $achiev  The achievement this is for
+ * @param float $percentage the percentage stored if already passed
+ * @param string $achiev  The achievement this is for
+ * @param string $code The event code for attendance requirements
  * @return returns whether or not more needs to be displayed.
  */
-function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null, $achiev=null, $tester=null) {
+function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null, $achiev=null, $tester=null,$code=null) {
     $append = $capid.$type.$achiev;
     if(in_array($type, array('LT','AE','DT'))) {
         if(is_numeric($percentage)) {   //if percent is a decimal change to percent
@@ -1191,18 +1212,22 @@ function promoRequireInput($capid, $type, DateTime $date= null,$percentage=null,
         }
         echo '%:<input type="text" size="1" maxlength="10" name="percentage'.$append.'" value="'.$display.'"/><br>';
     } if(!in_array($type,array('PB','PT'))) {
-        echo 'ID:<input type="text" maxlength="6" size="1" name="tester'.$append.'"';
-        if(isset($tester)) 
-            echo ' value="'.$tester.'"';
-        echo '/><br>';
+        if(!in_array($type, array('CD','SA','EC','AC'))) {
+            echo 'ID:<input type="text" maxlength="6" size="1" name="tester'.$append.'"';
+            if(isset($tester)) 
+                echo ' value="'.$tester.'"';
+            echo '/><br>';
+        }
         enterDate(false, $append, $date);
+        if(isset($code))
+            echo '<a href="/login/attendance/event.php?eCode='.$code.'">View Event</a>';
         return false;
     } else {
         if($type=="PT") {      //if was pt test link to page for pt test
             echo '<a href="/login/testing/PTtest.php?capid='.$capid.'&achiev='.$achiev.'" target="_blank">enter PT test</a><br>';
         } else {        //if was promo board give link
         ?>
-            <a href="/login/testing/promoBoard.php" target="_blank">enter Promotion Board</a><br>
+        <a href="/login/testing/promoBoard.php?field=enter&capid=<?php echo $capid; if(isset($date)) echo "&date=".$date->format(PHP_TO_MYSQL_FORMAT); ?>" target="_blank">enter Promotion Board</a><br>
         <?php
         }
         return true;
@@ -2179,9 +2204,13 @@ class member {
             if(!$found) {                           //if still not found try spec events
                 if(in_array($current, $specialRequires)) {  //if is a special case then check it out.
                     if(($buffer=checkEventPromo($eventAttendance,$promoFor, $current))!=false) {  //if it was so then say so
-                        $this->promoRecord[$current]=array('P',$buffer,"percent"=>$requirements[$i]['PERCENT']);
+                        if(isset($buffer[1]))
+                            $code =$buffer[1];   //get the event code
+                        else
+                            $code=null;
+                        $this->promoRecord[$current]=array('P',$buffer[0],"percent"=>$requirements[$i]['PERCENT'],"code"=>$code);
                         $found = true;
-                    }  
+                    }
                 }
             }
             if(!$found) {
@@ -2224,7 +2253,11 @@ class member {
                             $tester=$this->promoRecord[$index]['tester'];
                         else
                             $tester=null;
-                        $displayText=promoRequireInput($this->capid,$index, $date, $percent,$this->promoRecord['achiev'],$tester);  //display the input
+                        if(isset($this->promoRecord[$index]['code']))
+                            $code=$this->promoRecord[$index]['code'];
+                        else
+                            $code=null;         //get the event code
+                        $displayText=promoRequireInput($this->capid,$index, $date, $percent,$this->promoRecord['achiev'],$tester,$code);  //display the input
                     } if(!$canEdit||($displayText)) {            //if can't edit
                         if($current[0]=="P") {
                             echo $current[1]->format(PHP_DATE_FORMAT);
@@ -2615,6 +2648,14 @@ class member {
                 $success=false;
         }
         return $success;
+    }
+    /**
+     * Returns the member's membership type
+     * 
+     * @return string the member's membership type
+     */
+    function get_member_type() {
+        return $this->memberType;
     }
 }
 class unit {

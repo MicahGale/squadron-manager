@@ -34,7 +34,7 @@ if(isset($_SESSION['home'])) {
     <body>
         <?php include("header.php"); 
         include("projectFunctions.php");?>
-        <table id="main">  <!table for formatting>
+        <table id="main" style="width: 1100px">  <!-- table for formatting -->
             <tr>                       <!left column>
                 <td style="text-align: left;width: 780px">
                     <p><strong>Today is:</strong> 
@@ -84,7 +84,7 @@ if(isset($_SESSION['home'])) {
                     <input type="submit" value="Sign-in"/>
                 </form>
                 </td>
-                <td style="text-align: right;width: 120px">                     <!right column for holding login info>
+                <td style="text-align: right;width: 120px">                     <!-- right column for holding login info -->
                 <form action="/login/" method="post">
                     <strong>Staff Login:</strong> <br>
                     <font size="2">CAPID<br>
@@ -102,7 +102,7 @@ if(isset($_SESSION['home'])) {
                     <iframe src="https://www.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=rmdltfq8r1lvh7brb7s1ib23k8%40group.calendar.google.com&amp;color=%23182C57&amp;src=ufhvf2qfb8ccsum50kvig52m9k%40group.calendar.google.com&amp;color=%23182C57&amp;src=idahowing%40gmail.com&amp;color=%232F6309&amp;src=en.usa%23holiday%40group.v.calendar.google.com&amp;color=%23691426&amp;ctz=America%2FDenver" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
                 </td>
             </tr>
-        </table> <!google calendar>
+        </table>
         <?php include("footer.php");?>
     </body>
 </html>
