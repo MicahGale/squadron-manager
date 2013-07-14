@@ -1,5 +1,5 @@
 <?php
-/* * Copyright 2012 Micah Gale
+/* * Copyright 2013 Micah Gale
  *
  * This file is a part of Squadron Manager
  *

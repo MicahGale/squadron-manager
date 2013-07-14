@@ -33,6 +33,9 @@
 require("projectFunctions.php");
 session_secure_start();
 $ident=  connect('login');
+if(isset($_GET['lock'])) {
+    $_SESSION['memberType']=  cleanInputString($_GET['lock'],1, "lock field",false);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -51,14 +54,16 @@ $ident=  connect('login');
                     <strong>View Promotion Sign-up</strong>
                         <form method="post"><strong>Select Member Type:</strong>
                             <?php
-                            if(!isset($_SESSION['memberType'])) 
-                               $_SESSION['memberType']='C';        //if hasn't chosen member type, then assume cadets
-                            if(isset($_POST['filter'])) {  //if set a filter then get it in
-                                $_SESSION['memberType']=cleanInputString($_POST['memberType'],1,"member filter",false);
-                            }
-                            dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType']);
-                            ?>
-                            <input type="submit" name="filter" value="Filter"/> <br><br>
+                            if(!isset($_GET['lock'])) {
+                                if(!isset($_SESSION['memberType'])) 
+                                   $_SESSION['memberType']='C';        //if hasn't chosen member type, then assume cadets
+                                if(isset($_POST['filter'])) {  //if set a filter then get it in
+                                    $_SESSION['memberType']=cleanInputString($_POST['memberType'],1,"member filter",false);
+                                }
+                                dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType']);
+                                ?>
+                                <input type="submit" name="filter" value="Filter"/> <br><br>
+                            <?php } ?>
                             <strong>Color Key</strong><br>
                             <p class="P">████=Completed task, and passed</p>
                             <p class="I">████=Signed up to test, but hasn't been entered</p>

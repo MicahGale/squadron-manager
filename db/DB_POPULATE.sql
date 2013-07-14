@@ -16,7 +16,8 @@ VALUES ('M','Meeting'),
         ('HG','Honor Guard'),
         ('CG','Color Guard'),
         ('CP','CyberPatriot'),
-        ('SARX','Search and Rescue Exercise');
+        ('SARX','Search and Rescue Exercise'),
+        ('ENC','Basic Encampment');
 ##############INSERT SUB EVENT TYPE######################
 INSERT INTO SUBEVENT_TYPE (SUBEVENT_TYPE, SUBEVENT_NAME)
 VALUES ('SAF','Safety'),
@@ -109,7 +110,8 @@ VALUES('LT','Leadership Test'),
     ('CD','Character Development','C'),
     ('SA','Safety',NULL),
     ('CO','Cadet Oath','C'),
-    ('GS','Grooming Standards','C');
+    ('GS','Grooming Standards','C'),
+    ('EC','Basic Encampment','C');
 #########################insert promotion requirements##########################
 INSERT INTO PROMOTION_REQUIREMENT (ACHIEV_CODE, REQUIREMENT_TYPE, PER_ACHIEVEMENT, PER_PHASE, TEXT_SET, NAME, PASSING_PERCENT, IS_ONLINE)
 VALUES('WB','LT',TRUE,FALSE,'L21C','Wright Brothers','80',false),
@@ -135,30 +137,33 @@ VALUES('ME','Membership Action'),
     ('DA','Discipline action'),
     ('RE','Squadron Reports'),
     ('AD','Administration');
-###############################insert staff positions for permissions#########
-INSERT INTO STAFF_POS_PERM(STAFF_CODE, STAFF_NAME)
-VALUES('AD','Administrator'),
-        ('AL','All');
 ##############################insert tasks#################################
-INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL, NEW_TAB, UNGRANTABLE)
-VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE),
-        ('HOM','Home','ME','home.php',FALSE,FALSE),
-        ('MSE','Member Search','ME','member/search.php',FALSE,FALSE),
-        ('DDE','Find Discipline Event','DA','discipline/details.php',FALSE,FALSE),
-        ('EVR','Find Event Report','EV','attendance/event.php',FALSE,FALSE),
-        ('NEV','Create a new Event','EV','attendance/new.php',FALSE,FALSE),
-        ('EVI','Insert attendance for an Event','EV','attendance/add.php',FALSE,FALSE),
-        ('TSE','View Testing Sign-up','TP','testing/testSignUp',FALSE,FALSE),
-        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php',FALSE,TRUE),
-        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE,FALSE),
-        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE,TRUE),
-        ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true,FALSE),
-        ('PAS','Change your Password','AD','adminis/pswdChange.php',false,FALSE),
-        ('NME','Create Staff Member','AD','adminis/newMember.php',false,true),
-        ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true),
-        ('ADL','View site Logs','AD','adminis/auditLog.php',false,true),
-        ('LLO','Login Logs and Locks','AD','adminis/loginLog.php',false,true),
-        ('CLO','Clear System Logs','AD','adminis/clearLog.php',false,true);
+INSERT INTO TASKS(TASK_CODE, TASK_NAME, TYPE_CODE, URL, NEW_TAB, UNGRANTABLE,GET_FIELD)
+VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE,NULL),
+        ('HOM','Home','ME','home.php',FALSE,FALSE,NULL),
+        ('MSE','Member Search','ME','member/search.php',FALSE,FALSE,NULL),
+ #       ('DDE','Find Discipline Event','DA','discipline/details.php',FALSE,FALSE,NULL),
+        ('EVR','Find Event Report','EV','attendance/event.php',FALSE,FALSE,NULL),
+        ('NEV','Create a new Event','EV','attendance/new.php',FALSE,FALSE,NULL),
+        ('EVI','Insert attendance for an Event','EV','attendance/add.php',FALSE,FALSE,NULL),
+        ('TSE','View Testing Sign-up','TP','testing/testSignUp.php',FALSE,FALSE,NULL),
+        ('PSE','Promotion Sign-up','TP','testing/promotionSign.php',FALSE,TRUE,NULL),
+        ('PTT','Manage CPFT Testing','TP','testing/PTtest.php',FALSE,FALSE,NULL),
+        ('PRR','Edit Promotion Record','TP','testing/promoRecord.php',FALSE,TRUE,NULL),
+        ('EMR','Emergency Contact Information','RE','reporting/emergency_contact.php',true,FALSE,NULL),
+        ('PAS','Change your Password','AD','adminis/pswdChange.php',false,FALSE,NULL),
+        ('NME','Create Staff Member','AD','adminis/newMember.php',false,true,NULL),
+        ('SPM','Change Staff Permissions','AD','adminis/staffPerm.php',false,true,NULL),
+        ('ADL','View site Logs','AD','adminis/auditLog.php',false,true,NULL),
+        ('LLO','Login Logs and Locks','AD','adminis/loginLog.php',false,true,NULL),
+        ('CLO','Clear System Logs','AD','adminis/clearLog.php',false,true,NULL),
+        ('CAO','Cadet Oath and Grooming Standards','TP','testing/cadetOath.php',false, false,NULL),
+        ('DRT','Drill Testing Sign-Up','TP','testing/testSignUp.php',false,false,'DT'),
+        ('CPS','Cadet Promotion Sign-Up','TP','testing/promotionSign.php',false,true,'C'),
+        ('SPS','Senior Member Promotions','TP','testing/promotionSign.php',false,true,'S'),
+        ('CPR','Cadet Promotion Record','TP','testing/promoRecord.php',false,true,'C'),
+        ('SPR','Senior Member Promotion Record','TP','testing/promoRecord.php',false,true,'S'),
+        ('PRB','Manage Promotion Boards','TP','testing/promoBoard.php',false,false,null);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -178,21 +183,25 @@ VALUES('CTO','MEA')
         ('CTO','SPM'),
         ('CTO','ADL'),
         ('CTO','LLO'),
-        ('CTO','CLO');
+        ('CTO','CLO'),
+        ('CTO','CAO'),
+        ('CTO','DRT'),
+        ('CTO','CPS'),
+        ('CTO','CPR');
 ###########################INSERT INTO PERMANENT_VISIT##############
-INSERT INTO NEXT_VISIT(LAST_URL,NEXT_URL)
-VALUES('member/approve.php','member/finalApprove.php'),
-        ('member/search.php','member/report.php'),
-        ('discipline/details.php','member/report.php'),
-        ('attendance/event.php','member/report.php'),
-        ('testing/testSignUp.php','member/report.php'),
-        ('testing/promotionSign.php','member/report.php'),
-        ('testing/PTtest.php','testing/ptCSV.php'),
-        ('adminis/staffPerm.php','member/report.php'),
-        ('adminis/loginLog.php','member/report.php'),
-        ('adminis/auditLog.php','member/report.php'),
-        ('adminis/clearLog.php','adminis/deleteIt.php'),
-        ('adminis/clearLog.php','member/research.php');
+INSERT INTO NEXT_VISIT(LAST_CODE,NEXT_URL)
+VALUES('MEA','member/finalApprove.php'),
+        ('MSE','member/report.php'),
+     #   ('discipline/details.php','member/report.php'),
+        ('EVR','member/report.php'),
+        ('TSE','member/report.php'),
+        ('PSE','member/report.php'),
+        ('PTT','testing/ptCSV.php'),
+        ('SPM','member/report.php'),
+        ('LLO','member/report.php'),
+        ('ADL','member/report.php'),
+        ('CLO','adminis/deleteIt.php'),
+        ('CLO','member/research.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),

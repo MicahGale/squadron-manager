@@ -27,6 +27,7 @@
                 <tr><td style="text-align:center; vertical-align: top"><h1>Boise Composite Squadron</h1></td></tr>
                 <tr><td style="text-align:right; vertical-align: bottom">
                     <a href="http://boisecap.org" target="_blank">Squadron Web-site</a><br>
+                    <a href="http://boisecap.org/calendar/" target="_blank">Squadron Calendar</a><br>
                     <a href="http://www.capmembers.com/forms_publications__regulations/" target="_blank">CAP regulations, and forms</a><br>
                 </td></tr>
             </table>

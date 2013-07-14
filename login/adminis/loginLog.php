@@ -191,8 +191,13 @@ if(isset($_POST['filter'])) {
                                 } else 
                                     echo '<td class="table"></td>';
                                 $member=new member($result[$i]['CAPID'],1,$ident);
-                                $name = $member->getCapid().", ".$member->getName_first()." ".$member->getName_Last();
-                                echo '<td class="table">'.'<a target="_blank" href="/login/member/report.php?capid='.$member->getCapid().'">'.$name.'</a></td>';
+                                echo '<td class="table">';
+                                if($member->exists()) {
+                                    $name = $member->getCapid().", ".$member->getName_first()." ".$member->getName_Last();
+                                    echo'<a target="_blank" href="/login/member/report.php?capid='.$member->getCapid().'">'.$name.'</a></td>';
+                                } else  {
+                                    echo $result[$i]['CAPID'].'</td>';
+                                }
                                 echo '<td class="table">'.$result[$i]['IP_ADDRESS'].'</td>';
                                 echo '<td class="table">';
                                 if($result[$i]['SUCEEDED'])

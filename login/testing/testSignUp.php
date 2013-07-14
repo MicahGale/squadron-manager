@@ -47,12 +47,16 @@ $ident=  connect('login');
                 <td align="center">
                     <strong>View Testing and Promotion Board Sign-up</strong>
                     <form method="post">
-                        Filter by test type:
                         <?php
-                        dropDownMenu("SELECT TYPE_CODE, TYPE_NAME FROM REQUIREMENT_TYPE
-                            WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
-                        ?>
-                        <input type="submit" name="filter" value="filter"/><br><br>
+                        if(!isset($_GET['lock'])) {
+                                ?>
+                            Filter by test type:
+                            <?php
+                            dropDownMenu("SELECT TYPE_CODE, TYPE_NAME FROM REQUIREMENT_TYPE
+                                WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
+                            ?>
+                            <input type="submit" name="filter" value="filter"/><br><br>
+                        <?php } ?>
                         <input type="submit" name="save" value="save"/><br><br>
                         <input type="submit" name="check" value="Check percentages"/><br>
                         Tester:<input type="text" size="2" disabled="disabled" value="<?php echo $_SESSION['member']->getcapid();?>"/>
@@ -150,8 +154,10 @@ $ident=  connect('login');
                             AND E.NEXT_ACHIEV=B.ACHIEV_CODE AND A.REQUIRE_TYPE=B.REQUIREMENT_TYPE
                             AND C.TYPE_CODE=A.REQUIRE_TYPE
                             AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\',\'PB\')';
-                        if(isset($_SESSION['filter'])) {
+                        if(isset($_SESSION['filter'])&&!isset($_GET['lock'])) {
                             $query.=" AND A.REQUIRE_TYPE='".$_SESSION['filter']."'";  //if there's a filter then apply it
+                        } else if(isset($_GET['lock'])) {
+                            $query.=" AND A.REQUIRE_TYPE='".cleanInputString($_GET['lock'],2,'Lock type' , false)."'";
                         }
                         $results = allResults(Query($query, $ident));
                         $_SESSION['results']=$results;  //stores the results so they may be used later

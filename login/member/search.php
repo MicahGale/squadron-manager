@@ -20,14 +20,20 @@
  * $_GET
  * redirect= the url to redirect as the whole url minus domain
  * field = the target field in the redirect so can have multi search
+ * lock- the member type lock
  * $_POST
  * input the search input
+ * $_SESSION
+ * lock- the member lock
  */
 include("projectFunctions.php");
 session_secure_start();
 $ident=  Connect('login');
 if(isset($_GET['redirect'])) {
     checkPath();
+}
+if(isset($_GET['lock'])) {
+    $_SESSION['lock']=  cleanInputString($_GET['lock'],1,"Member type lock",false);
 }
 if(isset($_POST['input'])) {
     $start=  microtime(true);
@@ -73,6 +79,13 @@ function search() {                         //if already tried to search then st
     if(strlen($search_capid)<6) {                                //if its not a full capid add wildcards to it
         $search_capid='%'.$search_capid.'%';
     }
+    $query ="SELECT CAPID FROM MEMBER 
+            WHERE CAPID LIKE '$search_capid'
+            AND NAME_FIRST LIKE ?
+            AND NAME_LAST LIKE ?";
+    if(isset($_SESSION['lock']))
+        $query.=" AND MEMBER_TYPE='".$_SESSION['lock']."'";  //specifies query locking
+    $stmt=  prepare_statement($ident, $query);
     $found_members = array();
     $size = count($exploded);
     for($i=0;$i<=$size;$i++) {                             //cycles through array to search split names by varying 
@@ -88,28 +101,22 @@ function search() {                         //if already tried to search then st
                 $string_2 = $string_2.$exploded[$j].'%';
             }
         }
-        $query ="SELECT CAPID FROM MEMBER 
-            WHERE CAPID LIKE '$search_capid'
-            AND NAME_FIRST LIKE '$string_1'
-            AND NAME_LAST LIKE '$string_2'";
-        $results = Query($query, $ident);   //first searchf assuming first name was first
-        $result_size = numRows($results);
+        bind($stmt,"ss", array($string_1,$string_2));
+        $results = allResults(execute($stmt));   //first searchf assuming first name was first
+        $result_size = count($results);
         for($j=0;$j<$result_size;$j++) {                      //now parses user results as an instance of searched_member
-            $found_capid = Result($results, $j,'CAPID');
+            $found_capid =$results[$j]['CAPID'];
             if(!isset($found_members[$found_capid])) { //if not already found
                 $found_members[$found_capid] = new searched_member($found_capid, $search_capid, $string_1, $string_2,$ident); //create new object
             } else {
                 $found_members[$found_capid]->recalc_match($string_1, $string_2);  //else just see if higher match
             }
         }
-        $query ="SELECT CAPID FROM MEMBER 
-            WHERE CAPID LIKE '$search_capid'
-            AND NAME_FIRST LIKE '$string_2'
-            AND NAME_LAST LIKE '$string_1'";
-        $results = Query($query, $ident);   //then assume last name was first
-        $result_size = numRows($results);
+        bind($stmt, "ss",array($string_2,$string_1));
+        $results = allResults(execute($stmt));  //then assume last name was first
+        $result_size = count($results);
         for($j=0;$j<$result_size;$j++) {                      //now parses user results as an instance of searched_member
-            $found_capid = Result($results, $j,'CAPID');
+            $found_capid =$results[$j]['CAPID'];
             if(!isset($found_members[$found_capid])) { //if not already found
                 $found_members[$found_capid] = new searched_member($found_capid, $search_capid, $string_2, $string_1,$ident); //create new object
             } else {
@@ -156,6 +163,8 @@ function prepDisplay($results_sorted) {
     } else {                                      // else just go to report page then 
         $redirectUrl="/login/member/report.php?";           
     }
+    if(isset($_SESSION['lock']))
+        $redirectUrl.="lock=".$_SESSION['lock']."&";
     for($i=0;$i<$size;$i++) {  //start show results
         if($results_sorted[$i]->get_match()==100) {                //if 100% match redirect 
             header("REFRESH:0;url=$redirectUrl"."capid=".$results_sorted[$i]->get_capid());
@@ -170,7 +179,7 @@ function prepDisplay($results_sorted) {
     }
     $_SESSION['redirect']=null;
     $_SESSION['field']=null;
-    unset($_SESSION['redirect'],$_SESSION['field']);   //get rid of useless session info
+    unset($_SESSION['redirect'],$_SESSION['field'],$_SESSION['lock']);   //get rid of useless session info
     return $display;
 }
         

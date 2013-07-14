@@ -19,7 +19,7 @@ tr:nth-of-type(even).table {
     background-color:  	#E0E0E0;
 }
 .table {
-    font-size:15px;
+    font-size:12px;
     vertical-align:top;
     text-align: center;
     width:900px;
@@ -48,4 +48,11 @@ a.pres3 {
 }
 .center {
     text-align: center;
+}
+ul.tasks {
+    margin-left: 5px;
+    padding-left: 0
+}
+li.tasks {
+    margin-left:10px
 }
