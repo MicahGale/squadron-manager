@@ -1,5 +1,5 @@
 <?php
-/* * Copyright 2013 Micah Gale
+/* Copyright 2013 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -25,11 +25,17 @@ $ident=  connect('login');
     <head>
         <title>View Attendance Report</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <?php if(!isset($_GET['print'])) {?>
+            <link rel="stylesheet" type="text/css" href="/main.css">
+        <?php } else {?>
+            <link rel="stylesheet" type="text/css" href="/print.css">
+        <?php }?>
         <link rel="shortcut icon" href="/patch.ico">
     </head>
-    <body>
+    <body> 
         <?php
-        include('squadManHeader.php');
+        if(!isset($_GET['print']))
+            include('squadManHeader.php');
         if(!isset($_GET['eCode'])&&!isset($_POST['month'])) {
             display_event_search_in($ident);
         } else if((!isset($_POST['day'])||$_POST['type']=="null"||$_POST['location']!="null")&&!isset($_GET['eCode'])) {
@@ -39,10 +45,13 @@ $ident=  connect('login');
         } 
         function report($eCode) {
             ?>
-        <font size="6">Event Report</font>
-            <?php                    
+        <h2>Event Report</h2>
+            <?php
             global $ident;
             $event=  cleanInputString($eCode, 32,"Event Code",false);
+            if(!isset($_GET['print'])) {
+                echo '<a href="/login/attendance/event.php?eCode='.$eCode.'&print=p" target="_blank">Print Report</a>';
+            }
             $query="SELECT B.EVENT_DATE, C.EVENT_TYPE_NAME, B.EVENT_NAME, D.LOCAT_NAME, B.END_DATE
                             FROM EVENT B
                             LEFT JOIN EVENT_TYPES C ON B.EVENT_TYPE=C.EVENT_TYPE_CODE
@@ -73,21 +82,49 @@ $ident=  connect('login');
                 echo $result[0]['SUBEVENT_NAME'];
             echo "<br><br>\n";
             ?>
-        <table border="0" width="800"><tr><td align="center">
-            <strong>Attendance</strong></td></tr><tr><td>
+        <table><tr><td style="text-align:center">
+            <h3>Attendance</h3></td></tr><tr><td><table style="width:100%" class="table">
             <?php
-            $query="SELECT CAPID FROM ATTENDANCE WHERE EVENT_CODE='$event'";
+            $query="SELECT A.CAPID FROM ATTENDANCE A, MEMBER B
+                WHERE A.CAPID=B.CAPID AND EVENT_CODE='$event'
+                    ORDER BY NAME_LAST, NAME_FIRST";
             $result=  allResults(Query($query, $ident));
-            foreach($result as $temp) {
-                $member=new member($temp['CAPID'],1, $ident);
-                echo $member->link_report();
-                echo "<br>\n";
+            $size=count($result);
+            $length=intval($size/3);
+            $remainder=$size%3;      //get the remainder
+            $max=$length-1;
+            if($remainder>=1) {
+                $max++;
+            }
+            $start_2=$max+1;
+            $end_2=$start_2+$length-1;
+            if($remainder==2) {
+                $end_2++;
+            }
+            $start_3=$end_2+1;
+            $end_3=$start_3+$length-1;
+            for($i=0;$i<=$max;$i++) {
+                $member=new member($result[$i]['CAPID'],1,$ident);
+                echo '<tr class="table"><td class="table">'.$member->title().'</td><td>';
+                if($i+$start_2<=$end_2&&$i+$start_2<$size) {
+                    $member=new member($result[$i+$start_2]['CAPID'],1,$ident);
+                    echo $member->title();
+                }
+                echo '</td><td class="table">';
+                if($i+$start_3<=$end_3&&$i+$start_3<$size) {
+                    $member=new member($result[$i+$start_3]['CAPID'],1,$ident);
+                    echo $member->title();
+                }
+                echo "</td></tr>\n";
             }
             ?>
-            </td></tr></table>
+            </table></td></tr></table>
             <?php
         }
-        include('squadManFooter.php');
+        if(!isset($_GET['print']))
+            include('squadManFooter.php');
+        else
+            include('footer.php');
         ?>
     </body>
 </html>

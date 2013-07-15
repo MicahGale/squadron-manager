@@ -26,8 +26,8 @@
  */
 /*
  * **********************FOR v. 0.10*****************************
- * TODO create reports: and eservices, and attendance
  * TODO allow adding to an event
+ * TODO enter online testing
  * TODO display options better
  * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
@@ -957,7 +957,6 @@ function display_event_search_in($ident){   //if doesn't have an event selected 
  */
 function searchEvent($ident,$callable,$link="/login/attendance/event.php"){      //if didn't provide complete then search
     ?>
-<table border="1" cellpadding="0"><tr><th>Event Date</th><th>Event Type</th><th>Event Location</th></tr>
     <?php
     $query="SELECT A.EVENT_CODE, A.EVENT_DATE, B.EVENT_TYPE_NAME, C.LOCAT_NAME
         FROM EVENT A JOIN EVENT_TYPES B ON A.EVENT_TYPE=B.EVENT_TYPE_CODE
@@ -968,7 +967,7 @@ function searchEvent($ident,$callable,$link="/login/attendance/event.php"){     
         $query.=" WHERE A.EVENT_TYPE='$type'";
         $isFirst=false;
     }
-    if(isset($_POST['day'])) {                              //if date given add it to 
+    if(isset($_POST['Date'])&&$_POST['Date']!="") {                              //if date given add it to 
         $date=  parse_date_input($_POST);
         if($isFirst)
             $query.=" WHERE "; 
@@ -977,7 +976,7 @@ function searchEvent($ident,$callable,$link="/login/attendance/event.php"){     
         $query.=" A.EVENT_DATE='".$date->format(PHP_TO_MYSQL_FORMAT)."'";
         $isFirst=false;
     }
-    if(isset($_POST['location'])&&$_POST['location']!=null) {
+    if(isset($_POST['location'])&&$_POST['location']!="null") {
         if($isFirst)
             $query.=" WHERE ";
         else
@@ -989,13 +988,16 @@ function searchEvent($ident,$callable,$link="/login/attendance/event.php"){     
     if($size==1) {
         call_user_func($callable,$result[0]["EVENT_CODE"]);
     } else {
+        ?>
+<table class="table"><tr class="table"><th class="table">Event Date</th><th class="table">Event Type</th><th class="table">Event Location</th></tr>
+    <?php
         for($i=0;$i<$size;$i++) {
-            echo "<tr><td>";
+            echo "<tr class=\"table\"><td class=\"table\">";
             echo '<a href="'.$link.'?eCode='.$result[$i]['EVENT_CODE'].'">';
             $date=new DateTime($result[$i]['EVENT_DATE']);
             echo $date->format(PHP_DATE_FORMAT)."</a></td><td>";
             echo $result[$i]['EVENT_TYPE_NAME']."</td>";
-            echo "<td>".$result[$i]['LOCAT_NAME']."</td></tr>\n";
+            echo '<td class="table">'.$result[$i]['LOCAT_NAME']."</td></tr>\n";
         }
     }
     ?>
@@ -2091,7 +2093,7 @@ class member {
     }
     function title() {
        $ident=  connect("Sign-in");
-       $buffer= $this->getGrade($ident, true)." ".$this->name_first." ".$this->name_last;
+       $buffer= $this->getGrade($ident, true)." ".$this->name_last.", ".$this->name_first."-".$this->capid;
        close($ident);
        return $buffer;
     }

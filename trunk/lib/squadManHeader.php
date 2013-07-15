@@ -73,7 +73,7 @@
                     if(isset($result[$row]['GET_FIELD']))
                         echo "?lock=".$result[$row]['GET_FIELD'];  //show the get field
                     echo '"';
-                    if($result[$row]['NEW_TAB']===true)              //if should open in a new table do so
+                    if($result[$row]['NEW_TAB'])              //if should open in a new table do so
                         echo ' target="blank"';
                     echo'>'.$result[$row]["TASK_NAME"]."</a></li>\n";
                 }
