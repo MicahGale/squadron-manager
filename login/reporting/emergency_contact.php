@@ -48,9 +48,9 @@ $ident = Connect('login');
             echo '<tr><td class="header" colspan="3">'.$member->getName_Last().", ".$member->getName_first()."- ".$member->getCapid().'</td></tr>'."\n";
             $member->display_Emergency($ident);
         }
-        
-                //TODO  create Unit defaults
+                       //TODO  create Unit defaults
         ?>
         </table>
+        <?php include("footer.php"); ?>
     </body>
 </html>

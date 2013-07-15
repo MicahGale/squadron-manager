@@ -22,7 +22,6 @@ tr:nth-of-type(even).table {
     font-size:12px;
     vertical-align:top;
     text-align: center;
-    width:900px;
     border:1px solid black;
     border-collapse: collapse;
     padding: 2px;
