@@ -164,7 +164,8 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE,NULL)
         ('CPR','Cadet Promotion Record','TP','testing/promoRecord.php',false,true,'C'),
         ('SPR','Senior Member Promotion Record','TP','testing/promoRecord.php',false,true,'S'),
         ('PRB','Manage Promotion Boards','TP','testing/promoBoard.php',false,false,null),
-        ('ESR','Eservice Report','RE','reporting/eservReport.php',true,false,null);
+        ('ESR','Eservice Report','RE','reporting/eservReport.php',true,false,null), 
+        ('EST','Enter Online Testing','TP','testing/onlineTesting.php',false, false,null);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')

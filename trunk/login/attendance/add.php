@@ -1,5 +1,25 @@
 <?php
-/* * Copyright 2012 Micah Gale
+/**
+ * Enter attendance for an event.
+ * 
+ * Allows staff to enter attendance and modify current attendance 
+ * other pages.
+ * @package Squadron-Manager
+ * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
+ * @copyright (c) 2013, Micah Gale
+ * POST
+ * search##- search for input field ##
+ * insert- insert the attendance
+ * cap[]- the input capids
+ * GET
+ * capid- the input capid from the search
+ * field- which input to hit
+ * eCode- the event code
+ * SESSION
+ * eCode- the event code
+ * input- the inputs that are saved during a search
+ */
+/* Copyright 2012 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
