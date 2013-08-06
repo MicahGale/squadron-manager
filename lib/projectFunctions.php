@@ -26,10 +26,6 @@
  */
 /*
  * **********************FOR v. 0.10*****************************
- * TODO allow adding to an event
- * TODO enter online testing
- * TODO display options better
- * TODO check promoboard halts on sign-up and promo report
  * TODO membership termination and deletion and edit members
  * TODO finish populating db
  * TODO add settings table?- add log clearing info
@@ -43,6 +39,7 @@
  * *******************FOR LATER******************************
  *  TODO add ribbon request stuff, and supply stuff
  *TODO populate pictures
+ * TODO allow editng attendance
  * TODO add drill test links?
  * TODO create cadet of the month selection
  * TODO create a barcode reader
@@ -1166,6 +1163,8 @@ function promotionAprove($ident,$memberType) {
     echo "<th class=\"table\">Approved</th></tr>\n";   //display approval header
     for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
         echo "<tr class=\"table\">";
+        if($signUps[$i][0]->check_promo_halt($ident))
+            echo '<tr class="table"><td class="table" colspan="'.(count($header)+3).'" style="color:red">This member\'s Promotions are halted due to a retention in grade</td></tr>';
         $signUps[$i][0]->displayPromoRequest($header,true,true,$signUps[$i][3]);
     }
     $_SESSION['signUps']=$signUps;
@@ -1289,12 +1288,12 @@ function parsePromoInput(mysqli $ident,array $input) {
     close_stmt($deleteTest);
 }
 /**
- * Parses percentage input
+ * Parses percentage input and cleans it.
  * 
  * @param type $append the appended stuff to post array
  * @param array $inputs the post array
  * @param type $passing the passing percentage as a decimal
- * @return null|boolean|float returns null if no input, false if incorrect, and the percentage as a float
+ * @return null|boolean|float returns null if no input, false if incorrent or not passing, and the percentage as a float
  */
 function parsePercent($append, array $inputs, $passing) {
     if(isset($inputs['percentage'.$append]))
@@ -1619,7 +1618,7 @@ class member {
                 }
                 echo "<td>$achievName</td></tr>";                      //displays achievement name
             }
-        } else {               //display promotion sign up if available
+        } else if(!$this->check_promo_halt($ident)){               //display promotion sign up if available
             echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
             echo "<td>Promotion</td><td>n/a</td><td>$achievName</td></tr>";
         }
@@ -1695,6 +1694,10 @@ class member {
                         if(isset($this->promoRecord['PRO']))
                             $promo_wait=$this->promoRecord['PRO'][1];
                         $is_ok=$this->check_promotion_wait($ident, $achievements[$i]['ACHIEV_CODE'], $promo_wait);
+                        if($i==count($achievements)-1) {  //if last achievement, then
+                            if($this->check_promo_halt($ident))
+                                echo '<tr class="table"><td class="table" colspan="'.(count($header)+2).'" style="color:red">Promotions have been halted due to a retention in grade from a promotion Board</td></tr>'."\n";
+                        }
                         if($is_ok!==true)
                             echo '<tr class=\"table\"><td class="table" colspan="'.(count($header)+2) .'" style="color:red">The time since last promotion is too short: You must wait until:'.$is_ok->format(PHP_DATE_FORMAT)."</td></tr>";
                         echo '<tr class="table"><td class="table">'.$achievements[$i]['ACHIEV_NAME'].'</td>';
@@ -2658,6 +2661,23 @@ class member {
      */
     function get_member_type() {
         return $this->memberType;
+    }
+    /**
+     * Checks if there is a promotion halt due to a failed promotion board
+     * 
+     * @param type $ident the database connection
+     * @return boolean true if the promotions are halted, false if otherwise
+     */
+    function check_promo_halt($ident) {
+        $query= "SELECT BOARD_DATE FROM PROMOTION_BOARD
+            WHERE CAPID='".$this->capid."'
+            AND APPROVED=FALSE
+            AND DATEDIFF(NEXT_SCHEDULED,CURDATE())>=0";
+        $size=count(allResults(Query($query, $ident)));  //get the number of results 
+        if($size>=1)
+            return true;
+        else
+            return false;
     }
 }
 class unit {
