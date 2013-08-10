@@ -29,7 +29,7 @@ if(isset($_SESSION['home'])) {
         <title>Boise Composite Squadron: RMR-ID-073</title>
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css"/>
-        <script type="text/javascript" src="/CAPS_LOCK.js"></script>
+        <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
     </head>
     <body>
         <?php include("header.php"); 

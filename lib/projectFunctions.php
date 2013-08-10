@@ -26,7 +26,6 @@
  */
 /*
  * **********************FOR v. 0.10*****************************
- * TODO membership termination and deletion and edit members
  * TODO finish populating db
  * TODO add settings table?- add log clearing info
  * TODO create all notifications
@@ -34,7 +33,7 @@
  * TODO edit member information
  * TODO create installer
  * ***************************Debug/fix*******************************************
- * TODO fix member-side queries
+ * TODO fix member-side queries and date_current field
  * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php) and all system_events
  * *******************FOR LATER******************************
  *  TODO add ribbon request stuff, and supply stuff
@@ -132,10 +131,13 @@
   * @return String the date and time of the Event formatted for SQL
   */
 function auditLog($ip, $type) {
-    $time = date(SQL_INSERT_DATE_TIME);
+    echo $type;
+    $timeStamp = date(SQL_INSERT_DATE_TIME);
+    $time=  microtime(true);
+    $time= $time-intval($time);
     $ident= Connect('Logger');
-    mysqli_query($ident,"INSERT INTO AUDIT_LOG(TIME_OF_INTRUSION, INTRUSION_TYPE, PAGE,IP_ADDRESS)
-        VALUES('$time','$type','".$_SERVER['SCRIPT_NAME']."','$ip')");
+    mysqli_query($ident,"INSERT INTO AUDIT_LOG(TIME_OF_INTRUSION, MICROSECONDS, INTRUSION_TYPE, PAGE,IP_ADDRESS)
+        VALUES('$timeStamp','$time','$type','".$_SERVER['SCRIPT_NAME']."','$ip')");
     close($ident);
     if(isset($_SESSION['member'])) {               //if this is an user session, attribute the user's capid to it
         auditDump($time,"user CAPID", $_SESSION['member']->getCapid());
@@ -151,8 +153,9 @@ function auditLog($ip, $type) {
  */
 function auditDump($time, $fieldName, $fieldValue) {
     $ident=connect('Logger');
-    mysqli_query($ident,"INSERT INTO AUDIT_DUMP(TIME_OF_INTRUSION, FIELD_NAME, FIELD_VALUE)
-        VALUES('$time','$fieldName','$fieldValue')");
+    $timeStamp= date(SQL_INSERT_DATE_TIME);
+    mysqli_query($ident,"INSERT INTO AUDIT_DUMP(TIME_OF_INTRUSION,MICROSECONDS, FIELD_NAME, FIELD_VALUE)
+        VALUES('$timeStamp','$time','$fieldName','$fieldValue')");
     close($ident);
 }
 /**
@@ -465,6 +468,14 @@ function numRows(mysqli_result $result) {
         return mysqli_num_rows($result);
     else
         return 0;                //else return 0
+}
+/**
+ * Reutrns the number of rows affected by the last query
+ * @param mysqli $ident the database connection from 
+ * @return int the number of rows affected
+ */
+function rows_affected(mysqli $ident) {
+    return mysqli_affected_rows($ident);
 }
 /**
  * Closes a database connection
@@ -1514,8 +1525,14 @@ class member {
         }
     }
     public function insertMember($ident) {
-        $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED)
-            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."','" . $this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."')";
+        $date_current=$this->Date_of_Join;
+        $now=new DateTime();
+        while($date_current->format('U')-$now->format('U')<0) {  //while the date current is less than right now
+            $date_current->add(new DateInterval('P1Y'));  //add 1 year until past right now
+        }
+        $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED, DATE_CURRENT)
+            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."','
+                " . $this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."','".$date_current->format(PHP_TO_MYSQL_FORMAT)."')";
         return Query($query, $ident);
     }
     public function insertEmergency($ident) {

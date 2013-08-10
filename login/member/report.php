@@ -40,6 +40,8 @@ session_secure_start();
                         $member = new member($_GET['capid'],4,$ident);  //init member
                         echo "<strong>Membership Report for:</strong> ";            //shows header
                         echo $member->getCapid()."- ".$member->getName_Last().", ".$member->getName_first()."<br><br>";
+                        if($member->check_terminated($ident))
+                            echo '<div style="color:red font-weight:bold">Member is terminated</div><br>';
                         echo "<a href=\"".$member->getPicture()."\"><img src=\"".$member->getPicture()."\" width=\"200\" height=\"275\" style=\"border:1px solid black\"/></a><br><br>";
                         ?>
                         <table border="1" cellpadding="0">
@@ -58,8 +60,8 @@ session_secure_start();
                         echo "<br><br>";
                         $member->promo_board_report($ident,false);
                         echo "<br><br>";
-                        $member->discipline_report($ident, false);
-                        echo "<br><br>";
+//                        $member->discipline_report($ident, false);
+//                        echo "<br><br>";
 //                        $member->staff_position($ident, false);
 //                        new chain_of_command($ident,$member->getCapid());
                     }

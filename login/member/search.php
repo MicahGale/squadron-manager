@@ -23,12 +23,17 @@
  * lock- the member type lock
  * $_POST
  * input the search input
+ * term- whether to search terminated members as well -is a checkbx
  * $_SESSION
- * lock- the member lock
+ * lock- the member type lock
  */
 include("projectFunctions.php");
 session_secure_start();
 $ident=  Connect('login');
+ if(isset($_POST['term'])&&$_POST['term']=="on")
+    $term='';
+else 
+    $term=" AND DATE_TERMINATED IS NULL";
 if(isset($_GET['redirect'])) {
     checkPath();
 }
@@ -59,6 +64,7 @@ function checkPath() {                      //keep redirect path and clean it up
 }
 function search() {                         //if already tried to search then start searching
     global $ident;
+    global $term;
     $input = cleanInputString($_POST['input'],96,"Search Input",true);
     if(isset($_POST['all']))
         $input="";                       //if wanted to show all just do a blank search
@@ -82,7 +88,7 @@ function search() {                         //if already tried to search then st
     $query ="SELECT CAPID FROM MEMBER 
             WHERE CAPID LIKE '$search_capid'
             AND NAME_FIRST LIKE ?
-            AND NAME_LAST LIKE ?";
+            AND NAME_LAST LIKE ?".$term;
     if(isset($_SESSION['lock']))
         $query.=" AND MEMBER_TYPE='".$_SESSION['lock']."'";  //specifies query locking
     $stmt=  prepare_statement($ident, $query);
@@ -182,7 +188,6 @@ function prepDisplay($results_sorted) {
     unset($_SESSION['redirect'],$_SESSION['field'],$_SESSION['lock']);   //get rid of useless session info
     return $display;
 }
-        
 ?>
 <!DOCTYPE html>
 <html>
@@ -197,9 +202,10 @@ function prepDisplay($results_sorted) {
         <form method="post">
             <input type="text" name="input" size="8"
                    <?php
-                   if(isset($_POST['searched']))   //show last input after quick cleaning
+                   if(isset($_POST['input']))   //show last input after quick cleaning
                        echo " value=\"".htmlspecialchars($_POST['input'], ENT_QUOTES | 'ENT_HTML5', 'UTF-8')."\"";
                    ?>/><br>
+            <input type="checkbox" <?php if(isset($term)&&$term=="") echo 'checked="checked" ';?> name="term"/>:Search terminated members as well.<br>
             <input type="submit" value="Search"/>  <input type="submit" name="all" Value="Show all members"/><br/>
         </form>
         <?php

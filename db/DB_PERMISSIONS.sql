@@ -42,3 +42,4 @@ GRANT SELECT ON TABLE ACCOUNT_LOCKS TO 'ViewNext'@'localhost';
 GRANT SELECT ON TABLE LOGIN_LOG TO 'ViewNext'@'localhost';
 ############################grant login priviledges#################3
 GRANT SELECT, UPDATE, INSERT ON SQUADRON_INFO.* TO 'login'@'localhost';
+GRANT DELETE, select ON SQUADRON_INFO.* TO 'delete'@'localhost';

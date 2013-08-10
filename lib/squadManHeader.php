@@ -17,7 +17,7 @@
  * 
  */
 ?>
-<script type="text/javascript" src="/resize.js"></script>
+<script type="text/javascript" src="/java_script/resize.js"></script>
 <table id="head" style="width:1100px">    
     <tr>
         <td style="width:210px"><a href="/login/home.php">
@@ -37,7 +37,7 @@
 </table>
 <table id="main" style="width:1100px">
     <tr>
-        <td style="text-align: left; vertical-align: top; width:20%">
+        <td style="text-align: left; vertical-align: top; width:250px">
             <ul class="tasks">
             <?php
             if(isset($_SESSION['home'])) {                  //if already found pages then display
@@ -66,7 +66,7 @@
                 $size=count($result);
                 for($row = 0;$row<$size;$row++) {   //loop trhogh all results
                     if($result[$row]["TYPE_NAME"]!=$oldSection) {   //IF IN NEW section show it
-                        echo "<strong>".  $result[$row]['TYPE_NAME']."</strong>\n";
+                        echo '<div style="font-weight:bold">'.  $result[$row]['TYPE_NAME']."</div>\n";
                         $oldSection = $result[$row]['TYPE_NAME'];  //set to new section
                     }           //echo link
                     echo '<li class="tasks"><a href="/login/'.$result[$row]["URL"];

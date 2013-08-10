@@ -80,7 +80,7 @@ if(isset($_POST['current'])) {  //if they give a password do stuff
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css">
-        <script type="text/javascript" src="/CAPS_LOCK.js"></script>
+        <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
     </head>
     <body>
         <?php
