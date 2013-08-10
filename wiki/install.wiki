@@ -42,6 +42,9 @@ You should then remove taskel after installing the LAMP
 sudo apt-get remove taskel
 }}}
 If you have a different distribution [http://www.linux.com/learn/tutorials/288158-easy-lamp-server-installation this link] may help. If not either Google how to do the installation on your distribution, or contact the developers.
+
+===Automatic Debian Install===
+On the Google drive for this Project is a .deb file that may be used to automatically Squadron Manager using on all Debian systems.
 ===Windows===
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
 ==Securing==
