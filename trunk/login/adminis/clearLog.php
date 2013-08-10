@@ -120,7 +120,7 @@ if(isset($_POST['request'])) {  //if requested then prepare
                         ?>
                             </table>
                     <?php } ?>                        
-            <form method="post">
+            <form method="post" id="confirm">
                 <h3>Select which Logs you want to clear</h3>
                 <?php
                 $audit=0;
@@ -147,7 +147,8 @@ if(isset($_POST['request'])) {  //if requested then prepare
                     echo '/>:Login Logs<br>';
                 }
                 ?>
-                <input type="submit" name="request" value="request"/>
+                <input type="hidden" name="request"/>
+                <input type="button" name="request" value="request" onclick="confirm_task('confirm');"/>
             </form>
         <?php
         } else {
@@ -159,7 +160,7 @@ if(isset($_POST['request'])) {  //if requested then prepare
                     echo '<span class="F">Improper Login.</span><br>';
                 ?>
                 Capid: <input type="text" size="3" disabled="disabled" value="<?php echo $_SESSION['member']->getCapid(); ?>"/><br>
-                Password: <input type="password" name="password" size="5" onkeypress="check_caps(event)"/><span id="warn" class="F"></span><br>
+                Password: <input type="password" name="password" size="5" autocomplete="off" onkeypress="check_caps(event)"/><span id="warn" class="F"></span><br>
                 <input type="submit" name="login" value="login"/>
             </form>
             <?php

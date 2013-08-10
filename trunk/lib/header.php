@@ -17,7 +17,7 @@
  * 
  */
 ?>
-<script type="text/javascript" src="/resize.js"></script>
+<script type="text/javascript" src="/java_script/resize.js"></script>
 <table id="head" style="width:1100px">        
     <tr>
         <td style="width:210px"><a href="/">

@@ -202,7 +202,7 @@ if(!isset($_GET['time'])) {
                 <tr><td colspan="2"><br><input type="submit" name="filter" value="filter"/></td></tr>
                 <tr>
                         <?php
-                        $query= "SELECT TIME_OF_INTRUSION AS TIME, INTRUSION_NAME AS NAME, IP_ADDRESS, PAGE
+                        $query= "SELECT TIME_OF_INTRUSION AS TIME, MICROSECONDS , INTRUSION_NAME AS NAME, IP_ADDRESS, PAGE
                                 FROM AUDIT_LOG, INTRUSION_TYPE
                                 WHERE INTRUSION_TYPE=INTRUSION_CODE ".$where.$order_by;
                         $result= allResults(Query($query, $ident));
@@ -238,7 +238,8 @@ if(!isset($_GET['time'])) {
                             for($i=$start;$i<$max;$i++) {
                                 echo '<tr class="table">';
                                 $date=new DateTime($result[$i]['TIME']);
-                                echo '<td class="table"><a href="/login/adminis/auditLog.php?time='.$date->format('o-m-d%20H:i:s').'">'.$date->format(PHP_DATE_FORMAT." G:i:s").'</a></td>';
+                                $time=  floatval($result[$i]['MICROSECONDS']);
+                                echo '<td class="table"><a href="/login/adminis/auditLog.php?time='.$date->format('o-m-d%20H:i:s').'&micro='.$time.'">'.$date->format(PHP_DATE_FORMAT." G:i:s").substr(round($time,3),1).'</a></td>';
                                 echo '<td class="table">'.$result[$i]['NAME'].'</td>';
                                 echo '<td class="table">'.$result[$i]['IP_ADDRESS'].'</td>';
                                 echo '<td class="table">'.$result[$i]['PAGE']."</td></tr>\n";
@@ -262,16 +263,17 @@ if(!isset($_GET['time'])) {
         <table class="table">
             <tr class="table"><th class="table">Time of Event</th><th class="table">Event Type</th>
                 <th class="table">IP Address</th><th class="table">Page of Event</th></tr>
-            <tr>
                 <?php
-                $time=  cleanInputString($_GET['time'],19,"time",false, false);
+                $timeStamp=  cleanInputString($_GET['time'],19,"time",false, false);
+                $time=  cleanInputInt($_GET['micro'],8,"microseconds");
                 $query= "SELECT TIME_OF_INTRUSION AS TIME, INTRUSION_NAME AS NAME, IP_ADDRESS, PAGE
                                 FROM AUDIT_LOG, INTRUSION_TYPE
                                 WHERE INTRUSION_TYPE=INTRUSION_CODE 
-                                AND TIME_OF_INTRUSION='$time'";
+                                AND TIME_OF_INTRUSION='$timeStamp'
+                                AND MICROSECONDS='$time'";
                 $result=  allResults(Query($query, $ident));
                  $date=new DateTime($result[0]['TIME']);
-                echo '<td class="table">'.$date->format(PHP_DATE_FORMAT." G:i:s").'</td>';
+                echo '<tr class="table"><td class="table">'.$date->format(PHP_DATE_FORMAT." G:i:s").substr(round($time,3),1).'</td>';
                 echo '<td class="table">'.$result[0]['NAME'].'</td>';
                 echo '<td class="table">'.$result[0]['IP_ADDRESS'].'</td>';
                 echo '<td class="table">'.$result[0]['PAGE']."</td></tr>\n";
@@ -282,7 +284,7 @@ if(!isset($_GET['time'])) {
             <tr class="table"><th class="table">Detail Name</th><th class="table">Detail</th></tr>
             <?php
             $query="SELECT FIELD_NAME, FIELD_VALUE FROM AUDIT_DUMP
-                WHERE TIME_OF_INTRUSION='$time'";
+                WHERE TIME_OF_INTRUSION='$timeStamp' and MICROSECONDS='$time'";
             $result=  allResults(Query($query, $ident));
             for($i=0;$i<count($result);$i++) {
                 echo '<tr class="table">';
@@ -290,9 +292,9 @@ if(!isset($_GET['time'])) {
                 if($result[$i]['FIELD_NAME']=="user CAPID") {
                     $capid=$result[$i]['FIELD_VALUE'];
                     $member=new member($capid,1,$ident);
-                    echo '<td class="table">'.$capid."-".$member->link_report(true).'</td>';
-                }
-                echo '<td class="table">'.$result[$i]['FIELD_VALUE']."</td></tr>\n";
+                    echo '<td class="table">'.$member->link_report(true).'</td>';
+                } else 
+                    echo '<td class="table">'.$result[$i]['FIELD_VALUE']."</td></tr>\n";
             }
             ?>
         </table>

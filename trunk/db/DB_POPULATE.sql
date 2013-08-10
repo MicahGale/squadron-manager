@@ -43,7 +43,8 @@ VALUES ('DC','Page direct call'),
         ('FM','File upload exceeded max. size'),
         ('FT','File Upload of improper type'),
         ('FA','File upload attack'),
-        ('FR','File upload error');
+        ('FR','File upload error'),
+        ('DR','Delete Record');
 ################INSERT PHASES ############################
 INSERT INTO PHASES (PHASE_NUM, PHASE_NAME, MEMBER_TYPE)
 VALUES (1,'The Learning Phase','C'),
@@ -165,7 +166,9 @@ VALUES('MEA','Approve Added Members','ME','member/approve.php',FALSE,FALSE,NULL)
         ('SPR','Senior Member Promotion Record','TP','testing/promoRecord.php',false,true,'S'),
         ('PRB','Manage Promotion Boards','TP','testing/promoBoard.php',false,false,null),
         ('ESR','Eservice Report','RE','reporting/eservReport.php',true,false,null), 
-        ('EST','Enter Online Testing','TP','testing/onlineTesting.php',false, false,null);
+        ('EST','Enter Online Testing','TP','testing/onlineTesting.php',false, false,null),
+        ('TME','Terminate Members','AD','adminis/termMembership.php',false,true,null),
+        ('DME','Delete Member record','AD','adminis/deleteRecord.php',false,true,null);
 ############################INSERT STAFF_PERMISSIONS######################
 INSERT INTO STAFF_PERMISSIONS(STAFF_CODE,TASK_CODE)
 VALUES('CTO','MEA')
@@ -203,7 +206,8 @@ VALUES('MEA','member/finalApprove.php'),
         ('LLO','member/report.php'),
         ('ADL','member/report.php'),
         ('CLO','adminis/deleteIt.php'),
-        ('CLO','member/research.php');
+        ('CLO','member/research.php'),
+        ('DME','adminis/finishRecordDel.php');
 #############################INSERT STAFF POSITIONS##################
 INSERT INTO STAFF_POSITIONS(STAFF_CODE, STAFF_NAME)
 VALUES('CC','Squadron Commander'),

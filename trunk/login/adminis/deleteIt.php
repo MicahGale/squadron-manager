@@ -78,6 +78,13 @@ if(!$_SESSION['authenticated']) {                 //if not authenticated leave i
             if(!Query($query, $ident))         //delete the request
                     $success=false;
         }
+        $time=  auditLog($_SERVER['REMOTE_ADDR'],'DR');
+        $deleted="";
+        if($_SESSION['audit'])
+            $deleted="Audit log ";
+        if($_SESSION['login_clear'])
+            $deleted.="Login log";
+        auditDump($time, "deleted",$deleted);
     }
 }
 ?>
