@@ -47,7 +47,7 @@ if(isset($_POST['remove'])) {
             FROM REQUIREMENTS_PASSED A, MEMBER B, PROMOTION_REQUIREMENT C WHERE A.ON_ESERVICES=FALSE
             AND A.CAPID=B.CAPID AND C.ACHIEV_CODE=A.ACHIEV_CODE AND A.TEXT_SET=C.TEXT_SET
             AND A.REQUIREMENT_TYPE=C.REQUIREMENT_TYPE AND A.REQUIREMENT_TYPE not IN ('SA','PB','CO','GS','PB')
-            ORDER BY CAPID ASC";   //TODO check on what they need to enter
+            ORDER BY CAPID ASC";   
         $require_passed=  allResults(Query($query, $ident));        //get all the requirements not on eservices
         $query="SELECT CAPID, ACHIEVEMENT, DATE_PROMOTED FROM PROMOTION_RECORD
             WHERE ON_ESERVICES=FALSE ORDER BY CAPID ASC";                 //GET PROMOTIONS
@@ -113,7 +113,7 @@ if(isset($_POST['remove'])) {
             ?>
         </table>
         <?php
-        require("footer.php");
+        require("report_footer.php");
         ?>
     </body>
 </html>

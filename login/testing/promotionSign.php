@@ -8,6 +8,9 @@
  * filter - the member type to limit the report to
  * save- saves the inputs
  * the input from the promotion record function
+ * Session
+ * memberType= the type of member limited to 
+ * approve- can approve the promotions
  * 
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
@@ -34,7 +37,16 @@ require("projectFunctions.php");
 session_secure_start();
 $ident=  connect('login');
 if(isset($_GET['lock'])) {
-    $_SESSION['memberType']=  cleanInputString($_GET['lock'],1, "lock field",false);
+    $buffer=  cleanInputString($_GET['lock'],2, "lock field",false);
+    if(strlen($buffer)==1) {
+        $_SESSION['memberType']=$buffer;
+        $_SESSION['approve']=true;
+    } else  {
+        $_SESSION['memberType']=  substr($buffer, 0,1);
+        $_SESSION['approve']=false;
+    }
+} else {
+  $_SESSION['approve']=true;  
 }
 ?>
 <!DOCTYPE html>
@@ -47,6 +59,7 @@ if(isset($_GET['lock'])) {
     </head>
     <body>
         <?php
+        $hide=true;
         require("squadManHeader.php");
         ?>
         <table border="0" width="800" >
@@ -77,7 +90,7 @@ if(isset($_GET['lock'])) {
                             if(isset($_POST)&&isset($_POST['save'])) {  //if has post and not filter parse it and save it
                                 parsePromoInput($ident, $_POST);
                             }
-                            promotionAprove($ident, $_SESSION['memberType']);
+                            promotionAprove($ident, $_SESSION['memberType'],$_SESSION['approve']);
                             ?>
                             <input type="submit" name="save" value="Save"/>
                         </form>  

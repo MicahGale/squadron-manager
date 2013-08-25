@@ -42,7 +42,6 @@ if(isset($_POST['delete'])) { //get the input and prep it
         WHERE DELETE_MEMBER IS NOT NULL
         AND REQUESTER<>'".$_SESSION['member']->getcapid()."'";
     $results=  allResults(Query($query, $ident));
-    var_dump($_POST);
     $_SESSION['delete']=array();
     for($i=0;$i<count($results);$i++) {                 //first get the deletes
         $capid=$results[$i]['DELETE_MEMBER'];  //if all the buttons are checked then add to the list
@@ -63,7 +62,6 @@ if(isset($_POST['delete'])) { //get the input and prep it
             array_push($_SESSION['request'],$capid);
         }
     }
-    var_dump($_SESSION['request']);
 }
 ?>
 <!DOCTYPE html>

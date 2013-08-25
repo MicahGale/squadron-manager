@@ -27,32 +27,13 @@
 /*
  * **********************FOR v. 0.10*****************************
  * TODO finish populating db
- * TODO add settings table?- add log clearing info
- * TODO create all notifications
- * TODO check old TODO tags AND hide dorment code and pages
- * TODO edit member information
+ * TODO hide dorment code and pages
  * TODO create installer
+ * TODO handle other fields on adminis/newMember.php
+ * TODO handle unit defaults
  * ***************************Debug/fix*******************************************
- * TODO fix member-side queries and date_current field
- * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php) and all system_events
- * *******************FOR LATER******************************
- *  TODO add ribbon request stuff, and supply stuff
- *TODO populate pictures
- * TODO allow editng attendance
- * TODO add drill test links?
- * TODO create cadet of the month selection
- * TODO create a barcode reader
- *TODO create warning system
- *TODO create page for units
- * TODO debug commanders and add chain of command
- * TODO  add scheduling
- * TODO add edit member and add picture
- * TODO regulations page and update regsupdater
- * TODO add statistics esp. for attendance
- * TODO use css more and js
- * TODO create a ical parsing script
- * TODO make colorblind safe options
- * TODO allow upload and store documents
+ * anti-test banking measures
+ * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php) and all system_events  
  */
 /*Unix specific functions
  * cleanUploadFile-path delimeter /
@@ -82,46 +63,64 @@
  * 
  * The date format to universally display the date
  */
- define("PHP_DATE_FORMAT","d M y");     //Date formats to use, default php display date
+$input=  parse_ini_file("/etc/squadMan/squadMan.ini");
+if($input!==false) {  //if the file was parsed then get the inputs
+    /**
+     * @constant PHP_DATE_FORMAT 
+     * 
+     * The date format to universally display the date
+     */
+    define("PHP_DATE_FORMAT",$input['date_format']);  
+    define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." ".$input['time_format']);  //the datetime format
+    define('CSV_SAVE_PATH',$input['csv_path']);  //the constant for where csv files go
+    define('PROFILE_PATH',$input['profile_path']);  //the path to the profile pictures stored outside document root
+    define("BAD_LOGIN_WAIT",$input['login_wait']);
+    define("LOCK_TIME",$input['lock_time']);
+    define("MAX_LOGIN",$input['lock_count']);
+    define('PASSWORD_LIFE',$input['password_life']);
+    define('PASSWORD_NOTIF',$input['password_notif']);
+    define('LOG_PER_PAGE',$input['log_per_page']);
+} else {
+    define("PHP_DATE_FORMAT","d M y");  
+    define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." H:i:s");  //the datetime format
+    define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
+    define('PROFILE_PATH',"/var/upload/profile");  //the path to the profile pictures stored outside document root
+    define("BAD_LOGIN_WAIT",5);
+    /**
+    * The constant for how long to have an account in SQL time format
+    */
+    define("LOCK_TIME","00:30:00");
+    /**
+    * The maximum number of bad login attempts in account lockout time before the account is locked
+    */
+    define("MAX_LOGIN",8);
+    /**
+    * The maximum password life
+    */
+    define('PASSWORD_LIFE',180);
+     /**
+     * The days to wait to notify the password experiation
+     */
+    define('PASSWORD_NOTIF',14);
+    define('LOG_PER_PAGE',40);
+}
  /**
   * how to format to insert into mysql
   */
  define("PHP_TO_MYSQL_FORMAT","Y-m-d");   
- define( "SQL_DATE_FORMAT", "%d-%m-%Y");  //php display except at mysql level
  /**
   * The format for inserting a complete date time into SQL
   */
  define("SQL_INSERT_DATE_TIME","o-m-d H:i:s");
- define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." H:i:s");  //the datetime format
  define("EVENT_CODE_DATE",'dMy');         //date for creating event codes
  define("CPFT_RUNNING_REQ",1);            //the amount of running events that must be passed
  define("CPFT_OTHER_REQ",2);             //the amount of non-running events that must be passed
- define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
- define('PROFILE_PATH',"/usr/share/www/profile");  //the path to the profile pictures stored outside document root
  define('NOTIF_PATH','/etc/squadMan/notifications.csv');  //the csv that holds the notification information
  define("PSSWD_INI",'/etc/squadMan/psswd.ini');
- define("BAD_LOGIN_WAIT",5);
  /**
-  * The constant for how long to have an account in SQL time format
-  */
- define("LOCK_TIME","00:30:00");
- /**
-  * The maximum number of bad login attempts in account lockout time before the account is locked
-  */
- define("MAX_LOGIN",8);
- /**
-  * the interval that must be waited between promotions
+  * the interval that must be waited between promotions in seconds
   */
  define("PROMOTION_WAIT",4838400);
- /**
-  * The maximum password life
-  */
- define('PASSWORD_LIFE',180);
- /**
-  * The days to wait to notify the password experiation
-  */
- define('PASSWORD_NOTIF',14);
- define('LOG_PER_PAGE',40);
  /**
   * Stores and auditable event to the AUDIT_LOG table.
   * If we have the user's CAPID that will be stored along with the log
@@ -131,7 +130,6 @@
   * @return String the date and time of the Event formatted for SQL
   */
 function auditLog($ip, $type) {
-    echo $type;
     $timeStamp = date(SQL_INSERT_DATE_TIME);
     $time=  microtime(true);
     $time= $time-intval($time);
@@ -245,6 +243,7 @@ function newMember($identifier, $page,$capid=null) {                            
     enterDate(true,'DoJ');
     echo "<br><br><strong>Also add at least One emergency Contact</strong>";
     newContact(FALSE, $identifier);
+    echo '<input type="Submit" value="Create Member"/></form>';
 }
 /**
  * Creates a form to input emergency contact information
@@ -326,7 +325,7 @@ function newVisitor($page, $defaultFname = null, $defaultLname = null) {
  * @param boolean $hasNoSelect allows the user to not put input
  */
 function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default = null, $hasNoSelect=false) {      //drop down menu 1st field is code 2nd is name
-    $results = Query($query, $identifier);                     //TODO include error handlin
+    $results = Query($query, $identifier);                    
     $row = 0;
     echo "<select name=\"$name\">";
     if($hasNoSelect==true) {                          //if has no select show empty drop down
@@ -358,13 +357,12 @@ function dropDownMenu($query, $name, $identifier, $hasotherfield=false, $default
  */
 function reportDbError($errorno,$error) {
     $time = auditLog( $_SERVER['REMOTE_ADDR'], 'ER');
+    $date= new DateTime();
     auditDump($time, 'Error Code', $errorno);
     auditDump($time, 'Error Message', mysql_real_escape_string($error));  //escape the ''
     echo"<br><strong>there was an error with processing the request</strong><br>
-        Please give the following information to you Squadron's IT Officer(s)<br>
-        <strong>error:</strong>\n";
-    echo $errorno . " " .$error;
-    echo "<br><strong>Time:</strong>$time\n";
+        Please give the following information to you Squadron's IT Officer(s)<br>\n";
+    echo "<br><strong>Time:</strong>".$date->format(PHP_TIMESTAMP_FORMAT)."\n";
     echo"<br><strong>Page:</strong>".$_SERVER['SCRIPT_NAME']."<br>\n";
     echo"<strong>IP:</strong>" . $_SERVER['REMOTE_ADDR'] . "<br>";
 }
@@ -704,7 +702,7 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
  * @param Int $capid the capid of the user for creating the session should be used only
  * by /login/index.php
  */
-function session_secure_start($capid=null) {  //todo do get checks
+function session_secure_start($capid=null) {
     session_start();                     //starts the session
     if (!isset($_SESSION['ip_addr'])) {       //if starting the session
         if ($_SERVER['SCRIPT_NAME'] == '/login/index.php') {        //if at the login page
@@ -1140,8 +1138,10 @@ function specialPromoRequire($ident) {
  * 
  * @param mysqli $ident the database connection
  * @param String $memberType the member type that the promotion requests are to be displayed for
+ * @param boolean $approve whether or not the member can approve the promotion
  */
-function promotionAprove($ident,$memberType) {
+function promotionAprove($ident,$memberType,$approve=false) {
+    echo $approve;
     $query="SELECT A.CAPID, A.ACHIEV_CODE, A.APPROVED, CONCAT(D.GRADE_NAME,' - ',C.ACHIEV_NAME) AS NAME
         FROM ACHIEVEMENT C, GRADE D, PROMOTION_SIGN_UP A
         JOIN MEMBER B ON A.CAPID=B.CAPID
@@ -1171,12 +1171,17 @@ function promotionAprove($ident,$memberType) {
     for($i=0;$i<count($header);$i++) {  //displays the headers
         echo "<th class=\"table\">".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
     }
-    echo "<th class=\"table\">Approved</th></tr>\n";   //display approval header
+    if(!$approve)
+        echo "<th class=\"table\">Approved</th></tr>\n";   //display approval header
     for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
         echo "<tr class=\"table\">";
         if($signUps[$i][0]->check_promo_halt($ident))
             echo '<tr class="table"><td class="table" colspan="'.(count($header)+3).'" style="color:red">This member\'s Promotions are halted due to a retention in grade</td></tr>';
-        $signUps[$i][0]->displayPromoRequest($header,true,true,$signUps[$i][3]);
+        if($approve)
+            $approved=$signUps[$i][3];
+        else
+            $approved=null;
+        $signUps[$i][0]->displayPromoRequest($header,true,true,null,false,$approve);
     }
     $_SESSION['signUps']=$signUps;
     $_SESSION['header']=$header;
@@ -1525,14 +1530,14 @@ class member {
         }
     }
     public function insertMember($ident) {
-        $date_current=$this->Date_of_Join;
+        $date_current=new DateTime($this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT));
         $now=new DateTime();
         while($date_current->format('U')-$now->format('U')<0) {  //while the date current is less than right now
             $date_current->add(new DateInterval('P1Y'));  //add 1 year until past right now
         }
         $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED, DATE_CURRENT)
-            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."','
-                " . $this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."','".$date_current->format(PHP_TO_MYSQL_FORMAT)."')";
+            VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."',
+                '".$this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."','".$date_current->format(PHP_TO_MYSQL_FORMAT)."')";
         return Query($query, $ident);
     }
     public function insertEmergency($ident) {
@@ -1551,8 +1556,8 @@ class member {
     }
     public function sign_in($ident, $message, $event_code = null) {
         if ($event_code == null) {                         //assume current event
-            return Query("INSERT INTO ATTENDANCE (CAPID, EVENT_CODE)
-                SELECT '" . $this->capid . "',EVENT_CODE FROM EVENT WHER IS_CURRENT=TRUE", $ident, $message);
+            return Query("INSERT IGNORE INTO ATTENDANCE (CAPID, EVENT_CODE) 
+                SELECT '" . $this->capid . "',EVENT_CODE FROM EVENT WHERE IS_CURRENT=TRUE", $ident, $message);
         } else {              //else use provided event
             return Query("INSERT INTO ATTENDANCE(CAPID,EVENT_CODE)
                 VALUES('" . $this->capid . "','$event_code')", $ident, $message);
@@ -1604,8 +1609,8 @@ class member {
     public function testSign_up($ident, $target) {
         echo "<strong>Testing and Promotion Sign-up</strong>";   //shows header and starts a form and show table header
         echo "<form action=\"$target\" method=\"post\">
-            <table border=\"1\" cellspacing=\"1\">
-                <tr><th>Sign-Up</th><th>Test Type</th><th>Test Name</th><th>Achievement</th></tr>\n";
+            <table class=\"table\">
+                <tr class=\"table\"><th class=\"table\">Sign-Up</th><th class=\"table\">Test Type</th><th class=\"table\">Test Name</th><th class=\"table\">Achievement</th></tr>\n";
         $results = Query("SELECT ACHIEV_NAME FROM ACHIEVEMENT
             WHERE ACHIEV_CODE='" . $this->achievement . "'", $ident);  //gets name of achievement 
         if (numRows($results)) {
@@ -1623,7 +1628,9 @@ class member {
                     JOIN ACHIEVEMENT F ON E.ACHIEV_CODE =F.ACHIEV_CODE
                     JOIN ACHIEVEMENT G ON G.NEXT_ACHIEV=F.ACHIEV_CODE
                     WHERE G.ACHIEV_CODE='" . $this->achievement . "'AND
-                    E.CAPID='" . $this->capid . "')", $ident);  //get all available requirement sign_up
+                    E.CAPID='" . $this->capid . "')
+                    and A.REQUIREMENT_TYPE NOT IN(SELECT REQUIREMENT_TYPE FROM 
+                    TESTING_SIGN_UP WHERE CAPID='".$this->capid."')", $ident);  //get all available requirement sign_up
         if (numRows($results) > 0) {                                   //if can sign up for testing
             for ($row = 0; $row < numRows($results); $row++) {
                 echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"" . Result($results, $row, "REQUIREMENT_TYPE") . "\"/></td>"; //create checkbox
@@ -1636,8 +1643,10 @@ class member {
                 echo "<td>$achievName</td></tr>";                      //displays achievement name
             }
         } else if(!$this->check_promo_halt($ident)){               //display promotion sign up if available
-            echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
-            echo "<td>Promotion</td><td>n/a</td><td>$achievName</td></tr>";
+            if(numRows(query("SELECT CAPID FROM PROMOTION_SIGN_UP WHERE CAPID='".$this->capid."'",$ident))==0) {
+                echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
+                echo "<td>Promotion</td><td>n/a</td><td>$achievName</td></tr>";
+            }
         }
         unset($results);
         echo "</table>\n<input type=\"submit\" name=\"finish\" value=\"Sign-in only\"/>
@@ -1653,7 +1662,7 @@ class member {
                         WHERE B.ACHIEV_CODE='" . $this->achievement . "'";
             } else {
                 $query = "INSERT INTO TESTING_SIGN_UP(CAPID,REQUIRE_TYPE,REQUESTED_DATE)
-                    VALUESS('" . $this->capid ."','$code', CURDATE())";
+                    VALUES('" . $this->capid ."','$code', CURDATE())";
             }
             return Query($query, $ident, $message);
         }
@@ -1727,11 +1736,11 @@ class member {
     }
     public function editInformation($page, $identifier) {
                     //displays table for input
-                    echo "<form action=\"$page\" method=\"post\"><table border =\"1\" cellspacing=\"1\"><tr><th>Last Name</th><th>First Name</th>
+                    echo "<form action=\"$page\" method=\"post\"><table class=\"table\"><tr class=\"table\"><th class=\"table\">Last Name</th><th class=\"table\">First Name</th>
             </tr>";
                     //displays input fields
-                    echo "<tr><td><input type=\"text\" name=\"Lname\" value=\"" . $this->name_last . "\" size=\"4\"/></td>
-        <td><input type=\"text\" name=\"Fname\" value=\"" . $this->name_first . "\" size=\"4\"/></td>
+                    echo "<tr class=\"table\"><td class=\"table\"><input type=\"text\" name=\"Lname\" value=\"" . $this->name_last . "\" size=\"4\"/></td>
+        <td class=\"table\"><input type=\"text\" name=\"Fname\" value=\"" . $this->name_first . "\" size=\"4\"/></td>
         ";
 //                    enterDate(false,null,$this->DoB);
                     echo "\n</tr></table><br><strong>Also add at least One emergency Contact</strong>";
@@ -1742,19 +1751,19 @@ class member {
         if ($submit) {
             echo"<form action=\"$page\" method=\"post\">";
         }
-        echo "<table border=\"1\" cellspacing=\"1\"><tr>
-    <th>Contact Name</th><th>Contact's Relation</th><th>Contact's Phone Number</th></tr>\n";
+        echo "<table class=\"table\"><tr class=\"table\">
+    <th class=\"table\">Contact Name</th><th class=\"table\">Contact's Relation</th><th class=\"table\">Contact's Phone Number</th></tr>\n";
         $row = 0;
         while ($row < 5) {
             if (array_key_exists($row, $this->emergencyContacts)) {
-                echo "<tr><td><input type=\"text\" name=\"ContName$row\" value=\"" . $this->emergencyContacts[$row]->getName . "\" size=\"7\"/></td><td>";
+                echo "<tr class=\"table\"><td class=\"table\"><input type=\"text\" name=\"ContName$row\" value=\"" . $this->emergencyContacts[$row]->getName() . "\" size=\"7\"/></td><td>";
                 dropDownMenu("SELECT RELATION_CODE,RELATION_NAME FROM CONTACT_RELATIONS", "relation$row", $identifier, true, $this->emergencyContacts[$row]->getRelation());
-                echo "</td><td><input type=\"text\" name=\"number$row\" size=\"16\"/></td>\n";
+                echo "</td><td class=\"table\"><input type=\"text\" name=\"number$row\" placeholder=\"###-###-####\" size=\"16\"/></td>\n";
                 $row++;
             } else {
-                echo "<tr><td><input type=\"text\" name=\"ContName$row\" size=\"7\"/></td><td>";
+                echo "<tr><td class=\"table\"><input type=\"text\" name=\"ContName$row\" size=\"7\"/></td><td>";
                 dropDownMenu("SELECT RELATION_CODE,RELATION_NAME FROM CONTACT_RELATIONS", "relation$row", $identifier, true);
-                echo "</td><td><input type=\"text\" name=\"number$row\" size=\"16\"/></td>\n";
+                echo "</td><td class=\"table\"><input type=\"text\" name=\"number$row\" size=\"16\" v/></td>\n";
                 $row++;
             }
         }
@@ -1846,7 +1855,7 @@ class member {
                         if (!$this->insertSingleContact($row, $ident)) {
                             $contactSuccess = false;
                         }
-                    }                       //TODO update all info and contact info.
+                    }                 
                 }
             }
         }
@@ -1854,8 +1863,8 @@ class member {
     }
     public function updateContact($row, $oldRelat, $ident) {
         $query = "UPDATE EMERGENCY_CONTACT
-    SET RELATION='" . $this->emergencyContacts[$row]->getRelation() . "'
-    CONTACT_NAME='" . $this->emergencyContacts[$row]->getName() . "'
+    SET RELATION='" . $this->emergencyContacts[$row]->getRelation() . "',
+    CONTACT_NAME='" . $this->emergencyContacts[$row]->getName() . "',
         CONTACT_NUMBER='" . $this->emergencyContacts[$row]->getPhone() . "'
             WHERE CAPID='" . $this->capid . "'
                 AND RELATION='" . $oldRelat . "'";
@@ -1873,8 +1882,8 @@ class member {
         $query = "UPDATE MEMBER 
     SET NAME_LAST='" . $this->name_last . "',
     NAME_FIRST='" . $this->name_first . "',
-    DATE_OF_BIRTH=STR_TO_DATE('" . $this->DoB->format(PHP_DATE_FORMAT) . "','" . SQL_DATE_FORMAT . "'),
-    DATE_JOINED=STR_TO_DATE('" . $this->Date_of_Join->format(PHP_DATE_FORMAT) . "'," . SQL_DATE_FORMAT . "),
+    DATE_OF_BIRTH='".$this->DoB->format(PHP_TO_MYSQL_FORMAT)."',
+    DATE_JOINED='".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."',
     ACHIEVEMENT='" . $this->achievement . "',
     MEMBER_TYPE='" . $this->memberType . "',
     TEXTBOOK_SET='" . $this->text_set . "'
@@ -2256,7 +2265,7 @@ class member {
         }
         if(isset($this->promoRecord['NAME'])&&$this->promoRecord['NAME']!=null)
             echo "<td class=\"table\">".$this->promoRecord['NAME']."</td>";
-        for($j=0;$j<count($header);$j++) {              //TODO actually display stuff
+        for($j=0;$j<count($header);$j++) {             
             $index=$header[$j]['TYPE_CODE'];   //get the current requirement
             if(isset($this->promoRecord[$index])) {  //if has that requirement do stuff
                 $current=$this->promoRecord[$index];  //load it
@@ -2940,10 +2949,7 @@ class chain_of_command {
            for($j=0;$j<count($this->commanders[$i]);$j++) {       //cycle across line
                if($i>0) {  //if has someone above sort it under it not display jet
                    $temp = $this->commanders[$i][$j];             //the calculating commander
-                   var_dump($temp);
                    $next = $temp->get_next();                    //the index for the next commander
-                   var_dump($next);
-                   print_r($locations);
                    $min= $locations[($i-1)][$next][0];             //get the bounds of the one above
                    if(!isset($buffer[$min])) {                   //if the left of it's commander isn't occupied then use
                        $buffer[$min]=$j;                        //show index used

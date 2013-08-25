@@ -30,8 +30,13 @@
 include("header.php");
 include("projectFunctions.php");
 $ident=Connect('Sign-in');
-$member = new member($_GET["CAPID"],2,$ident);
-if($member->badInput) {
+if(isset($_GET['CAPID'])) {
+    $capid= cleanInputInt($_GET['CAPID'],6, "Capid");
+    $member = new member($capid,2,$ident);
+} else  {
+    $capid=null;
+}
+if(isset($member)&&$member->badInput) {
     echo " please search again
         <form action=\"../signIn\" method=\"get\">
                         <input type =\"text\" name=\"CAPID\" size=\"5\"/>
@@ -39,14 +44,14 @@ if($member->badInput) {
                     </form>";
     break;
 }    
-    if($member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
-        echo"<strong>We found this member from the entered CAPID:</strong><br><br>\n";
-        echo "<table border =\"1\" cellspacing=\"1\"><tr><th>CAPID</th><th>Last Name</th><th>First Name</th><th>Grade</th></tr>\n";
-        echo "<tr><td>".$member->getCapid()."</td><td>".$member->getName_Last()."</td><td>".$member->getName_first()."</td><td>".$member->getGrade($ident,'signin/index.php')."</td></tr></table><br>";  
+    if(isset($member)&&$member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
+        echo"<div styl=\"font-weight:bold\">We found this member from the entered CAPID:</div><br><br>\n";
+        echo "<table class=\"table\"><tr class=\"table\"><th class=\"table\">CAPID</th><th class=\"table\">Last Name</th><th class=\"table\">First Name</th><th class=\"table\">Grade</th></tr>\n";
+        echo "<tr class=\"table\"><td class=\"table\">".$member->getCapid()."</td><td class=\"table\">".$member->getName_Last()."</td><td class=\"table\">".$member->getName_first()."</td><td>".$member->getGrade($ident,'signin/index.php')."</td></tr></table><br>";  
         $member->testSign_up($ident, "finishSignin.php","signin/index.php");
         session_start();
         $_SESSION["member"]=$member;
-    } else if($member->check_terminated($ident)) {
+    } else if(isset($member)&&$member->check_terminated($ident)) {
         echo '<span class="F">Your membership is terminated, and you cannot log in.</span>';
     }
     else {
@@ -56,14 +61,14 @@ if($member->badInput) {
                         <input type =\"text\" name=\"CAPID\" size=\"5\"/>
                         <input type=\"submit\" value =\"Sign-In\"/>
                     </form><br><strong>Or add a new Member</strong>";
-        newMember($ident,'newMember.php',$member->getCapid());
+        newMember($ident,'newMember.php',$capid);
     }
     
 ?>
         
         <br><br><strong>Not You?</strong><br>
 Search again.<br>
-<form action="../signin" method ="get">
+<form method ="get">
     <input type="text" size="3" name="CAPID"/>
     <input type="submit" value="search again"/>
 </form>

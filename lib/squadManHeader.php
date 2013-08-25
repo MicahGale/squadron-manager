@@ -61,7 +61,7 @@
                 $_SESSION['home']=  allResults($permissions);
                 $result = $_SESSION['home'];
             }
-            if((isset($permissions)&&$permissions!= false)||!isset($permissions)) {                              //if no errors
+            if(((isset($permissions)&&$permissions!= false)||!isset($permissions))&&!isset($hide)) {                              //if no errors
                 $oldSection = "";
                 $size=count($result);
                 for($row = 0;$row<$size;$row++) {   //loop trhogh all results

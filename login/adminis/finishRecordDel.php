@@ -45,9 +45,6 @@ $staffer=$_SESSION['member'];
         ?>
         <h1>Finish Deleting Records</h1>
         <?php
-        echo "request";
-        var_dump($_SESSION['request']);
-        var_dump($_SESSION['delete']);
         if($staffer->check_password($ident,$_POST['password'],$salt)) {   //check that they logged in correctly then do the stuff
             $delete=  connect("delete");    //get a user who can delete data
             if(isset($_SESSION['request'])) {

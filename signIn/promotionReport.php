@@ -21,7 +21,8 @@
 <html>
     <head>
         <title>Promotion Progress Report</title> 
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+        <link rel="stylesheet" type="text/css" href="/main.css">
          <link rel="shortcut icon" href="../patch.ico">
     </head>
     <body>
@@ -38,7 +39,6 @@
         $member=$_SESSION["member"];
         $member->promotionReport($ident,true);
         ?>
-        <a href="../index.php">Go Home</a> <br/>
         <a href="edit.php">Edit Your Personal, and Emergency Contact Information</a> <br/>
         <a href="logout.php">Logout</a>
         <?php include("footer.php");?>
