@@ -157,7 +157,6 @@ $ident= connect('login');
                    echo "<meta http-equiv=\"REFRESH\" content=\"5;url=/login/attendance/add.php?eCode=$event_Code\">";
                    echo "You will be redirected in 5 seconds to enter attendence for this event.";
                }
-               //TODO show success screen, and redirect
            }
         } else {                                                     //process other fields
             $locatSpec=false;

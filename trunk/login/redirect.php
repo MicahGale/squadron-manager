@@ -23,7 +23,6 @@
         <title>redirect for Sign-in</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <?php
-        //TODO include error handling
         include('projectFunctions.php');
         $capid=  cleanInputInt($_POST['user'],6,"CAPID",$_SERVER['SCRIPT_NAME']);
         $password = cleanInputString($_POST['password'],256,password,$_SERVER['SCRIPT_NAME'],false);
@@ -45,7 +44,7 @@
                 $_SESSION['count']++;
                 $continue = true;
             } else {                          //kill the session if too many attempts
-                header("refresh:0;url=/");             //TODO log killing sessions
+                header("refresh:0;url=/");             
                 $time= auditLog($_SERVER['REMOTE_ADDR'],'KS');
                 auditDump($time,"user",$_SESSION['member']->getcapid());
                 session_destroy();

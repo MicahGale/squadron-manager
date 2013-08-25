@@ -57,6 +57,7 @@ if(!$_SESSION['authenticated']) {                 //if not authenticated leave i
             $success=false;
         close_stmt($stmt);
     } else  {  //if not first then actually clear the log
+        $requester=$result[0]['REQUESTER'];
         if($_SESSION['audit']) {
             $query1="DELETE FROM AUDIT_DUMP"; //delete the audit dump
             $query2="DELETE FROM AUDIT_LOG";  //clear the log
@@ -85,6 +86,7 @@ if(!$_SESSION['authenticated']) {                 //if not authenticated leave i
         if($_SESSION['login_clear'])
             $deleted.="Login log";
         auditDump($time, "deleted",$deleted);
+        auditDump($time,'requester',$requester);
     }
 }
 ?>

@@ -28,7 +28,7 @@
         <?php
         include("header.php");
         include("projectFunctions.php");
-        session_start();              //TODO finish new member sign-in
+        session_start();             
         $_SESSION["visitor"]=new visitor($_POST["Fname"],$_POST["Lname"]);
         $_SESSION["visitor"]->getRestofFields("finishVisit.php");
         ?>

@@ -22,6 +22,7 @@
     <head>
         <title>Complete Sign-in</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="/main.css">
          <link rel="shortcut icon" href="../patch.ico">
     </head>
     <body>
@@ -47,7 +48,6 @@
         ?>
         <br><a href="promotionReport.php">View Your Promotion Track Progress</a><br>
         <a href="edit.php">Edit Your Personal, and Contact Information</a><br>
-        <a href="../index.php">Go to Squadron Home Page</a> <br/>
         <a href="logout.php">Logout</a>
         <?php include("footer.php");?>
     </body>

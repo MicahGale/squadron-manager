@@ -286,10 +286,11 @@ if(!isset($_GET['time'])) {
             $query="SELECT FIELD_NAME, FIELD_VALUE FROM AUDIT_DUMP
                 WHERE TIME_OF_INTRUSION='$timeStamp' and MICROSECONDS='$time'";
             $result=  allResults(Query($query, $ident));
+            $capids=array("CAPID","user CAPID",'Deleted Member','Requester');  //all the names for capid fields
             for($i=0;$i<count($result);$i++) {
                 echo '<tr class="table">';
                 echo '<td class="table">'.$result[$i]['FIELD_NAME']."</td>";
-                if($result[$i]['FIELD_NAME']=="user CAPID") {
+                if(in_array($result[$i]['FIELD_NAME'],$capids)) {
                     $capid=$result[$i]['FIELD_VALUE'];
                     $member=new member($capid,1,$ident);
                     echo '<td class="table">'.$member->link_report(true).'</td>';

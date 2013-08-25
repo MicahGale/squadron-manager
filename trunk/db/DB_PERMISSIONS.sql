@@ -5,7 +5,6 @@ GRANT INSERT ON TABLE AUDIT_DUMP TO 'Logger'@'localhost';
 GRANT INSERT,UPDATE,Select ON TABLE LOGIN_LOG TO 'Logger'@'localhost';
 GRANT INSERT, delete, select ON TABLE ACCOUNT_LOCKS TO 'Logger'@'localhost';
 ##############################GRANT PERMISSIONS TO VIEWER TO GET CURRENT EVENT INFO##########
-GRANT SELECT ON TABLE CURRENT_EVENT TO 'Viewer'@'localhost';
 GRANT SELECT ON TABLE EVENT TO 'Viewer'@'localhost';
 GRANT SELECT ON TABLE SUBEVENT TO 'Viewer'@'localhost';
 GRANT SELECT ON TABLE SUBEVENT_TYPE TO 'Viewer'@'localhost';
@@ -25,11 +24,17 @@ GRANT SELECT ON TABLE CONTACT_RELATIONS TO 'Sign-in'@'localhost';
 GRANT SELECT ON TABLE REGION TO 'Sign-in'@'localhost';
 GRANT SELECT ON TABLE WING TO 'Sign-in'@'localhost';
 GRANT SELECT ON TABLE CURRENT_EVENT TO 'Sign-in'@'localhost';
-GRANT SELECT (CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, PASSED_DATE) ON TABLE REQUIREMENTS_PASSED TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE EVENT TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE PROMOTION_SIGN_UP TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE REQUIREMENTS_PASSED TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE PROMOTION_RECORD TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE ATTENDANCE TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE SUBEVENT TO 'Sign-in'@'localhost';
 GRANT INSERT ON TABLE PROMOTION_SIGN_UP TO 'Sign-in'@'localhost';
 GRANT INSERT ON TABLE TESTING_SIGN_UP TO 'Sign-in'@'localhost';
 GRANT INSERT, SELECT, UPDATE ON TABLE EMERGENCY_CONTACT TO 'Sign-in'@'localhost';
 GRANT INSERT ON TABLE NEW_MEMBER TO 'Sign-in'@'localhost';
+GRANT SELECT ON TABLE PROMOTION_BOARD TO 'Sign-in'@'localhost';
 ###########################grant prediction privileges#####################
 GRANT SELECT ON TABLE NEXT_VISIT TO 'ViewNext'@'localhost';
 GRANT SELECT ON TABLE TASK_TYPE TO 'ViewNext'@'localhost';

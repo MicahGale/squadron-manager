@@ -44,7 +44,6 @@
  * You should have received the GNU General Public License version 3 with this in GPL.txt
  * if not it is available at <http://www.gnu.org/licenses/gpl.txt>.
  */
-//TODO handle units and stuff
 require("projectFunctions.php");
 $ident = connect('login');
 session_secure_start();

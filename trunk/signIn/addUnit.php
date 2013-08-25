@@ -22,6 +22,7 @@
     <head>
         <title>Add A CAP Unit</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="/main.css">
         <link rel="shortcut icon" href="../patch.icon">
     </head>
     <body>

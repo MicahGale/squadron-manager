@@ -73,6 +73,7 @@ if(!isset($_SESSION['microscope'])) {                      //if not saved yet ma
     </head>
     <body>
         <?php
+        $hide=true;
         require("squadManHeader.php");
         ?>
         <form method="post">

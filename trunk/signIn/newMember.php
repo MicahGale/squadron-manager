@@ -22,13 +22,14 @@
     <head>
         <title>add a new member</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="/main.css">
         <link rel="shortcut icon" href="../patch.ico">
     </head>
     <body>
         <?php include("header.php"); 
         include("projectFunctions.php");
         $ident=Connect('Sign-in');
-        $otherUnit=false;        //TODO figure out persistance
+        $otherUnit=false;       
         $otherContact = false;
         if($_POST["unit"]=="other") {   //if other unit set null to prevent construct errors
             $otherUnit = true;
@@ -52,7 +53,7 @@
             } if($otherContact) {
                  echo "<form action=\"newContact.php\" method=\"post\"><table border=\"1\" cellspacing=\"1\"><tr>
                     <th>Contact Name</th><th>Contact's Relation</th><th>Contact's Phone Number</th></tr>\n";
-                 $row=0;//TODO finish table
+                 $row=0;
                  while($row<5) {                       //searchs for those that had other listed
                      if(($temp=$newMember->emergency_get($row)->getRelation())!=null) {
                          if($temp=="other") {
@@ -64,7 +65,7 @@
                  echo "</table><input type=\"submit\" value=\"Add Relation\"/></form></body></form>";
             }
             exit;
-        }                   //insert new member in.   //TODO replace with method call
+        }                   //insert new member in.   
         $complete=$newMember->insertMember($ident);
          if($complete) {         //else continue to insert data
             echo"<strong>You have successfully been added.</strong><br>";
