@@ -27,13 +27,7 @@
 /*
  * **********************FOR v. 0.10*****************************
  * TODO finish populating db
- * TODO hide dorment code and pages
  * TODO create installer
- * TODO handle other fields on adminis/newMember.php
- * TODO handle unit defaults
- * ***************************Debug/fix*******************************************
- * anti-test banking measures
- * TODO debug session hijacking resign-in keep post input (/adminis/clearLog.php) and all system_events  
  */
 /*Unix specific functions
  * cleanUploadFile-path delimeter /
@@ -362,6 +356,7 @@ function reportDbError($errorno,$error) {
     auditDump($time, 'Error Message', mysql_real_escape_string($error));  //escape the ''
     echo"<br><strong>there was an error with processing the request</strong><br>
         Please give the following information to you Squadron's IT Officer(s)<br>\n";
+//    echo $errorno . " " .$error;
     echo "<br><strong>Time:</strong>".$date->format(PHP_TIMESTAMP_FORMAT)."\n";
     echo"<br><strong>Page:</strong>".$_SERVER['SCRIPT_NAME']."<br>\n";
     echo"<strong>IP:</strong>" . $_SERVER['REMOTE_ADDR'] . "<br>";
@@ -699,67 +694,98 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
  * the user is allowed to view this page using a list from session_predict_path.
  * If there is a threat it will force the user to resign in.
  * 
+ * Uses the following Session variables 
+ * ip_addr= the ip_address to be used
+ * predicted- the pages the user can see
+ * last- the last visited page
+ * -request - an array of the last used request header
+ *       -agent- the user agent
+ *       -accept- the accept header
+ *       -lang_char- the accepted language and charset
+ *       -encoding- the accepted encoding
+ * - resignin- force user to resign in 0 - must resignin 1- another request
+ * 
  * @param Int $capid the capid of the user for creating the session should be used only
  * by /login/index.php
  */
 function session_secure_start($capid=null) {
     session_start();                     //starts the session
-    if (!isset($_SESSION['ip_addr'])) {       //if starting the session
-        if ($_SERVER['SCRIPT_NAME'] == '/login/index.php') {        //if at the login page
-            $_SESSION['ip_addr'] = $_SERVER['REMOTE_ADDR'];    //store the ip address to prevent hijacking from other "ips"
-            $_SESSION['last_page'] = $_SERVER['SCRIPT_NAME'];  //store what the current page is
-            $_SESSION['predicted'] = array();
-            $_SESSION['resignin'] = true;                             //assume good no need to kill session
-            $_SESSION['intruded']=false;
-            $ident =connect('ViewNext');
-            if($capid==null) {
-                    session_predict_path($ident);
-            } else {
-                session_predict_path($ident,$capid);
-            }
-            close($ident);
-        } else {                             //force redirect to login page if not at index
-            header("refresh:0;url=/login");       //force the user to redirect out 
-            exit;                                                              //ends current script
+    if(isset($_SESSION['resignin'])) {
+        if($_SESSION['resignin']<1) {
+            $_SESSION['resignin']++;
+            session_resign_in (true);
+        } else {
+            $time=  auditLog($_SERVER['REMOTE_ADDR'], 'KS');
+            auditDump($time, "User Agent",$_SERVER['HTTP_USER_AGENT']);
+            auditDump($time,"Language and Charset", $_SERVER['HTTP_ACCEPT_LANGUAGE']." ".$_SERVER['HTTP_ACCEPT_CHARSET']);
+            session_resign_in(false); //kill the session
         }
-    } else {                 //if session is already started check for malicious intent
-        $hijacked = false;
-        if (($_SESSION['ip_addr'] == $_SERVER['REMOTE_ADDR'])) { //checks if from the correct ip and not spoofing the http refere
-            if (!in_array($_SERVER['SCRIPT_NAME'], $_SESSION['predicted'])) {  //if not where it was supposed to go
-                $hijacked = true;
+    }
+    if(!isset($_SESSION['ip_addr'])) {  //checks if it's a new session
+        $ident=  connect('Logger');   //check if there are any standing log-ins
+        $query="SELECT TIME_LOGIN FROM LOGIN_LOG 
+            WHERE LOG_OFF IS NULL 
+                AND SUCEEDED=TRUE
+                AND IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
+        $results=  Query($query, $ident);
+        close($ident);
+        if(numRows($results)>0&&!isset($capid)) {  //if outstanding sessions, let it expire
+            session_resign_in(false);
+        } else  {   //else assume new and set it-up
+            if(!empty($_SERVER['HTTPS'])) { //make sure the connection is secure
+                $referrers= array('https://'.$_SERVER['SERVER_NAME'].'/login/index.php','https://'.$_SERVER['SERVER_NAME'].'/login/','https://'.$_SERVER['SERVER_NAME'].'/index.php','https://'.$_SERVER['SERVER_NAME'].'/');
+                if($_SERVER['SCRIPT_NAME']=='/login/index.php'&&in_array($_SERVER['HTTP_REFERER'],$referrers)) { //ensures that the start is through proper channels
+                    $_SESSION['ip_addr']=$_SERVER['REMOTE_ADDR'];  //store the ip addr
+                    $ident=connect('ViewNext');
+                    session_predict_path($ident,$capid);   //predict the path that users will use
+                    close($ident);
+                    $_SESSION['last']='https://'.$_SERVER['SERVER_NAME'].'/login/index.php';
+                    $_SESSION['request']['agent']=$_SERVER['HTTP_USER_AGENT'];
+                    $_SESSION['request']['accept']=$_SERVER['HTTP_ACCEPT']; 
+                    $_SESSION['request']['lang_char']=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
+                    $_SESSION['request']['encoding']=$_SERVER['HTTP_ACCEPT_ENCODING'];
+                } else {  //else force to the login
+                     header("refresh:0;url=/login/");
+                    auditLog($_SERVER['REMOTE_ADDR'],'DC');
+                    log_off();
+                    exit;
+                }
+            } else {  //send to https
+                header("refresh:0;url=https://".$_SERVER['SERVER_NAME']."/login/");
+                log_off();
+                exit;
             }
-        } else {                        // if not the right ip is hijacked
-            $hijacked = true;
         }
-        if (!$_SESSION['resignin']) {   //if didn't resign in then kill the session 
-            $time = auditLog( $_SERVER['REMOTE_ADDR'], 'KS');
-            auditDump($time, "user", $_SESSION['member']->getcapid());
-            session_destroy();
-            header("refresh:0;url=/");       //destroy the session and then redirect
+    } else { //if not a new session then start testing the info for accuracy.
+        $error_total=0; //counts minor errors that independently dictacte a hijacking
+        if(empty($_SERVER['HTTPS'])||$_SERVER['HTTPS']=='off') {  //if not https send them bac
+            header("refresh:0;url=https://".$_SERVER['SERVER_NAME']."/login/");
+            log_off();
             exit;
         }
-        if ($hijacked) {                     //redirect to reprompt for user info
-            $_SESSION['resign'] = false;     //says needs to resignin if they don't will kill it next time
-            $_SESSION['intruded'] = true;        //says someone has intruded so all need to be reverified
-            unset($_SESSION['password']);  //clear password so can't connect to database at all until reverified
-            $time = auditLog( $_SERVER['REMOTE_ADDR'], 'SH');  //log it
-            if(!isset($_SESSION['member']))
-                auditDump ($time, "USER",$capid);
-            session_resign_in(false);            //makes resign in
-        } else {              //if no foul play set up info for next request
-             header("refresh: 1790;url=/login/logout.php");     //auto logout after 29 minutes 50s
-            $_SESSION['last_page'] = $_SERVER['SCRIPT_NAME'];       //allocate last page
-            $ident = connect( 'ViewNext');
-            if($capid!=null) {
-                session_predict_path($ident,$capid);
-            }else {
-                session_predict_path($ident);
+        if(isset($_SERVER['HTTP_REFERE'])&&$_SERVER['HTTP_REFERER']!=$_SESSION['last'])
+            $error_total+=0.5;  //if not the right referrer 
+        if(isset($_SERVER['HTTP_ACCEPT'])&&$_SERVER['HTTP_ACCEPT']!=$_SESSION['request']['accept'])
+            $error_total+=0.5;    //if not the same content accepted
+        if($_SERVER['HTTP_ACCEPT_ENCODING']!=$_SESSION['request']['encoding'])
+            $error_total+=0.5;
+        if($error_total >=1||$_SESSION['ip_addr']!=$_SERVER['REMOTE_ADDR']||!in_array($_SERVER['SCRIPT_NAME'],$_SESSION['predicted'])||
+            $_SESSION['request']['agent']!=$_SERVER['HTTP_USER_AGENT']||
+            $_SESSION['request']['lang_char']!=$_SERVER['HTTP_ACCEPT_LANGUAGE']) { //if it's the right ip continue
+            If(!isset($_SESSION['resign'])||$_SESSION['resign']==0) {  //if the session needs to be verified by 
+                $time= auditLog($_SERVER['REMOTE_ADDR'],'SH');
+                auditDump($time, "User Agent",$_SERVER['HTTP_USER_AGENT']);
+                auditDump($time, "Language", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                $_SESSION['resignin']=0;
+                session_resign_in(true);
             }
+        } else  { //if clean get ready for the next Request
+            $_SESSION['last']="https://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'];
+            $ident=Connect('ViewNext');
+            session_predict_path($ident);
             close($ident);
-            session_regenerate_id();                                //if all good regenerate id lengthen session
-            if ($_SESSION['intruded']) {                       //if someone has tried to intrude make resign in
-                session_resign_in(true);               //has them resign in and keep the post stuff
-            }
+            session_regenerate_id();
+            header("refresh:1800; url=/login/logout.php");
         }
     }
 }
@@ -773,7 +799,6 @@ function session_secure_start($capid=null) {
  * @param type $ident The databse connection of user ViewNext
  * @param type $capid The user we're looking at only for establishing sessions
  * @param type $page The page to create the list for if not the current page
- * @return array the pages allowed to be seen.
  */
 function session_predict_path($ident,$capid=null,$page=null) {     //creates an array of pages that the user may visit next    
     $results=array();
@@ -831,16 +856,45 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
 /**
  * Forces a user to resign in if there is a threat against their session.
  * 
- * @param boolean $keepPost true to keep all the post inputs, false otherwise
+ * @param boolean allowSignIn false won't resign in just show dead session true allows to resign in
  */
-function session_resign_in($keepPost=false) {                        //requires person to resign in
-    if ($keepPost) {                 //if want to keep post store post info to session 
-        $_SESSION['GET'] = $_GET;
-        $_SESSION['POST'] = $_POST;
+function session_resign_in($allowSignIn=true) {                        //requires person to resign in
+    if($allowSignIn) { //if allowed to 
+        header("refresh:0;url=/login/reSignIn.php");  //go to resignin
+        exit;
+    } else  {
+        header('refresh:0;url=/login/endSession.php'); //display death of session
+        log_off();
+        exit;
     }
-    $_SESSION['redirect'] = $_SERVER['SCRIPT_NAME'];
-//    header("refresh:0;url=/login/reSignIn.php"); //redirect to resign in and exit
-//    exit;
+}
+/**
+ * Destroys the user session. And logs the log off.
+ */
+function log_off() {
+      $ident=  connect('Logger');
+    if(isset($_SESSION['log_time'])) {
+        $capid=$_SESSION['member']->getCapid();
+        $time = date(SQL_INSERT_DATE_TIME);
+        $log_in_time=date(SQL_INSERT_DATE_TIME,$_SESSION['log_time']);
+        $query="UPDATE LOGIN_LOG SET LOG_OFF='$time'
+            WHERE TIME_LOGIN='$log_in_time'
+            AND CAPID='$capid'
+            AND IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
+        Query($query, $ident);
+        
+    } else {
+        $query="SELECT MAX(TIME_LOGIN)AS MAX FROM LOGIN_LOG
+            WHERE LOG_OFF IS NULL AND 
+            IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
+        $time=  Result(Query($query, $ident),0, 'MAX');
+        $query="UPDATE LOGIN_LOG SET LOG_OFF=CURRENT_TIMESTAMP()
+            WHERE TIME_LOGIN='$time' AND IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
+        Query($query, $ident);        
+    }
+    close($ident);
+    session_destroy();
+    setcookie(session_name(),"0",0,"/");   //deletes the cookie
 }
 /**
  * Creates a input for entering a date
@@ -2875,7 +2929,7 @@ class searched_member {
         return $this->member->getName_first()." ".$this->member->getName_Last();
     }
 }
-class chain_of_command {
+/* class chain_of_command {
     private $commanders= array(array());   //the commanders in 2d array 1st is level, then contents
    function  __construct($ident,$capid=null) {
        if($capid!=null) {                     //if for specific person
@@ -3068,5 +3122,5 @@ class commander {
      $this->member = null;
      unset($this->member);
  }
-}
+}*/
 ?>

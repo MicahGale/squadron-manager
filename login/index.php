@@ -32,8 +32,8 @@ if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
             $member=new member($capid, 1, $ident);
             //if the right password and the member isn't terminated
             if($member->check_password($ident, $password, $salt)&&!$member->check_terminated($ident)) {  //checks the password
-                logLogin($capid,true);
                 session_secure_start($capid);       //starts session
+                logLogin($capid,true);
                 $_SESSION["member"]= new member($capid,2,$ident);
                 $_SESSION['log_time']=time();  //keep track of the start of the login
                 if($_SESSION['member']->check_pass_life($ident)!==true) {  //if the password is still valid

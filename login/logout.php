@@ -20,22 +20,13 @@
  * 
  */
  require('projectFunctions.php');
-session_start();
-$ident=  connect("Logger");  //connect
-$time = date(SQL_INSERT_DATE_TIME);
-$log_in_time=date(SQL_INSERT_DATE_TIME,$_SESSION['log_time']);
-$query="UPDATE LOGIN_LOG SET LOG_OFF='$time'
-        WHERE TIME_LOGIN='$log_in_time'
-        AND CAPID='".$_SESSION['member']->getCapid()."'
-        AND IP_ADDRESS='".$_SERVER['REMOTE_ADDR']."'";
-Query($query, $ident);
-close($ident);
-session_destroy();
-    ?>
+ session_start();
+ log_off();
+?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta http-equiv="REFRESH" content="0; url=/">
+        <meta http-equiv="REFRESH" content="0; url=/index.php">
     </head>
 </html>
