@@ -1,14 +1,19 @@
+#labels Phase-Support
 #Procedures for Beta testing
 
 = IP Address: [http://174.27.28.244  174.27.28.244] =
 
 =Beta Testing=
-Squadron-Manager 0.10 beta is here, and ready to be beta tested. To help with the testing go to the ip-address above.
+Squadron-Manager 0.10 beta is here, and ready to be beta tested. To help with the testing go to the IP-address above. The address may change from time to time, if the link is broken check back in a few hours, or e-mail me at [mailto:micah.gale@gmail.com micah.gale@gmail.com]. Please note that I am using a self-signed certificate so your browser will give you an error, just ignore it, and please do not enter personal information.
 
+==Reporting Errors==
+If you find any errors, or security problems please report it in the issues section, or just e-mail me at [mailto:micah.gale@gmail.com micah.gale@gmail.com].
 
-= Details =
+==Guidelines==
+  * Do not enter personal information, just use generic information.
+  * Test anything and everything for functionality and security
+  * Do penetration tests, only of the website not the server, the idea is to test the website, not how well I configured the server.
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+==User Logins==
+|| *Capid* || *Password* || *Staff Permissions* ||
+||111111||Password!||Commander||
