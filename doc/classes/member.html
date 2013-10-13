@@ -33,11 +33,9 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">200</span></a></li>
+                <span class="label label-info">178</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
-                <ul><li>todo 
-                <span class="label label-info">12</span>
-</li></ul></a></li>
+                <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
 </ul>
@@ -60,8 +58,7 @@
 <li class="nav-header">
 <i class="icon-custom icon-method"></i> Methods
                     <ul>
-<li class="method public "><a href="#method___construct" title="__construct :: "><span class="description">__construct()
-        </span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method___construct" title="__construct :: Creaes the member object"><span class="description">Creaes the member object</span><pre>__construct()</pre></a></li>
 <li class="method public "><a href="#method_addEmeregencyContactArray" title="addEmeregencyContactArray :: "><span class="description">addEmeregencyContactArray()
         </span><pre>addEmeregencyContactArray()</pre></a></li>
 <li class="method public "><a href="#method_addEmergencyContact" title="addEmergencyContact :: "><span class="description">addEmergencyContact()
@@ -71,10 +68,13 @@
 <li class="method public "><a href="#method_attendance_report" title="attendance_report :: "><span class="description">attendance_report()
         </span><pre>attendance_report()</pre></a></li>
 <li class="method public "><a href="#method_checkPassing" title="checkPassing :: Checks if all requirements for promotion are passed"><span class="description">Checks if all requirements for promotion are passed</span><pre>checkPassing()</pre></a></li>
-<li class="method public "><a href="#method_cleanFields" title="cleanFields :: "><span class="description">cleanFields()
-        </span><pre>cleanFields()</pre></a></li>
-<li class="method public "><a href="#method_cleanFieldsComplete" title="cleanFieldsComplete :: "><span class="description">cleanFieldsComplete()
-        </span><pre>cleanFieldsComplete()</pre></a></li>
+<li class="method public "><a href="#method_check_pass_life" title="check_pass_life :: Checks if the member's password is expired"><span class="description">Checks if the member's password is expired</span><pre>check_pass_life()</pre></a></li>
+<li class="method public "><a href="#method_check_password" title="check_password :: Verifies the user provided the right password"><span class="description">Verifies the user provided the right password</span><pre>check_password()</pre></a></li>
+<li class="method public "><a href="#method_check_promo_halt" title="check_promo_halt :: Checks if there is a promotion halt due to a failed promotion board"><span class="description">Checks if there is a promotion halt due to a failed promotion board</span><pre>check_promo_halt()</pre></a></li>
+<li class="method public "><a href="#method_check_promotion_wait" title="check_promotion_wait :: Checks if there is the regulation required waiting period between a promtion
+and the one before it."><span class="description">Checks if there is the regulation required waiting period between a promtion
+and the one before it.</span><pre>check_promotion_wait()</pre></a></li>
+<li class="method public "><a href="#method_check_terminated" title="check_terminated :: Checks if a member's membership is terminated"><span class="description">Checks if a member's membership is terminated</span><pre>check_terminated()</pre></a></li>
 <li class="method public "><a href="#method_discipline_report" title="discipline_report :: "><span class="description">discipline_report()
         </span><pre>discipline_report()</pre></a></li>
 <li class="method public "><a href="#method_displayPromoRequest" title="displayPromoRequest :: "><span class="description">displayPromoRequest()
@@ -116,12 +116,14 @@
         </span><pre>get_gender()</pre></a></li>
 <li class="method public "><a href="#method_get_leader_text" title="get_leader_text :: "><span class="description">get_leader_text()
         </span><pre>get_leader_text()</pre></a></li>
+<li class="method public "><a href="#method_get_member_type" title="get_member_type :: Returns the member's membership type"><span class="description">Returns the member's membership type</span><pre>get_member_type()</pre></a></li>
 <li class="method public "><a href="#method_get_next_achiev" title="get_next_achiev :: "><span class="description">get_next_achiev()
         </span><pre>get_next_achiev()</pre></a></li>
 <li class="method public "><a href="#method_get_phase" title="get_phase :: "><span class="description">get_phase()
         </span><pre>get_phase()</pre></a></li>
 <li class="method public "><a href="#method_get_text" title="get_text :: "><span class="description">get_text()
         </span><pre>get_text()</pre></a></li>
+<li class="method public "><a href="#method_hash_password" title="hash_password :: Creates a password hash."><span class="description">Creates a password hash.</span><pre>hash_password()</pre></a></li>
 <li class="method public "><a href="#method_init" title="init :: "><span class="description">init()
         </span><pre>init()</pre></a></li>
 <li class="method public "><a href="#method_insertEmergency" title="insertEmergency :: "><span class="description">insertEmergency()
@@ -130,6 +132,7 @@
         </span><pre>insertMember()</pre></a></li>
 <li class="method public "><a href="#method_insertSingleContact" title="insertSingleContact :: "><span class="description">insertSingleContact()
         </span><pre>insertSingleContact()</pre></a></li>
+<li class="method public "><a href="#method_insert_staff_position" title="insert_staff_position :: Insert Staff Positions into the database"><span class="description">Insert Staff Positions into the database</span><pre>insert_staff_position()</pre></a></li>
 <li class="method public "><a href="#method_link_report" title="link_report :: "><span class="description">link_report()
         </span><pre>link_report()</pre></a></li>
 <li class="method public "><a href="#method_massUpdateFields" title="massUpdateFields :: "><span class="description">massUpdateFields()
@@ -149,6 +152,7 @@
         </span><pre>retrieveCPFTrequire()</pre></a></li>
 <li class="method public "><a href="#method_saveUpdates" title="saveUpdates :: "><span class="description">saveUpdates()
         </span><pre>saveUpdates()</pre></a></li>
+<li class="method public "><a href="#method_set_password" title="set_password :: Changes the password in the database."><span class="description">Changes the password in the database.</span><pre>set_password()</pre></a></li>
 <li class="method public "><a href="#method_signUp" title="signUp :: "><span class="description">signUp()
         </span><pre>signUp()</pre></a></li>
 <li class="method public "><a href="#method_sign_in" title="sign_in :: "><span class="description">sign_in()
@@ -185,7 +189,6 @@
 <li class="property private "><a href="#property_memberType" title="$memberType :: "><span class="description"></span><pre>$memberType</pre></a></li>
 <li class="property private "><a href="#property_name_first" title="$name_first :: "><span class="description"></span><pre>$name_first</pre></a></li>
 <li class="property private "><a href="#property_name_last" title="$name_last :: "><span class="description"></span><pre>$name_last</pre></a></li>
-<li class="property private "><a href="#property_picture_link" title="$picture_link :: "><span class="description"></span><pre>$picture_link</pre></a></li>
 <li class="property private "><a href="#property_promoRecord" title="$promoRecord :: "><span class="description"></span><pre>$promoRecord</pre></a></li>
 <li class="property private "><a href="#property_text_set" title="$text_set :: "><span class="description"></span><pre>$text_set</pre></a></li>
 <li class="property private "><a href="#property_unit" title="$unit :: "><span class="description"></span><pre>$unit</pre></a></li>
@@ -203,42 +206,81 @@
 <span class="divider">\</span><a href="../classes/member.html">member</a>
 </li>
 </ul>
-<div class="element class"><div class="details">
+<div class="element class">
+<p class="short_description">A class for CAP members</p>
+<div class="details">
+<div class="long_description"><p>It holds all the functions, and data for members. The amount of Data held is based on the init levels</p>
+
+<p>init levels :
+-1= all from input
+0=capid
+1=capid+name+gender+achievement
+2=1+text+member_type+picture
+3=2+dates
+4=3+emergency+unit</p></div>
 <h3>
 <i class="icon-custom icon-method"></i> Methods</h3>
 <a id="method___construct"></a><div class="element clickable method public method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
-<h2>__construct()
-        </h2>
-<pre>__construct($capid, $level, $ident, $name_last, $name_first, $gender, \dateTime $DoB, $memberType, $achievement, $text_set, $unit, \DateTime $Date_of_Join) </pre>
+<h2>Creaes the member object</h2>
+<pre>__construct(Integer | \numeric $capid, Integer $level, <a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident, String $name_last, String $name_first, string $gender, \dateTime $DoB, String $memberType, String $achievement, String $text_set, String $unit, \DateTime $Date_of_Join) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$capid</h4></div>
-<div class="subelement argument"><h4>$level</h4></div>
-<div class="subelement argument"><h4>$ident</h4></div>
-<div class="subelement argument"><h4>$name_last</h4></div>
-<div class="subelement argument"><h4>$name_first</h4></div>
-<div class="subelement argument"><h4>$gender</h4></div>
-<div class="subelement argument"><h4>$DoB</h4></div>
-<div class="subelement argument"><h4>$memberType</h4></div>
-<div class="subelement argument"><h4>$achievement</h4></div>
-<div class="subelement argument"><h4>$text_set</h4></div>
-<div class="subelement argument"><h4>$unit</h4></div>
-<div class="subelement argument"><h4>$Date_of_Join</h4></div>
+<div class="subelement argument">
+<h4>$capid</h4>
+<code>Integer</code><code>\numeric</code><p>string $capid the capid of the member</p>
+</div>
+<div class="subelement argument">
+<h4>$level</h4>
+<code>Integer</code><p>the init level to start at, -1 if you want to enter the data and not get it from the database</p>
+</div>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<div class="subelement argument">
+<h4>$name_last</h4>
+<code>String</code><p>the Last name</p></div>
+<div class="subelement argument">
+<h4>$name_first</h4>
+<code>String</code><p>The first name</p></div>
+<div class="subelement argument">
+<h4>$gender</h4>
+<code>string</code><p>the gender of the member</p></div>
+<div class="subelement argument">
+<h4>$DoB</h4>
+<code>\dateTime</code><p>the member's date of birth</p>
+</div>
+<div class="subelement argument">
+<h4>$memberType</h4>
+<code>String</code><p>the member's member type</p>
+</div>
+<div class="subelement argument">
+<h4>$achievement</h4>
+<code>String</code><p>the member's current achievement</p>
+</div>
+<div class="subelement argument">
+<h4>$text_set</h4>
+<code>String</code><p>the member's textbook set</p>
+</div>
+<div class="subelement argument">
+<h4>$unit</h4>
+<code>String</code><p>the member's home unit</p>
+</div>
+<div class="subelement argument">
+<h4>$Date_of_Join</h4>
+<code><a href="http://php.net/manual/en/class.datetime.php">\DateTime</a></code><p>the date the member joined</p></div>
 </div></div>
 </div>
 <a id="method_addEmeregencyContactArray"></a><div class="element clickable method public method_addEmeregencyContactArray" data-toggle="collapse" data-target=".method_addEmeregencyContactArray .collapse">
 <h2>addEmeregencyContactArray()
         </h2>
-<pre>addEmeregencyContactArray(array $Name, array $Relation, array $phone) </pre>
+<pre>addEmeregencyContactArray(array $input) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$Name</h4></div>
-<div class="subelement argument"><h4>$Relation</h4></div>
-<div class="subelement argument"><h4>$phone</h4></div>
+<div class="subelement argument"><h4>$input</h4></div>
 </div></div>
 </div>
 <a id="method_addEmergencyContact"></a><div class="element clickable method public method_addEmergencyContact" data-toggle="collapse" data-target=".method_addEmergencyContact .collapse">
@@ -280,28 +322,111 @@
 </div>
 <a id="method_checkPassing"></a><div class="element clickable method public method_checkPassing" data-toggle="collapse" data-target=".method_checkPassing .collapse">
 <h2>Checks if all requirements for promotion are passed</h2>
-<pre>checkPassing() : boolean</pre>
+<pre>checkPassing(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident, \DateTime $date) : boolean</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<div class="subelement argument">
+<h4>$date</h4>
+<code>\dateTime</code><p>the date for the promotion</p></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>boolean</code>true if and only if all requirements are passed false otherwise</div>
 </div></div>
 </div>
-<a id="method_cleanFields"></a><div class="element clickable method public method_cleanFields" data-toggle="collapse" data-target=".method_cleanFields .collapse">
-<h2>cleanFields()
-        </h2>
-<pre>cleanFields() </pre>
+<a id="method_check_pass_life"></a><div class="element clickable method public method_check_pass_life" data-toggle="collapse" data-target=".method_check_pass_life .collapse">
+<h2>Checks if the member's password is expired</h2>
+<pre>check_pass_life(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident) : mixed</pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>mixed</code>true if the password is expired, otherwise the number of days to the expiration</div>
+</div></div>
 </div>
-<a id="method_cleanFieldsComplete"></a><div class="element clickable method public method_cleanFieldsComplete" data-toggle="collapse" data-target=".method_cleanFieldsComplete .collapse">
-<h2>cleanFieldsComplete()
-        </h2>
-<pre>cleanFieldsComplete() </pre>
+<a id="method_check_password"></a><div class="element clickable method public method_check_password" data-toggle="collapse" data-target=".method_check_password .collapse">
+<h2>Verifies the user provided the right password</h2>
+<pre>check_password(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident, String $pass, String $salt) : boolean</pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>Uses member::has_password() to create a password hash, and compares it to
+the hash in the member table</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<div class="subelement argument">
+<h4>$pass</h4>
+<code>String</code><p>the password to check</p></div>
+<div class="subelement argument">
+<h4>$salt</h4>
+<code>String</code><p>the system salt</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>true if it matches false otherwise</div>
+</div></div>
+</div>
+<a id="method_check_promo_halt"></a><div class="element clickable method public method_check_promo_halt" data-toggle="collapse" data-target=".method_check_promo_halt .collapse">
+<h2>Checks if there is a promotion halt due to a failed promotion board</h2>
+<pre>check_promo_halt(\type $ident) : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code>\type</code><p>the database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>true if the promotions are halted, false if otherwise</div>
+</div></div>
+</div>
+<a id="method_check_promotion_wait"></a><div class="element clickable method public method_check_promotion_wait" data-toggle="collapse" data-target=".method_check_promotion_wait .collapse">
+<h2>Checks if there is the regulation required waiting period between a promtion
+and the one before it.</h2>
+<pre>check_promotion_wait(\type $ident, \type $achiev, \DateTime $date) : \booleann | \dateTime</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code>\type</code><p>the databse connection</p></div>
+<div class="subelement argument">
+<h4>$achiev</h4>
+<code>\type</code><p>the achievement your checking for</p></div>
+<div class="subelement argument">
+<h4>$date</h4>
+<code>\dateTime</code><p>the date to check for this</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>\booleann</code><code>\dateTime</code>returns true if enough time has passed, otherwise returns a dateTime of when it will
+be enough time</div>
+</div></div>
+</div>
+<a id="method_check_terminated"></a><div class="element clickable method public method_check_terminated" data-toggle="collapse" data-target=".method_check_terminated .collapse">
+<h2>Checks if a member's membership is terminated</h2>
+<pre>check_terminated(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident) : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>true if the member is terminated false if not</div>
+</div></div>
 </div>
 <a id="method_discipline_report"></a><div class="element clickable method public method_discipline_report" data-toggle="collapse" data-target=".method_discipline_report .collapse">
 <h2>discipline_report()
@@ -356,9 +481,13 @@
 </div>
 <a id="method_display_Emergency"></a><div class="element clickable method public method_display_Emergency" data-toggle="collapse" data-target=".method_display_Emergency .collapse">
 <h2>displays the emergency contact information in tabular form the emergency contact report</h2>
-<pre>display_Emergency() </pre>
+<pre>display_Emergency($ident) </pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$ident</h4></div>
+</div></div>
 </div>
 <a id="method_editContact"></a><div class="element clickable method public method_editContact" data-toggle="collapse" data-target=".method_editContact .collapse">
 <h2>editContact()
@@ -527,6 +656,17 @@
 <div class="subelement argument"><h4>$ident</h4></div>
 </div></div>
 </div>
+<a id="method_get_member_type"></a><div class="element clickable method public method_get_member_type" data-toggle="collapse" data-target=".method_get_member_type .collapse">
+<h2>Returns the member's membership type</h2>
+<pre>get_member_type() : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>the member's membership type</div>
+</div></div>
+</div>
 <a id="method_get_next_achiev"></a><div class="element clickable method public method_get_next_achiev" data-toggle="collapse" data-target=".method_get_next_achiev .collapse">
 <h2>get_next_achiev()
         </h2>
@@ -560,6 +700,25 @@
 <pre>get_text() </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_hash_password"></a><div class="element clickable method public method_hash_password" data-toggle="collapse" data-target=".method_hash_password .collapse">
+<h2>Creates a password hash.</h2>
+<pre>hash_password(\type $pass, \type $salt) : String</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>Creates a SHA512 hash from the password, salted with the member's capid,
+and the passed salt.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$pass</h4>
+<code>\type</code><p>the password to create a hash from</p></div>
+<div class="subelement argument">
+<h4>$salt</h4>
+<code>\type</code><p>the salt to add to the password</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>String</code>128 digit hash</div>
+</div></div>
 </div>
 <a id="method_init"></a><div class="element clickable method public method_init" data-toggle="collapse" data-target=".method_init .collapse">
 <h2>init()
@@ -607,12 +766,34 @@
 <div class="subelement argument"><h4>$ident</h4></div>
 </div></div>
 </div>
+<a id="method_insert_staff_position"></a><div class="element clickable method public method_insert_staff_position" data-toggle="collapse" data-target=".method_insert_staff_position .collapse">
+<h2>Insert Staff Positions into the database</h2>
+<pre>insert_staff_position(array $input, \type $ident) : boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$input</h4>
+<code>array</code><p>the array of the checked boxes</p></div>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code>\type</code><p>the database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>true success false if fail!</div>
+</div></div>
+</div>
 <a id="method_link_report"></a><div class="element clickable method public method_link_report" data-toggle="collapse" data-target=".method_link_report .collapse">
 <h2>link_report()
         </h2>
-<pre>link_report() </pre>
+<pre>link_report($new_tab) </pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$new_tab</h4></div>
+</div></div>
 </div>
 <a id="method_massUpdateFields"></a><div class="element clickable method public method_massUpdateFields" data-toggle="collapse" data-target=".method_massUpdateFields .collapse">
 <h2>massUpdateFields()
@@ -628,7 +809,7 @@
 <a id="method_parsePromoEdit"></a><div class="element clickable method public method_parsePromoEdit" data-toggle="collapse" data-target=".method_parsePromoEdit .collapse">
 <h2>parsePromoEdit()
         </h2>
-<pre>parsePromoEdit(\mysqli_stmt $insert, \mysqli_stmt $update, \mysqli_stmt $delete, array $header, array $input, $achiev, $ident) </pre>
+<pre>parsePromoEdit(\mysqli_stmt $insert, \mysqli_stmt $update, \mysqli_stmt $delete, array $header, array $input, $achiev) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -639,7 +820,6 @@
 <div class="subelement argument"><h4>$header</h4></div>
 <div class="subelement argument"><h4>$input</h4></div>
 <div class="subelement argument"><h4>$achiev</h4></div>
-<div class="subelement argument"><h4>$ident</h4></div>
 </div></div>
 </div>
 <a id="method_parseWholeEdit"></a><div class="element clickable method public method_parseWholeEdit" data-toggle="collapse" data-target=".method_parseWholeEdit .collapse">
@@ -750,6 +930,25 @@
 <div class="long_description"></div>
 <h3>Parameters</h3>
 <div class="subelement argument"><h4>$ident</h4></div>
+</div></div>
+</div>
+<a id="method_set_password"></a><div class="element clickable method public method_set_password" data-toggle="collapse" data-target=".method_set_password .collapse">
+<h2>Changes the password in the database.</h2>
+<pre>set_password(<a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a> $ident, String $hash) : Boolean</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$ident</h4>
+<code><a href="http://php.net/manual/en/class.mysqli.php">\mysqli</a></code><p>the database connection</p></div>
+<div class="subelement argument">
+<h4>$hash</h4>
+<code>String</code><p>the hash of the password from hash_password()</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>Boolean</code>true on success.</div>
 </div></div>
 </div>
 <a id="method_signUp"></a><div class="element clickable method public method_signUp" data-toggle="collapse" data-target=".method_signUp .collapse">
@@ -924,12 +1123,6 @@
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_picture_link"> </a><div class="element clickable property private property_picture_link" data-toggle="collapse" data-target=".property_picture_link .collapse">
-<h2></h2>
-<pre>$picture_link </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="property_promoRecord"> </a><div class="element clickable property private property_promoRecord" data-toggle="collapse" data-target=".property_promoRecord .collapse">
 <h2></h2>
 <pre>$promoRecord </pre>
@@ -948,13 +1141,14 @@
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-</div></div>
+</div>
+</div>
 </div>
 </div>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-05-11T14:06:23-06:00.<br></footer></div>
+            generated on 2013-10-13T16:49:20-06:00.<br></footer></div>
 </div>
 </body>
 </html>
