@@ -42,7 +42,8 @@ if(isset($_GET['lock'])) {
         $_SESSION['memberType']=$buffer;
         $_SESSION['approve']=true;
     } else  {
-        $_SESSION['memberType']=  substr($buffer, 0,1);
+        if(substr($buffer,0,1)!="A")   //if not all then lock it
+            $_SESSION['memberType']=  substr($buffer, 0,1);
         $_SESSION['approve']=false;
     }
 } else {

@@ -53,7 +53,7 @@ if(!isset($_GET['phase'])||$_GET['phase']==1) {
     if(isset($_GET['capid'])) {             //if searched mmember
         $success=true;
         $capid=  cleanInputInt($_GET['capid'],6,'Capid');
-        $staffer=new member($capid,1,$ident);
+        $staffer=new member($capid,2,$ident);
         if(!$staffer->exists())
             $success=false;
     } else if(isset($_POST['CAPID'])){                   //else create a new member
@@ -185,7 +185,7 @@ if(isset($success)&&$success) {
                         <h2>Select Staff Positions</h2>
                         <table>
                         <?php
-                        $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' ORDER BY STAFF_NAME";
+                        $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' AND MEMBER_TYPE='".$_SESSION['staffer']->get_member_type()."' ORDER BY STAFF_NAME";
                         $results=allResults(Query($query, $ident));
                         echo "<tr>";
                         for($i=0;$i<count($results);$i++) {

@@ -28,6 +28,7 @@
  * **********************FOR v. 0.10*****************************
  * TODO finish populating db
  * TODO create installer
+ * TODO visitor page
  */
 /*Unix specific functions
  * cleanUploadFile-path delimeter /
@@ -127,7 +128,8 @@ function auditLog($ip, $type) {
     $timeStamp = date(SQL_INSERT_DATE_TIME);
     $time=  microtime(true);
     $time= $time-intval($time);
-    $ident= Connect('Logger');
+    $passes= parse_ini_file(PSSWD_INI);
+    $ident= mysqli_connect('localhost', 'Logger', $passes['Logger'],"SQUADRON_MANAGER");
     mysqli_query($ident,"INSERT INTO AUDIT_LOG(TIME_OF_INTRUSION, MICROSECONDS, INTRUSION_TYPE, PAGE,IP_ADDRESS)
         VALUES('$timeStamp','$time','$type','".$_SERVER['SCRIPT_NAME']."','$ip')");
     close($ident);
@@ -146,6 +148,8 @@ function auditLog($ip, $type) {
 function auditDump($time, $fieldName, $fieldValue) {
     $ident=connect('Logger');
     $timeStamp= date(SQL_INSERT_DATE_TIME);
+    $passes= parse_ini_file(PSSWD_INI);
+    $ident= mysqli_connect('localhost', 'Logger', $passes['Logger'],"SQUADRON_MANAGER");
     mysqli_query($ident,"INSERT INTO AUDIT_DUMP(TIME_OF_INTRUSION,MICROSECONDS, FIELD_NAME, FIELD_VALUE)
         VALUES('$timeStamp','$time','$fieldName','$fieldValue')");
     close($ident);
@@ -226,13 +230,13 @@ function newMember($identifier, $page,$capid=null) {                            
     <?php
     enterDate(true,'DoB');
     echo "<br>CAP Grade"; //SELECT A.ACHIEV_CODE, CONCAT(A.ACHIEV_CODE,'-',B.GRADE_NAME) FROM ACHIEVEMENT A JOIN SQAUDRON_INFO.GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY B.GRADE_NUM
-    dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "achiev", $identifier, false);
+    dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.MEMBER_TYPE, A.ACHIEV_NUM", "achiev", $identifier, false);
     echo "<br>Member Type";
     dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'", "member", $identifier, false);  //creates drop down menu for membership types
     echo "<br>Textbook Set";
-    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier, false,'L2L');  //creates drop down menu for text sets
+    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier, false,null,true);  //creates drop down menu for text sets
     echo "<br>Unit Charter Number:";
-    dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,'RMR-ID-073');  //creates drop down menu for text sets
+    dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,result(Query("SELECT CHARTER_NUM FROM CAP_UNIT WHERE DEFAULT_UNIT=TRUE", $identifier)),0,'CHARTER_NUM');  //creates drop down menu for text sets
     echo "<br>Date Joined CAP:";
     enterDate(true,'DoJ');
     echo "<br><br><strong>Also add at least One emergency Contact</strong>";
@@ -392,7 +396,7 @@ function Query($query, mysqli $ident, $message = null) {         //kill $page si
  * @param String $db the default database to use
  * @return mixed the mysqli connection on success false on failure
  */
-function connect($username,$password=null,$server="localhost",$db="SQUADRON_INFO") {
+function connect($username,$password=null,$server="localhost",$db="SQUADRON_MANAGER"){
     if($password==null) {
         $passes=  parse_ini_file(PSSWD_INI);
         $password=$passes[$username];
@@ -827,8 +831,7 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
                     A.TYPE_CODE=B.TYPE_CODE
                     WHERE B.TASK_CODE IN (
                     SELECT A.TASK_CODE FROM STAFF_PERMISSIONS A
-                        LEFT JOIN CHAIN_OF_COMMAND B ON B.STAFF_CODE=A.STAFF_CODE
-                        LEFT JOIN STAFF_POSITIONS_HELD C ON B.POS_CODE=C.STAFF_POSITION
+                        LEFT JOIN STAFF_POSITIONS_HELD C ON A.STAFF_CODE=C.STAFF_POSITION
                         WHERE  A.STAFF_CODE = 'AL'
                         OR C.CAPID='$id')
                         OR B.TASK_CODE IN (
@@ -1698,8 +1701,8 @@ class member {
             }
         } else if(!$this->check_promo_halt($ident)){               //display promotion sign up if available
             if(numRows(query("SELECT CAPID FROM PROMOTION_SIGN_UP WHERE CAPID='".$this->capid."'",$ident))==0) {
-                echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
-                echo "<td>Promotion</td><td>n/a</td><td>$achievName</td></tr>";
+                echo "<tr class=\"table\"><td class=\"table\"><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
+                echo "<td class=\"table\">Promotion</td><td class=\"table\">n/a</td><td>$achievName</td></tr>";
             }
         }
         unset($results);

@@ -265,7 +265,7 @@ if(!isset($_GET['time'])) {
                 <th class="table">IP Address</th><th class="table">Page of Event</th></tr>
                 <?php
                 $timeStamp=  cleanInputString($_GET['time'],19,"time",false, false);
-                $time=  cleanInputInt($_GET['micro'],8,"microseconds");
+                $time=  cleanInputInt($_GET['micro'],8,"microseconds",false);
                 $query= "SELECT TIME_OF_INTRUSION AS TIME, INTRUSION_NAME AS NAME, IP_ADDRESS, PAGE
                                 FROM AUDIT_LOG, INTRUSION_TYPE
                                 WHERE INTRUSION_TYPE=INTRUSION_CODE 
