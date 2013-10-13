@@ -23,6 +23,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <?php
     session_start();
-    session_destroy();
+    include('projectFunctions.php');
+    log_off();
     ?>
 </html>

@@ -44,16 +44,16 @@
                 $result=$_SESSION['home'];
             } else {
                 $query ="SELECT A.TYPE_NAME, B.TASK_NAME,B.TASK_CODE, B.URL, B.NEW_TAB, B.GET_FIELD
-                    FROM SQUADRON_INFO.TASK_TYPE A JOIN
-                    SQUADRON_INFO.TASKS B ON
+                    FROM TASK_TYPE A JOIN
+                    TASKS B ON
                     A.TYPE_CODE=B.TYPE_CODE
                     WHERE (B.TASK_CODE IN (
-                        SELECT C.TASK_CODE FROM SQUADRON_INFO.STAFF_PERMISSIONS C
-                        LEFT JOIN SQUADRON_INFO.STAFF_POSITIONS_HELD D ON D.STAFF_POSITION=C.STAFF_CODE
+                        SELECT C.TASK_CODE FROM STAFF_PERMISSIONS C
+                        LEFT JOIN STAFF_POSITIONS_HELD D ON D.STAFF_POSITION=C.STAFF_CODE
                         WHERE  C.STAFF_CODE = 'AL'
                         OR D.CAPID='".$_SESSION["member"]->getCapid()."') OR
                     B.TASK_CODE IN (
-                        SELECT TASK_CODE FROM SQUADRON_INFO.SPECIAL_PERMISSION
+                        SELECT TASK_CODE FROM SPECIAL_PERMISSION
                         WHERE CAPID='".$_SESSION["member"]->getCapid()."'))
                     AND B.TASK_CODE<>'HOM'
                     ORDER BY A.TYPE_NAME, B.TASK_NAME";

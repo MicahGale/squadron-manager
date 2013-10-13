@@ -44,13 +44,13 @@ $ident = connect('login');
 session_secure_start();
 if(isset($_GET['capid'])) {
     $capid=  cleanInputInt($_GET['capid'],6, "Capid");
-    $staffer=new member($capid,1,$ident);
+    $staffer=new member($capid,2,$ident);
     $_SESSION['staffer']=$staffer;
 } else
     $capid=null;
 if(isset($_POST['find'])) {
     $capid=  cleanInputInt($_POST['capid'], 6, 'capid');
-    $staffer=new member($capid,1, $ident);
+    $staffer=new member($capid,2, $ident);
     $_SESSION['staffer']=$staffer;
 }
 if(isset($_POST['search'])) {
@@ -116,7 +116,8 @@ if(isset($_POST['save'])) {  //save the permissions
                             array_push($staff_pos, $buffer[$i]['CODE']);
                         }
                     }
-                    $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' ORDER BY STAFF_NAME";
+                    $member_type=$_SESSION['staffer']->get_member_type();
+                    $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' AND MEMBER_TYPE='$member_type' ORDER BY STAFF_NAME";
                     $results=allResults(Query($query, $ident));
                     echo "<tr>";
                     for($i=0;$i<count($results);$i++) {
