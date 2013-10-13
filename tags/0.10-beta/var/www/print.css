@@ -1,0 +1,57 @@
+/* 
+    Document   : print
+    Created on : May 7, 2013, 8:13:54 AM
+    Author     : 2011083465
+    Description:
+        Purpose of the stylesheet follows.
+*/
+@media screen {
+    body {
+        font: 13px Arial, Helvetica,"Lucida Grande", serif
+    }
+}
+body {
+    margin:0; 
+    padding:0; 
+    line-height: 1.4em; 
+    word-spacing:1px; 
+    letter-spacing:0.2px; 
+    width:8.5in;
+    color: #000;
+    position: static;
+}
+table {
+    width:8.5in;
+    border-collapse: collapse;
+}
+td {
+    /*width: 37.5%;*/
+    font-size:small;
+    border-bottom: 1px dashed black;
+}
+td.header{
+        font-size:medium;
+        font-weight:bold;
+        border-bottom: 2px solid black;
+    }
+td.blank{
+    border:none;
+    width:15%;
+}
+.table {
+    font-size:12px;
+    vertical-align:top;
+    text-align: center;
+    border:1px solid black;
+    border-collapse: collapse;
+    padding: 2px;
+}
+th.table {
+    font-size: 12px;
+    border:1px solid black;
+}
+@media print {
+    body {
+        font-family:times,serif;font-size:10px;
+    }
+}
