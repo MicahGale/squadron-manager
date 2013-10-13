@@ -15,5 +15,10 @@ If you find any errors, or security problems please report it in the issues sect
   * Do penetration tests, only of the website not the server, the idea is to test the website, not how well I configured the server.
 
 ==User Logins==
-|| *Capid* || *Password* || *Staff Permissions* ||
-||111111||Password!||Commander||
+|| *Capid* || *Password* || *Staff Permissions* || *Name*||
+||123456||Password!||Commander|| John Curry||
+||654321||Password!||Admin Officer||Hap Arnold||
+||121212||Password!||Cadet Commander||Mary Feik||
+||232323||Password!||Cadet Deputy Commander||Wilber Wright||
+||343434||Password!||Cadet IT Officer||Eddie Rickenbacker||
+||454545||Password!||Cadet Executive Officer||Charles Lindberg||
