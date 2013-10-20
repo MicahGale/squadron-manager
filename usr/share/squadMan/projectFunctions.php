@@ -737,7 +737,12 @@ function session_secure_start($capid=null) {
             session_resign_in(false);
         } else  {   //else assume new and set it-up
             if(!empty($_SERVER['HTTPS'])) { //make sure the connection is secure
-                $referrers= array('https://'.$_SERVER['SERVER_NAME'].'/login/index.php','https://'.$_SERVER['SERVER_NAME'].'/login/','https://'.$_SERVER['SERVER_NAME'].'/index.php','https://'.$_SERVER['SERVER_NAME'].'/');
+                $temp= array('/','/index.php','/login/','/login/index.php');
+                $referrers= array();
+                foreach($temp as $buffer) {
+                    array_push($referrers, "https://".$_SERVER['SERVER_NAME'].$buffer);
+                    array_push($referrers, 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$buffer);
+                }
                 if($_SERVER['SCRIPT_NAME']=='/login/index.php'&&in_array($_SERVER['HTTP_REFERER'],$referrers)) { //ensures that the start is through proper channels
                     $_SESSION['ip_addr']=$_SERVER['REMOTE_ADDR'];  //store the ip addr
                     $ident=connect('ViewNext');
@@ -767,7 +772,7 @@ function session_secure_start($capid=null) {
             log_off();
             exit;
         }
-        if(isset($_SERVER['HTTP_REFERE'])&&$_SERVER['HTTP_REFERER']!=$_SESSION['last'])
+        if(isset($_SERVER['HTTP_REFERER'])&&!in_array($_SERVER['HTTP_REFERER'],$_SESSION['last']))
             $error_total+=0.5;  //if not the right referrer 
         if(isset($_SERVER['HTTP_ACCEPT'])&&$_SERVER['HTTP_ACCEPT']!=$_SESSION['request']['accept'])
             $error_total+=0.5;    //if not the same content accepted
@@ -784,7 +789,7 @@ function session_secure_start($capid=null) {
                 session_resign_in(true);
             }
         } else  { //if clean get ready for the next Request
-            $_SESSION['last']="https://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'];
+            $_SESSION['last']=array("https://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'],"https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME']);
             $ident=Connect('ViewNext');
             session_predict_path($ident);
             close($ident);
@@ -1198,7 +1203,6 @@ function specialPromoRequire($ident) {
  * @param boolean $approve whether or not the member can approve the promotion
  */
 function promotionAprove($ident,$memberType,$approve=false) {
-    echo $approve;
     $query="SELECT A.CAPID, A.ACHIEV_CODE, A.APPROVED, CONCAT(D.GRADE_NAME,' - ',C.ACHIEV_NAME) AS NAME
         FROM ACHIEVEMENT C, GRADE D, PROMOTION_SIGN_UP A
         JOIN MEMBER B ON A.CAPID=B.CAPID
@@ -1690,16 +1694,16 @@ class member {
                     TESTING_SIGN_UP WHERE CAPID='".$this->capid."')", $ident);  //get all available requirement sign_up
         if (numRows($results) > 0) {                                   //if can sign up for testing
             for ($row = 0; $row < numRows($results); $row++) {
-                echo "<tr><td><input type=\"checkbox\" name=\"signup[]\" value=\"" . Result($results, $row, "REQUIREMENT_TYPE") . "\"/></td>"; //create checkbox
-                echo"<td>" .Result($results, $row, "TYPE_NAME") . "</td>";         //show test type
+                echo "<tr class=\"table\"><td class=\"table\"><input type=\"checkbox\" name=\"signup[]\" value=\"" . Result($results, $row, "REQUIREMENT_TYPE") . "\"/></td>"; //create checkbox
+                echo"<td class=\"table\">" .Result($results, $row, "TYPE_NAME") . "</td>";         //show test type
                 if (is_null(Result($results, $row, "NAME"))) {                   //if the name is null for the test just echo n/a
-                    echo "<td>n/a</td>";
+                    echo "<td class=\"table\">n/a</td>";
                 } else {
-                    echo "<td>" . Result($results, $row, "NAME") . "</td>";    //display test name
+                    echo "<td class=\"table\">" . Result($results, $row, "NAME") . "</td>";    //display test name
                 }
-                echo "<td>$achievName</td></tr>";                      //displays achievement name
+                echo "<td class=\"table\">$achievName</td></tr>";                      //displays achievement name
             }
-        } else if(!$this->check_promo_halt($ident)){               //display promotion sign up if available
+        } if(!$this->check_promo_halt($ident)){               //display promotion sign up if available
             if(numRows(query("SELECT CAPID FROM PROMOTION_SIGN_UP WHERE CAPID='".$this->capid."'",$ident))==0) {
                 echo "<tr class=\"table\"><td class=\"table\"><input type=\"checkbox\" name=\"signup[]\" value=\"PR\"/></td>";
                 echo "<td class=\"table\">Promotion</td><td class=\"table\">n/a</td><td>$achievName</td></tr>";
