@@ -26,7 +26,7 @@ if(isset($_SESSION['home'])) {
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Boise Composite Squadron: RMR-ID-073</title>
+        <title>Squadron Manager</title>
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css"/>
         <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
@@ -77,12 +77,6 @@ if(isset($_SESSION['home'])) {
                         <input type="submit" value ="Sign-In"/>
                     </form>
                     <br>
-                <br><strong>Or if you are new to CAP please Sign-in Below</strong><br>
-                <form action="/visitor/visitor.php" method="post">
-                    First Name:<input type="text" name="Fname" size="5"/><br>
-                    Last Name: <input type="text" name="Lname" size="5"/><br>
-                    <input type="submit" value="Sign-in"/>
-                </form>
                 </td>
                 <td style="text-align: right;width: 120px">                     <!-- right column for holding login info -->
                 <form action="/login/" method="post">

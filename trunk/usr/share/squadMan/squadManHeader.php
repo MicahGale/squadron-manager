@@ -21,10 +21,10 @@
 <table id="head" style="width:1100px">    
     <tr>
         <td style="width:210px"><a href="/login/home.php">
-        <img src="/patch.gif"></a></td>
+        <img src="/patch.png"></a></td>
         <td>
             <table style="width:100%">
-                <tr><td style="text-align:center; vertical-align: top"><h1>Boise Composite Squadron</h1></td></tr>
+                <tr><td style="text-align:center; vertical-align: top"><h1>Squadron Manager</h1></td></tr>
                 <tr><td style="text-align:right; vertical-align: bottom">
                     <a href="http://boisecap.org" target="_blank">Squadron Web-site</a><br>
                     <a href="http://boisecap.org/calendar/" target="_blank">Squadron Calender</a><br>
@@ -37,6 +37,9 @@
 </table>
 <table id="main" style="width:1100px">
     <tr>
+        <?php 
+        if(!isset($hide)) {
+            ?>
         <td style="text-align: left; vertical-align: top; width:250px">
             <ul class="tasks">
             <?php
@@ -81,4 +84,5 @@
             ?>
             </ul>
         </td>
+        <?php } ?>
         <td style="text-align: left; vertical-align: top">
