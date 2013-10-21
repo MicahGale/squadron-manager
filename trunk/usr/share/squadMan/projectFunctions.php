@@ -1617,12 +1617,15 @@ class member {
     }
     public function sign_in($ident, $message, $event_code = null) {
         if ($event_code == null) {                         //assume current event
-            return Query("INSERT IGNORE INTO ATTENDANCE (CAPID, EVENT_CODE) 
-                SELECT '" . $this->capid . "',EVENT_CODE FROM EVENT WHERE IS_CURRENT=TRUE", $ident, $message);
-        } else {              //else use provided event
+            $results= Query("SELECT EVENT_CODE FROM EVENT WHERE IS_CURRENT=TRUE", $ident, $message);
+            if(numRows($results)>0)
+                $event_code=  Result ($results, 0,"EVENT_CODE");
+        }              //else use provided event
+        $results=  Query("SELECT CAPID FROM ATTENDANCE WHERE CAPID='".$this->capid."' AND EVENT_CODE='$event_code'", $ident);
+        if(numRows($results)<=0)
             return Query("INSERT INTO ATTENDANCE(CAPID,EVENT_CODE)
-                VALUES('" . $this->capid . "','$event_code')", $ident, $message);
-        }
+                VALUES('" . $this->capid . "','$event_code')", $ident, $message);   //if not already inserted then let's insert it
+        
     }
     public function emergency_get($index) {
         if ($index < count($this->emergencyContacts)) {
@@ -1782,7 +1785,7 @@ class member {
                             $promo_wait=$this->promoRecord['PRO'][1];
                         $is_ok=$this->check_promotion_wait($ident, $achievements[$i]['ACHIEV_CODE'], $promo_wait);
                         if($i==count($achievements)-1) {  //if last achievement, then
-                            if($this->check_promo_halt($ident))
+                            if($this->check_promo_halt($ident)&&$date)
                                 echo '<tr class="table"><td class="table" colspan="'.(count($header)+2).'" style="color:red">Promotions have been halted due to a retention in grade from a promotion Board</td></tr>'."\n";
                         }
                         if($is_ok!==true)
