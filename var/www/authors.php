@@ -9,8 +9,8 @@
     <body>
         <?php include('header.php'); ?>
         <table id="main" style="text-align:center"> <tr><td>
-        <h3>All developers who have contributed to Squadron Manager</h3>
-        <table class="table">
+        <h3>All developers who have contributed to Squadron Manager</h3><br>
+        <table class="table center">
             <tr class="table">
                 <th class="table">Developer Name</th><th class="table">Email address</th>
             </tr>

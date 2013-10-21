@@ -55,3 +55,7 @@ ul.tasks {
 li.tasks {
     margin-left:10px
 }
+.center {
+    margin-left:auto;
+    margin-right:auto;
+}
