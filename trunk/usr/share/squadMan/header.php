@@ -16,18 +16,26 @@
  *
  * 
  */
+$fields= parse_ini_file('/etc/squadMan/squadMan.ini');
 ?>
 <script type="text/javascript" src="/java_script/resize.js"></script>
-<table id="head" style="width:1100px">        
+<table id="head" style="width:1100px">    
     <tr>
         <td style="width:210px"><a href="/">
         <img src="/patch.png"></a></td>
         <td>
             <table style="width:100%">
-                <tr><td style="text-align:center; vertical-align: top"><h1>Squadron Manager</h1></td></tr>
+                <tr><td style="text-align:center; vertical-align: top"><h1>
+                            <?php
+                            if($fields!==false&&isset($fields['header_name']))
+                                echo $fields['header_name'];
+                            else 
+                                echo 'Squadron Manager';
+                            ?>
+                        </h1></td></tr>
                 <tr><td style="text-align:right; vertical-align: bottom">
-                    <a href="http://boisecap.org" target="_blank">Squadron Web-site</a><br>
-                    <a href="http://boisecap.org/calendar/" target="_blank">Squadron Calendar</a><br>
+                    <a href="<?php if($fields!==false&&isset($fields['squad_site'])) echo $fields['squad_site']; else echo 'http://capmembers.com'; ?>" target="_blank">Squadron Web-site</a><br>
+                    <a href="<?php if($fields!==false&&isset($fields['squad_cal'])) echo $fields['squad_cal']; else echo "https://www.capnhq.gov/CAP.Calendar.Web/Modules/AdvSearch.aspx";?>" target="_blank">Squadron Calender</a><br>
                     <a href="http://www.capmembers.com/forms_publications__regulations/" target="_blank">CAP regulations, and forms</a><br>
                 </td></tr>
             </table>

@@ -53,7 +53,7 @@ $ident=  connect('login');
                             Filter by test type:
                             <?php
                             dropDownMenu("SELECT TYPE_CODE, TYPE_NAME FROM REQUIREMENT_TYPE
-                                WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
+                                WHERE TYPE_CODE NOT IN('AC','CD','ME','SA','SD','PB','EC','CO','GS','LA','SS') ORDER BY TYPE_NAME","filterTypes", $ident,false,null,true);
                             ?>
                             <input type="submit" name="filter" value="filter"/><br><br>
                         <?php } ?>
@@ -153,7 +153,7 @@ $ident=  connect('login');
                             WHERE D.CAPID=A.CAPID AND E.ACHIEV_CODE=D.ACHIEVEMENT
                             AND E.NEXT_ACHIEV=B.ACHIEV_CODE AND A.REQUIRE_TYPE=B.REQUIREMENT_TYPE
                             AND C.TYPE_CODE=A.REQUIRE_TYPE
-                            AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\',\'PB\')';
+                            AND A.REQUIRE_TYPE NOT IN(\'AC\',\'CD\',\'ME\',\'SA\',\'SD\',\'PB\',\'EC\',\'CO\',\'GS\',\'LA\',\'SS\')';
                         if(isset($_SESSION['filter'])&&!isset($_GET['lock'])) {
                             $query.=" AND A.REQUIRE_TYPE='".$_SESSION['filter']."'";  //if there's a filter then apply it
                         } else if(isset($_GET['lock'])) {
