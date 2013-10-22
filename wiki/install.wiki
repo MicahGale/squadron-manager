@@ -1,6 +1,6 @@
 #summary Steps to install squadron Manager
 #labels Phase-Deploy
-
+<wiki:toc max_depth="3" />
 = Introduction =
 
 This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware.
@@ -17,19 +17,21 @@ The major steps for the installation will be:
 
 _ Squadron Manager comes without a warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See the GNU General Public License version 3 for more details. _
 
-==Requirements Before Installation==
+=Hardware Requirements=
 To run Squadron Manager you need at least one computer, although it is suggested that you use a dedicated Server/computer to host the site.
-===Hardware Requirements===
-  * Must be running Windows, Linux, or Unix
-  * A CPU with two or more cores running at 2gHz is recommended
-  * At least 1GB of RAM is recommended
-  * 1-10gb of free hard drive space is recommended
-==Installing Required Software==
+This computer must:
+  * Be running Windows, Linux, or Unix
+  * Have A CPU with two or more cores running at 2gHz is recommended
+  * Have At least 1GB of RAM is recommended
+  * Have 1-10gb of free hard drive space is recommended
+
+=Installing=
 You will need to install: 
   * A http sever- [http://httpd.apache.org/ Apache] is recommended.
-  * [http://www.mysql.com/ MySQL]
+  * A Database Server (DBMS) [http://dev.mysql.com/downloads/mysql/ MySQL] is currently the only one supported
   * [http://us.php.net/ PHP]
-===Linux===
+  * [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Squadron manger]
+==Linux==
 To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) package.
 
 In Ubuntu you can run:
@@ -44,7 +46,7 @@ sudo apt-get remove taskel
 If you have a different distribution [http://www.linux.com/learn/tutorials/288158-easy-lamp-server-installation this link] may help. If not either Google how to do the installation on your distribution, or contact the developers.
 
 ===Automatic Debian Install===
-On the Google drive for this Project is a .deb file that may be used to automatically Squadron Manager using on all Debian systems.
-===Windows===
+On the Google drive the debian file (.deb) that may be used to automatically Squadron Manager using on all Debian systems. It will be squadMan_version_x86_x64.deb
+==Windows==
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
 ==Securing==
