@@ -32,21 +32,22 @@ You will need to install:
   * [http://us.php.net/ PHP]
   * The PHP mysql native driver (PHP5-mysqlnd)
   * [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Squadron manger]
+==Download File==
 ==Linux==
 To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) package, and PHP5-mysqlnd, and Squadron Manager. You can either do this automatically using a debian file, or manually.
 
 ===Automatic Debian Install===
 *Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distrubition's package management  software. 
 
-On the Google drive the debian file (.deb) that may be used to automatically Squadron Manager using on all Debian systems. It will be squadMan_version_x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
+Download the debian file from the [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Google Drive]. It will be squadMan_version_x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
 software.
 
 To install the package download the .deb onto the computer. Then in terminal you will need to navigate to where it is and run:
 {{{
-sudo dpkg -i squadMan_Version_x64_x86.deb
+sudo dpkg -i squadMan_Version_x64_x86_Debian.deb
 }}}
 
-If this does not work please do the Manual install
+If this does not work please do the [install#Manual_Install Manual install]
 
 ===Manual Install===
 
@@ -60,11 +61,15 @@ You should then remove taskel after installing the LAMP
 {{{
 sudo apt-get remove taskel
 }}}
-If you have a different distribution either Google how to do the installation on your distribution, or ask it in the [http://groups.google.com/group/squadron-manager-users Users' Google Group]
+If you have a different distribution either Google how to do the installation on your distribution, or ask it in the [http://groups.google.com/group/squadron-manager-users Users' Google Group]. Remember you will need to install the Apache2 server, PHP5, PHP5-mysqlnd, and the MySql server.
 
 Finally you will need to [install#Setup_https Setup https], and either install the [install#Automatic_Debian_Install Debian File] or [install#Manually_Depackage_Squadron_Manager Manually Install Squadron Manager]
 
 ==Windows==
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
 =Setup https=
+
 =Manually Depackage Squadron Manager=
+For this you will need to download the Linux or Windows generic tar ball or zip file from the [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Google Drive]. These will be SquadMan_version_x86_x64_linux.tar.gz and squadMan_version_x86_x64_windows.zip respectively. These will be almost identical, they only differ in a few lines of code, so from now on they will be referred to as the same, as they set up the same way. Once the Download is complete extract the contents somewhere you have easy access to, and follow these steps:
+  # Go to the install folder, and run db_dump.sql in terminal or command prompt with the command `mysql -u root -p db_dump.sql` You will be then prompted for the mysql root password, enter it, and mysql with then run the file, setting up the database for Squadron Manager.
+  # Install the website. There are two sites, one http one that redirects all requests to the https, and the actual https. In the archive var/www contains the actual site and var/www-redirect contains the redirect site. Copy var/www to where you would like on Linux /var/www is suggested, and for Windows C:\www do the same with var/www-redirect but instead /var/www-redirect and C:\www-redirect are recommended.
