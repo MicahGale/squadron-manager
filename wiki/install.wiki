@@ -3,7 +3,7 @@
 <wiki:toc max_depth="3" />
 = Introduction =
 
-This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the User Google Group]
+This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
 
 The major steps for the installation will be:
   # Install required Software
@@ -60,8 +60,11 @@ You should then remove taskel after installing the LAMP
 {{{
 sudo apt-get remove taskel
 }}}
-If you have a different distribution [http://www.linux.com/learn/tutorials/288158-easy-lamp-server-installation this link] may help. If not either Google how to do the installation on your distribution, or contact the Squadron Manager developers.
+If you have a different distribution either Google how to do the installation on your distribution, or ask it in the [http://groups.google.com/group/squadron-manager-users Users' Google Group]
+
+Finally you will need to [install#Setup_https Setup https], and either install the [install#Automatic_Debian_Install Debian File] or [install#Manually_Depackage_Squadron_Manager Manually Install Squadron Manager]
 
 ==Windows==
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
-==Securing==
+=Setup https=
+=Manually Depackage Squadron Manager=
