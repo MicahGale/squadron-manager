@@ -3,7 +3,7 @@
 <wiki:toc max_depth="3" />
 = Introduction =
 
-This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware.
+This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the User Google Group]
 
 The major steps for the installation will be:
   # Install required Software
@@ -30,23 +30,38 @@ You will need to install:
   * A http sever- [http://httpd.apache.org/ Apache] is recommended.
   * A Database Server (DBMS) [http://dev.mysql.com/downloads/mysql/ MySQL] is currently the only one supported
   * [http://us.php.net/ PHP]
+  * The PHP mysql native driver (PHP5-mysqlnd)
   * [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Squadron manger]
 ==Linux==
-To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) package.
+To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) package, and PHP5-mysqlnd, and Squadron Manager. You can either do this automatically using a debian file, or manually.
+
+===Automatic Debian Install===
+*Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distrubition's package management  software. 
+
+On the Google drive the debian file (.deb) that may be used to automatically Squadron Manager using on all Debian systems. It will be squadMan_version_x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
+software.
+
+To install the package download the .deb onto the computer. Then in terminal you will need to navigate to where it is and run:
+{{{
+sudo dpkg -i squadMan_Version_x64_x86.deb
+}}}
+
+If this does not work please do the Manual install
+
+===Manual Install===
 
 In Ubuntu you can run:
 {{{
-sudo apt-get install taskel
+sudo apt-get install taskel 
 sudo taskel lamp-server
+sudo apt-get install PHP5-mysqlnd
 }}}
 You should then remove taskel after installing the LAMP
 {{{
 sudo apt-get remove taskel
 }}}
-If you have a different distribution [http://www.linux.com/learn/tutorials/288158-easy-lamp-server-installation this link] may help. If not either Google how to do the installation on your distribution, or contact the developers.
+If you have a different distribution [http://www.linux.com/learn/tutorials/288158-easy-lamp-server-installation this link] may help. If not either Google how to do the installation on your distribution, or contact the Squadron Manager developers.
 
-===Automatic Debian Install===
-On the Google drive the debian file (.deb) that may be used to automatically Squadron Manager using on all Debian systems. It will be squadMan_version_x86_x64.deb
 ==Windows==
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
 ==Securing==
