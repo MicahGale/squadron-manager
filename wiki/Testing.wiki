@@ -1,7 +1,7 @@
 #summary Procedures for Beta testing
 #labels Phase-Support
 
-= IP Address: [https://174.27.10.213 174.27.10.213] =
+= IP Address: [https://174.27.16.136] =
 
 *NOTE:* Currently my ISP is blocking some incoming traffic, the problem has been resolved for now, but if there are more problems, please let me know.
 
