@@ -1127,7 +1127,7 @@ CREATE TABLE `STAFF_POSITIONS` (
 
 LOCK TABLES `STAFF_POSITIONS` WRITE;
 /*!40000 ALTER TABLE `STAFF_POSITIONS` DISABLE KEYS */;
-INSERT INTO `STAFF_POSITIONS` VALUES ('AL','All staff positions','A'),('CC','Squadron Commander','S'),('CCC','Cadet Commander','C'),('CDC','Cadet Deputy Commander','C'),('CTO','Cadet Information Technology Officer','C'),('CXO','Cadet Executive Officer','C'),('DCC','Deputy Commander of Cadets','S'),('FLC','Flight Commander','C'),('FLS','Flight Sergeant','C'),('ITO','Information Technology Officer','S'),('CTO','Cadet Information Technology Officer','C'),('TO','Testing Officer','S'),('ADM','Administrative Officer','S'),('PTT','Cadet Physical Fitness Tester','C'),('DRT','Drill Tester','C'),('DCS','Deputy Commander of Seniors','S');
+INSERT INTO `STAFF_POSITIONS` VALUES ('AL','All staff positions','A'),('CC','Squadron Commander','S'),('CCC','Cadet Commander','C'),('CDC','Cadet Deputy Commander','C'),('CTO','Cadet Information Technology Officer','C'),('CXO','Cadet Executive Officer','C'),('DCC','Deputy Commander of Cadets','S'),('FLC','Flight Commander','C'),('FLS','Flight Sergeant','C'),('ITO','Information Technology Officer','S'),('TO','Testing Officer','S'),('ADM','Administrative Officer','S'),('PTT','Cadet Physical Fitness Tester','C'),('DRT','Drill Tester','C'),('DCS','Deputy Commander of Seniors','S');
 /*!40000 ALTER TABLE `STAFF_POSITIONS` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1319,7 +1319,7 @@ CREATE TABLE `TEXT_SETS` (
 
 LOCK TABLES `TEXT_SETS` WRITE;
 /*!40000 ALTER TABLE `TEXT_SETS` DISABLE KEYS */;
-INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets'),('L21C','Leadership for the 21st Century'),('L2L','Learn to Lead');
+INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets')('L2L','Learn to Lead');
 /*!40000 ALTER TABLE `TEXT_SETS` ENABLE KEYS */;
 UNLOCK TABLES;
 

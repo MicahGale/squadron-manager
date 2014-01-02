@@ -95,7 +95,7 @@ if(isset($_SESSION['home'])) {
                     <br><br>
                     <?php
                     if($fields!==false&&isset($fields['site_cal']))
-                        echo $fields;
+                        echo $fields['site_cal'];
                     ?>
                 </td>
             </tr>

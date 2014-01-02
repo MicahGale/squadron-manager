@@ -197,7 +197,7 @@ function prepDisplay($results_sorted) {
         <link rel="shortcut icon" href="/patch.ico">
     </head>
     <body>
-          <?php include('squadManHeader.php'); ?>      
+          <?php include('squadManHeader.php');  ?>      
         <p>To search for a member enter part of or all of their CAPID, name, or a combination of these.</p>
         <form method="post">
             <input type="text" name="input" size="8"
