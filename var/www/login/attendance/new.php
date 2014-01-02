@@ -87,31 +87,33 @@ $ident= connect('login');
             $endDate = "null";
             $startDate= parse_date_input($_POST,"start");
             $needsOther= false;                                        //says if needs to get input for other, and delays insert
-            $subEvents = parse_Sub_events($_POST);
-            $otherSubs =array();
-            for($i=0;$i<count($subEvents);$i++) {  //cycle trough subevents array and make sure there are no others or nulls
-                if($subEvents[$i]=="null") {      //if was null then pull it out
-                    array_splice($subEvents,$i);  //pull it out without distorting the indexes
-                }
-                if($subEvents[$i]=="other") {
-                    array_push($otherSubs, $i);       //inserts into the otherSubs array to show we need to get specifity
-                    $subEvents[$i]=null;            //null it so no dirty input to the db on accident
-                    $needsOther = true;
+            $otherSubs=false;
+            if(isset($_POST['subevent'])) {
+                    $subEvents = parse_Sub_events($_POST);
+                for($i=0;$i<count($subEvents);$i++) {  //cycle trough subevents array and make sure there are no others or nulls
+                    if($subEvents[$i]=="null") {      //if was null then pull it out
+                        array_splice($subEvents,$i);  //pull it out without distorting the indexes
+                    }
+                    if($subEvents[$i]=="other") {
+                        array_splice($subEvents,$i);            //null it so no dirty input to the db on accident
+                        $needsOther = true;
+                        $otherSubs=true;
+                    }
                 }
             }
             if(isset($_POST['dayend'])&&$_POST['dayend']!="")                        //if end date is given then parse
                 $endDate=  parse_date_input ($_POST,'end');
-            $type= cleanInputString($_POST['type'],5,'event Type',false);
-            if($type =="other") {                                                //if wants other for the meeting type
+            if($_POST['type'] =="other") {                                                //if wants other for the meeting type
                 $needsOther = true;
                 $type = true;
-            }
-            if($_POST['location']!="null") {                     //if location is specified clean
+            } else 
+               $type= cleanInputString($_POST['type'],5,'event Type',false);
+            if($_POST['location']!="null"&&$_POST['location']!='other') {                     //if location is specified clean
                 $locat=  cleanInputString ($_POST['location'],5,'Location',false);
-                if($locat=="other") {                                              //if wants other get input and delay insert
-                    $locat = true;                                                //says this one is needed
-                    $needsOther = true;                                            
-                }
+            }
+            if($_POST['location']=="other") {                                              //if wants other get input and delay insert
+                $locat = true;                                                //says this one is needed
+                $needsOther = true;                                            
             }
             if(isset($_POST['name'])&&$_POST['name']!="")                         //gets name if was inputed
                 $name= cleanInputString ($_POST['name'],32,"event name",false);
@@ -135,19 +137,17 @@ $ident= connect('login');
                $_SESSION['otherSubs']=$otherSubs;
                echo '<form method="post">';
                echo '<input type="hidden" name="other" value="hi"/>';
-               if($locat) 
+               if($locat===true) 
                    echo 'Please specify other Location: <input type="text" name="otherLocat" maxlength="50" size="5"/><br>';
-               if($type)
+               if($type===true)
                    echo 'Please Specify other event type: <input type="text" name="otherType" maxlength="40" size="5"/><br>';
-               if(count($otherSubs)!=0) { //if there were subevents that other needed to specify loop through for input
-                   for($i=0;$i<count($otherSubs);$i++) {       //loop through
-                       echo "Please specify other sub-event #$i:".' <input type="text" name="sub'.$otherSubs[$i].'" maxlength="40" size="5"/><br>';
-                   }
+               if($otherSubs===true) { //if there were subevents that other needed to specify loop through for input
+                   echo "Please specify other sub-event:".' <input type="text" name="sub" maxlength="40" size="5"/><br>';
                }
                echo '<input type="submit" value="Finish and Create event"/> </form>';
            } else {
                $event_Code=insert_Event($startDate, $type, $name, $isCurrent, $locat, $endDate);  //just insert as normal 
-               if(count($subEvents)!=0) {         //if has subevents insert them
+               if(isset($subEvents)&&count($subEvents)!=0) {         //if has subevents insert them
                    insert_Subevents($event_Code, $subEvents);
                }
                ?>
@@ -174,6 +174,7 @@ $ident= connect('login');
                $query="INSERT INTO EVENT_LOCATION(LOCAT_CODE, LOCAT_NAME)
                    VALUES('$code','$locat')";
                Query($query, $ident);
+               $_SESSION['locat']=$code;
                $locatSpec=true;
             }
             if(isset($_POST['otherType'])) {
@@ -189,19 +190,18 @@ $ident= connect('login');
                $query="INSERT INTO EVENT_TYPES(EVENT_TYPE_CODE, EVENT_TYPE_NAME)
                    VALUES('$code','$type')";
                Query($query, $ident);
+               $type=$code;
                $typeSpec=true;
             }
             if(!$locatSpec)
                 $locat=$_SESSION['locat'];
             if(!$typeSpec)
                 $type=$_SESSION['type'];
-            if(count($_SESSION['otherSubs'])) {
-                for($i=0;$i<count($_SESSION['otherSubs']);$i++) { //loops trough parsing other subevent input
-                    $buffer[$i]=  cleanInputString($_POST['sub'.$_SESSION['otherSubs'][$i]],40,"Sub-event #".$_SESSION['otherSubs'][$i],false);   
-                }
+            if(isset($_POST['sub'])) {
+                $buffer[0]=  cleanInputString($_POST['sub'],40,"Sub-event",false);   
                 $codes=insert_other_Subevents($buffer);   //inserts codes into db
                 for($i=0;$i<count($buffer);$i++) {          //shift codes into subevent array
-                    $_SESSION['subEvents'][$_SESSION['otherSubs'][$i]]=$codes[$i]; //pushes onto array
+                    array_push($_SESSION['subEvents'],$codes[0]);
                 }
             }
             $event_Code=insert_Event($_SESSION['startDate'], $type, $_SESSION['name'], $_SESSION['isCurrent'], $_SESSION['locat'], $_SESSION['endDate']);
@@ -269,9 +269,10 @@ $ident= connect('login');
             $parsed=array();
             for($i=0;$i<count($input['subevent']);$i++) {
                 $buffer=$input["subevent"][$i];
-                if(!is_null($buffer)&&$buffer!="null"&&$buffer!==null) {
+                if(!is_null($buffer)&&$buffer!="null"&&$buffer!==null&&$buffer!="other") {
                     array_push($parsed,cleanInputString($buffer, 3, "subevenet$i",true));
-                }
+                } else if($buffer=="other")
+                    array_push($parsed,"other");
             }
             return $parsed;
          }
@@ -309,16 +310,17 @@ $ident= connect('login');
              for($i=0;$i<count($subEvents);$i++) {
                  $name= $subEvents[$i];
                  $code=substr($name,0,3);   //try to create a code
-                 bind($search,"S",$code);    //binds for search
+                 bind($search,"s",array($code));    //binds for search
                  $results=execute($search);
                  $length= numRows($results);
                  while($length>0) {         //while there are results
                      $code=rand(-99,999);       //randomly generate code
-                     bind($search,"S",$code);    //binds for search
+                     bind($search,"s",array($code));    //binds for search
                      $results=execute($search);
                      $length= numRows($results);
                  }
-                 bind($insert,"SS",$code,$name);      //insert the subevent
+                 bind($insert,"ss",array($code,$name));      //insert the subevent
+                 execute($insert);
                  $codes[$i]= $code;       //pushes onto array of event codes created
              }
              return $codes;
