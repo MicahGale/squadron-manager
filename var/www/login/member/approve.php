@@ -24,7 +24,8 @@ session_secure_start();
     <head>
         <title>Approve Newly added members</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="../../patch.ico">
+        <link rel="shortcut icon" href="/patch.ico">
+        <link rel="stylesheet" type="text/css" href="/main.css">
     </head>
     <body>
         <?php
@@ -48,8 +49,8 @@ session_secure_start();
         You may edit the fields below for each member. To save these changes you must approve the member.  To approve members
         either check all the added members you approve and click "approve selected", or to approve all added members click approve all.</p>
         <form action="finalApprove.php" method="post">
-            <table border="1" cellspacing="1" width="800">
-                <tr><th>Approve</th><th>CAPID</th><th>Last Name</th><th>First Name</th><th>Gender</th><th>Date of Birth</th><th>CAP Grade</th><th>Member Type</th><th>Textbook Set</th><th>Home Unit</th><th>Date Joined CAP</th></tr>
+            <table class="table">
+                <tr class="table"><th class="table">Approve</th><th class="table">CAPID</th><th class="table">Last Name</th><th class="table">First Name</th><th class="table">Gender</th><th class="table">Date of Birth</th><th>CAP Grade</th><th class="table">Member Type</th><th class="table">Textbook Set</th><th class="table">Home Unit</th><th class="table">Date Joined CAP</th></tr>
         <?php
         for($i=0;$i<$size;$i++) {                                   //displays the edit field and approval
             $members[$i]->approveFields($ident);

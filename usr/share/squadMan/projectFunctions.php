@@ -75,12 +75,14 @@ if($input!==false) {  //if the file was parsed then get the inputs
     define('PASSWORD_LIFE',$input['password_life']);
     define('PASSWORD_NOTIF',$input['password_notif']);
     define('LOG_PER_PAGE',$input['log_per_page']);
+    date_default_timezone_set($input['time_zone']);  //sets the timezone
 } else {
     define("PHP_DATE_FORMAT","d M y");  
     define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." H:i:s");  //the datetime format
     define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
     define('PROFILE_PATH',"/var/upload/profile");  //the path to the profile pictures stored outside document root
     define("BAD_LOGIN_WAIT",5);
+    date_default_timezone_set("America/Denver");
     /**
     * The constant for how long to have an account in SQL time format
     */
@@ -236,7 +238,7 @@ function newMember($identifier, $page,$capid=null) {                            
     echo "<br>Textbook Set";
     dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier, false,null,true);  //creates drop down menu for text sets
     echo "<br>Unit Charter Number:";
-    dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,result(Query("SELECT CHARTER_NUM FROM CAP_UNIT WHERE DEFAULT_UNIT=TRUE", $identifier)),0,'CHARTER_NUM');  //creates drop down menu for text sets
+    dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,result(Query("SELECT CHARTER_NUM FROM CAP_UNIT WHERE DEFAULT_UNIT=TRUE", $identifier),0,'CHARTER_NUM'),0,'CHARTER_NUM');  //creates drop down menu for text sets
     echo "<br>Date Joined CAP:";
     enterDate(true,'DoJ');
     echo "<br><br><strong>Also add at least One emergency Contact</strong>";
@@ -357,7 +359,7 @@ function reportDbError($errorno,$error) {
     $time = auditLog( $_SERVER['REMOTE_ADDR'], 'ER');
     $date= new DateTime();
     auditDump($time, 'Error Code', $errorno);
-    auditDump($time, 'Error Message', mysql_real_escape_string($error));  //escape the ''
+    auditDump($time, 'Error Message', mysqli_real_escape_string($error));  //escape the ''
     echo"<br><strong>there was an error with processing the request</strong><br>
         Please give the following information to you Squadron's IT Officer(s)<br>\n";
 //    echo $errorno . " " .$error;
@@ -781,7 +783,7 @@ function session_secure_start($capid=null) {
         if($error_total >=1||$_SESSION['ip_addr']!=$_SERVER['REMOTE_ADDR']||!in_array($_SERVER['SCRIPT_NAME'],$_SESSION['predicted'])||
             $_SESSION['request']['agent']!=$_SERVER['HTTP_USER_AGENT']||
             $_SESSION['request']['lang_char']!=$_SERVER['HTTP_ACCEPT_LANGUAGE']) { //if it's the right ip continue
-            If(!isset($_SESSION['resign'])||$_SESSION['resign']==0) {  //if the session needs to be verified by 
+            If(!isset($_SESSION['resignin'])||$_SESSION['resignin']==0) {  //if the session needs to be verified by 
                 $time= auditLog($_SERVER['REMOTE_ADDR'],'SH');
                 auditDump($time, "User Agent",$_SERVER['HTTP_USER_AGENT']);
                 auditDump($time, "Language", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -818,7 +820,7 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
     $path = substr($path, strpos($path, "/", 1) + 1);            //cuts off leading /login/ offset by 1 to ignore first /
     $query = "SELECT NEXT_URL FROM NEXT_VISIT, TASKS
         WHERE LAST_CODE=TASK_CODE
-        AND URL='$page'";                           //query to find next 
+        AND URL='$path'";                           //query to find next 
     $result = allResults(Query($query, $ident));
     $size = count($result);
     for ($i = 0; $i < $size; $i++) {
@@ -854,6 +856,7 @@ function session_predict_path($ident,$capid=null,$page=null) {     //creates an 
         }
     }
     array_push($results,"/login/home.php");                 //add the home page on
+    array_push($results,'/pictures/profile/getter.php');    //add the profile pictures as 
     if($page!=null) {
         return $results;                                      //if page is given give results now
     } else {
@@ -1591,7 +1594,7 @@ class member {
         }
     }
     public function insertMember($ident) {
-        $date_current=new DateTime($this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT));
+        $date_current=$this->Date_of_Join;
         $now=new DateTime();
         while($date_current->format('U')-$now->format('U')<0) {  //while the date current is less than right now
             $date_current->add(new DateInterval('P1Y'));  //add 1 year until past right now
@@ -1789,7 +1792,7 @@ class member {
                                 echo '<tr class="table"><td class="table" colspan="'.(count($header)+2).'" style="color:red">Promotions have been halted due to a retention in grade from a promotion Board</td></tr>'."\n";
                         }
                         if($is_ok!==true)
-                            echo '<tr class=\"table\"><td class="table" colspan="'.(count($header)+2) .'" style="color:red">The time since last promotion is too short: You must wait until:'.$is_ok->format(PHP_DATE_FORMAT)."</td></tr>";
+                            echo '<tr class="table"><td class="table" colspan="'.(count($header)+2) .'" style="color:red">The time since last promotion is too short: You must wait until:'.$is_ok->format(PHP_DATE_FORMAT)."</td></tr>";
                         echo '<tr class="table"><td class="table">'.$achievements[$i]['ACHIEV_NAME'].'</td>';
                         $this->displayPromoRequest($header, $date, $edit,null,true);
                     }
@@ -1955,11 +1958,11 @@ class member {
         return Query($query, $ident);
     }
     public function approveFields($ident) {
-        echo "<tr><td><input type=\"checkbox\" name=\"approve[]\" value=\"" . $this->capid . "\"/></td>";
-        echo "<td><input type=\"text\" size=\"1\" name=\"capid" . $this->capid . "\" value=\"" . $this->capid . "\"/></td>";
-        echo "<td><input type=\"text\" size=\"1\" name=\"Lname" . $this->capid . "\" value=\"" . $this->name_last . "\"/></td>";
-        echo "<td><input type=\"text\" size=\"1\" name=\"Fname" . $this->capid . "\" value=\"" . $this->name_first . "\"/></td>";
-        echo "<td><select name=\"gender" . $this->capid . "\">";
+        echo "<tr class=\"table\"><td class=\"table\"><input type=\"checkbox\" name=\"approve[]\" value=\"" . $this->capid . "\"/></td>";
+        echo "<td class=\"table\"><input type=\"text\" size=\"1\" name=\"capid" . $this->capid . "\" value=\"" . $this->capid . "\"/></td>";
+        echo "<td class=\"table\"><input type=\"text\" size=\"1\" name=\"Lname" . $this->capid . "\" value=\"" . $this->name_last . "\"/></td>";
+        echo "<td class=\"table\"><input type=\"text\" size=\"1\" name=\"Fname" . $this->capid . "\" value=\"" . $this->name_first . "\"/></td>";
+        echo "<td class=\"table\"><select name=\"gender" . $this->capid . "\">";
         echo "<option value=\"M\" ";                   //drop down menu for gender
         if ($this->gender == "M") {                          //sets default to male if so
             echo "selected=\"yes\"";
@@ -1968,17 +1971,17 @@ class member {
         if ($this->gender == "F")
             echo "selected=\"yes\"";
         echo ">female</option>";
-        echo "</select></td><td>";                                  //end of drop down
+        echo "</select></td><td class=\"table\">";                                  //end of drop down
         enterDate(false, "DoB" . $this->capid, $this->DoB);
-        echo "</td><td>";
-        dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "grade" . $this->capid, $ident, false, $this->achievement);
-        echo "</td><td>";
+        echo "</td><td class=\"table\">";
+        dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS GRADE FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV ORDER BY A.ACHIEV_NUM", "grade" . $this->capid, $ident, false, $this->achievement);
+        echo "</td><td class=\"table\">";
         dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES", "member" . $this->capid, $ident, false, $this->memberType);
-        echo "</td><td>";
+        echo "</td><td class=\"table\">";
         dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL'", "text" . $this->capid, $ident, false, $this->text_set);
-        echo "</td><td>";
+        echo "</td><td class=\"table\">";
         dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit' . $this->capid, $ident, false, $this->unit->getCharter());
-        echo "</td><td>";
+        echo "</td><td class=\"table\">";
         enterDate(false, "DoJ" . $this->capid, $this->Date_of_Join);
         echo "</td></tr>\n";
     }
@@ -2011,12 +2014,12 @@ class member {
             NAME_LAST='" . $this->name_last . "',
             NAME_FIRST='" . $this->name_first . "',
             GENDER='" . $this->gender . "',
-            DATE_OF_BIRTH='" . $this->DoB->format(PHP_To_MYSQL_FORMAT) . "',
+            DATE_OF_BIRTH='" . $this->DoB->format(PHP_TO_MYSQL_FORMAT) . "',
             ACHIEVEMENT='" . $this->achievement . "',
             MEMBER_TYPE='" . $this->memberType . "',
             TEXTBOOK_SET='" . $this->text_set . "',
             HOME_UNIT='" . $this->unit . "',
-            DATE_JOINED='" . $this->Date_of_Join->format(PHP_To_MYSQL_FORMAT) . "',
+            DATE_JOINED='" . $this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT) . "',
             APPROVED=TRUE";
         return Query($query, $ident);
     }
