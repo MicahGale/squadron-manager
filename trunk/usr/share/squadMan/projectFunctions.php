@@ -359,7 +359,9 @@ function reportDbError($errorno,$error) {
     $time = auditLog( $_SERVER['REMOTE_ADDR'], 'ER');
     $date= new DateTime();
     auditDump($time, 'Error Code', $errorno);
-    auditDump($time, 'Error Message', mysqli_real_escape_string($error));  //escape the ''
+    $link=  mysqli_connect();
+    auditDump($time, 'Error Message', mysqli_real_escape_string($link,$error));  //escape the ''
+    mysqli_close($link);
     echo"<br><strong>there was an error with processing the request</strong><br>
         Please give the following information to you Squadron's IT Officer(s)<br>\n";
 //    echo $errorno . " " .$error;
