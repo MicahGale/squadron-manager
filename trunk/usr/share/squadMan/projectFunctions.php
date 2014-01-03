@@ -1909,18 +1909,19 @@ class member {
             $this->DoB =  parse_date_input($input);
         }
         for ($row = 0; $row < 5; $row++) {                                        //edit contact information
-            if (array_key_exists("ContName" . $row, $input)) {
-                if ($input["ContName" . $row] != "") {
+            if (isset($input["ContName".$row])) {
+                if ($input["ContName".$row] !== "") {
                     if (array_key_exists($row, $this->emergencyContacts)) {                      //if not a new one edit it
                         $oldRelat = $this->emergencyContacts[$row]->getRelation();
                         $this->emergencyContacts[$row]->setName($input["ContName" . $row]);
                         $this->emergencyContacts[$row]->setRelation($input["relation" . $row]);
-                        $this->emergencyContacts[$row]->setPhone($input["number" . $row]);
+                        if(isset($input["number".$row])&&$input['number'.$row]!=="")
+                            $this->emergencyContacts[$row]->setPhone($input["number" . $row]);
                         if (!$this->updateContact($row, $oldRelat, $ident)) {
                             $contactSuccess = false;
                         }
                     } else {
-                        array_push($this->emergencyContacts, new contact($input["contName" . $row], $input["relation" . $row], $input["number" . $row]));
+                        array_push($this->emergencyContacts, new contact($input["ContName".$row], $input["relation" . $row], $input["number" . $row]));
                         if (!$this->insertSingleContact($row, $ident)) {
                             $contactSuccess = false;
                         }
@@ -1941,11 +1942,13 @@ class member {
     }
     public function insertSingleContact($row, $ident) {
         $query = "INSERT INTO EMERGENCY_CONTACT (CAPID,RELATION,CONTACT_NAME,CONTACT_NUMBER) VALUES";
-        $con = $this->emergencyContacts[$row]->getName;
-        $relat = $this->emergencyContacts[$row]->getRelation;
-        $num = $this->emergencyContacts[$row]->getPhone;
-        $query = $query . "('".$this->capid."','$relat','$con','$num')";
-        return Query($query, $ident);
+        if(isset($this->emergencyContacts[$row])&& get_class($this->emergencyContacts[$row])==="contact") {
+            $con = $this->emergencyContacts[$row]->getName();
+            $relat = $this->emergencyContacts[$row]->getRelation();
+            $num = $this->emergencyContacts[$row]->getPhone();
+            $query = $query . "('".$this->capid."','$relat','$con','$num')";
+            return Query($query, $ident);
+        }
     }
     public function updateFields($ident) {
         $query = "UPDATE MEMBER 

@@ -19,11 +19,11 @@
 ?>
 <!DOCTYPE html>
 <html>
-    <meta HTTP-EQUIV="REFRESH" content="0; url=../index.php">
+    <meta HTTP-EQUIV="REFRESH" content="0; url=/index.php">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <?php
     session_start();
-    include('projectFunctions.php');
-    log_off();
+    session_destroy();
+    setcookie(session_name(),"0",0,"/");   //deletes the cookie
     ?>
 </html>

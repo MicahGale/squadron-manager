@@ -201,7 +201,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             if(isset($_SESSION['tester']))
                 $tester=$_SESSION['tester'];
             if(isset($_GET['capid'])) {
-                if($_GET['field']=='testee')
+                if($_GET['field']=='testee'||!isset($_GET['field']))
                     $capid=  cleanInputInt($_GET['capid'],6, 'capid');
                 else 
                     $tester=  cleanInputInt ($_GET['capid'], 6, 'capid');
@@ -227,16 +227,16 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
                 $date=$_SESSION['date'];
             enterDate(true,null,$date);
             ?>
-        <br> <br><input type="checkbox" name="waiver" value="waive"/> Category II,III,IV CPFT waiver<br><br><table border="1">
+        <br> <br><input type="checkbox" name="waiver" value="waive"/> Category II,III,IV CPFT waiver<br><br><table class="table">
             <?php
-            echo "<tr>";
+            echo "<tr class=\"table\">";
             for($i=0;$i<count($header);$i++) {
-                echo "<th>".$header[$i]['TEST_NAME'].'</th>';
+                echo "<th class=\"table\">".$header[$i]['TEST_NAME'].'</th>';
             }
-            echo "</tr>\n<tr>";
+            echo "</tr>\n<tr class=\"table\">";
             for($i=0;$i<count($header);$i++) {     //display input
                 $code=$header[$i]['TEST_CODE'];
-                echo '<td><input type="text" size="1" maxlength="10" name="'.$code.'" ';
+                echo '<td class="table"><input type="text" size="1" maxlength="10" name="'.$code.'" ';
                 if(isset($_SESSION['CPFT'][$code]))
                     echo 'value="'.$_SESSION['CPFT'][$code].'"';
                 echo '/></td>';
