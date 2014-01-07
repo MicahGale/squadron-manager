@@ -1418,6 +1418,7 @@ function parsePercent($append, array $inputs, $passing) {
  * @return true iff they passed, false if otherwise
  */
 function verifyCPFT($ident, array $requirements, array $actual) {
+    var_dump($requirements);
     $query ="SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=TRUE";  //gets the tests that are running
     $running =  allResults(Query($query, $ident));
     $query = "SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=FALSE"; //gets non-running events
@@ -2549,12 +2550,13 @@ class member {
             WHERE START_ACHIEV=B.ACHIEV_CODE
             AND D.ACHIEV_CODE='".$this->achievement."'
             AND A.AGE='$age' AND A.PHASE='".$this->get_phase($ident)."' and A.GENDER='".$this->gender."'
-            and (D.ACHIEV_NUM BETWEEN B.ACHIEV_NUM AND C.ACHIEV_NUM
-                OR (D.ACHIEV_NUM>=B.ACHIEV_NUM AND END_ACHIEV IS NULL))";
+            and ((D.ACHIEV_NUM BETWEEN B.ACHIEV_NUM AND C.ACHIEV_NUM)
+                OR END_ACHIEV IS NULL)";
         $require=  allResults(Query($query, $ident));             //get requirements
         for($i=0;$i<count($require);$i++) {  //reorganizes the info and return it
             $return[$require[$i]['TEST_TYPE']]=  floatval($require[$i]['REQUIREMENT']);
         }
+        var_dump($return);
         return $return;
     }
     function get_age($ident, DateTime $date=null) {
@@ -2571,8 +2573,9 @@ class member {
         return false;
     }
     function get_phase($ident) {
-        $query = "SELECT PHASE FROM ACHIEVEMENT
-            WHERE ACHIEV_CODE='".$this->achievement."'";
+        $query = "SELECT B.PHASE FROM ACHIEVEMENT A, ACHIEVEMENT B
+            WHERE A.ACHIEV_CODE='".$this->achievement."'
+            AND A.NEXT_ACHIEV=B.ACHIEV_CODE";
         $results=  allResults(Query($query, $ident));
         if(count($results)>0)
             return $results[0]['PHASE'];
