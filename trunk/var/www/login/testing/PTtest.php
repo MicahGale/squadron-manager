@@ -67,7 +67,7 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
         $field='testee';
     header("refresh:0;url=/login/member/search.php?redirect=/login/testing/PTtest.php&field=$field");  //refresh
     exit;
-} if(isset($_POST['save'])&&$_GET['multi']==0) {
+} if(isset($_POST['save'])&&(!isset($_GET['multi'])||$_GET['multi']==0)) { //S(!M!I+MI) S!(M xor I)
     $capid = cleanInputInt($_REQUEST['capid'],6,"Capid");
     $tester= cleanInputInt($_POST['tester'], 6, 'Tester Capid',true);
     $buffer=new member($capid,1,$ident);
@@ -75,9 +75,14 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
     $actual=array();  //parse the input as an array
     for($i=0;$i<count($header);$i++) {  //parse it together
         $buffer=$header[$i]['TEST_CODE'];   //buffer the results
-        $actual[$buffer]= cleanInputInt($_POST[$buffer],strlen($_POST[$buffer]),"CPFT entrance".$buffer);
+        if($buffer!='MR')
+            $actual[$buffer]= cleanInputInt($_POST[$buffer],strlen($_POST[$buffer]),"CPFT entrance".$buffer);
+        else 
+            $actual[$buffer]=  parseMinutes (cleanInputString ($_POST[$buffer],5,"Mile run",true));
     }
+    echo "execute";
     if(verifyCPFT($ident, $requirements, $actual)||(isset($_POST['waiver']))) {
+        echo "more";
         $query="INSERT INTO CPFT_ENTRANCE(CAPID,ACHIEV_CODE, TEST_TYPE,SCORE)
             VALUES('$capid','".$_SESSION['achiev']."',?,?)";
         $insert= prepare_statement($ident, $query);
@@ -101,7 +106,7 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
     }
     unset($_SESSION['csv']);   //clear the csv parsed data
 }
-if(isset($_POST['save'])&&$_GET['multi']==1) {
+if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
     $tester=  cleanInputInt($_POST['tester'], 6, 'Tester capid');
     $query="INSERT INTO CPFT_ENTRANCE(CAPID, ACHIEV_CODE,TEST_TYPE, SCORE)
             VALUES(?,?,?,?)";
@@ -201,7 +206,7 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             if(isset($_SESSION['tester']))
                 $tester=$_SESSION['tester'];
             if(isset($_GET['capid'])) {
-                if($_GET['field']=='testee'||!isset($_GET['field']))
+                if(!isset($_GET['field'])||$_GET['field']=='testee')
                     $capid=  cleanInputInt($_GET['capid'],6, 'capid');
                 else 
                     $tester=  cleanInputInt ($_GET['capid'], 6, 'capid');
@@ -218,9 +223,9 @@ if(isset($_POST['save'])&&$_GET['multi']==1) {
             if(isset($_REQUEST['achiev']))
                 $_SESSION['achiev']=  cleanInputString ($_REQUEST['achiev'],5,'achievement',true);
             if(isset($_SESSION['achiev']))
-                dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV where A.ACHIEV_CODE<>'0' ORDER BY A.ACHIEV_NUM", "achiev", $ident, false,$_SESSION['achiev']);
+                dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV where A.ACHIEV_CODE<>'0'AND A.MEMBER_TYPE='C' ORDER BY A.ACHIEV_NUM", "achiev", $ident, false,$_SESSION['achiev']);
             else 
-                 dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV where A.ACHIEV_CODE<>'0' ORDER BY A.ACHIEV_NUM ", "achiev", $ident);
+                 dropDownMenu("SELECT A.ACHIEV_CODE, CONCAT(B.GRADE_NAME,' - ',A.ACHIEV_NAME) AS HI FROM ACHIEVEMENT A JOIN GRADE B ON A.GRADE=B.GRADE_ABREV where A.ACHIEV_CODE<>'0' AND A.MEMBER_TYPE='C' ORDER BY A.ACHIEV_NUM ", "achiev", $ident);
             echo "<br><br>";
             $date=new DateTime();
             if(isset($_SESSION['date']))
