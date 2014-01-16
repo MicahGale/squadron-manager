@@ -3,6 +3,8 @@
 <wiki:toc max_depth="3" />
 = Introduction =
 
+[#Automatic_Debian_Install Jump to Automatic Linux Installation]
+[#Windows Jump to Automatic Windows Installation]
 This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
 
 The major steps for the installation will be:
