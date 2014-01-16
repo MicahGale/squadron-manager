@@ -3,8 +3,9 @@
 <wiki:toc max_depth="3" />
 = Introduction =
 
-[#Automatic_Debian_Install Jump to Automatic Linux Installation]
+[#Automatic_Debian_Install Jump to Automatic Linux Installation] <br>
 [#Windows Jump to Automatic Windows Installation]
+
 This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
 
 The major steps for the installation will be:
@@ -41,7 +42,7 @@ To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) pa
 ===Automatic Debian Install===
 *Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distrubition's package management  software. 
 
-Download the debian file from the [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Google Drive]. It will be squadMan_version_x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
+Download the most current Debian file from the [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
 software.
 
 To install the package download the .deb onto the computer. Then in terminal you will need to navigate to where it is and run:
@@ -68,7 +69,9 @@ If you have a different distribution either Google how to do the installation on
 Finally you will need to [install#Setup_https Setup https], and either install the [install#Automatic_Debian_Install Debian File] or [install#Manually_Depackage_Squadron_Manager Manually Install Squadron Manager]
 
 ==Windows==
-You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over SSH.
+You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over a remote desktop.
+
+Next download the most recent windows installer from the [https://drive.google.com/#folders/0B-3DXkTNAIwmZU5XSmF3WExILXM Google Drive], it will be squadMan`_*`version`*_`x86_x64_windows.msi, and run it
 =Setup https=
 
 =Manually Depackage Squadron Manager=
