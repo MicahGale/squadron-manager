@@ -1,7 +1,7 @@
 #summary Procedures for Beta testing
 #labels Phase-Support
 
-= IP Address: [https://6.18.186.55] =
+= IP Address: [https://96.18.186.55] =
 
 *NOTE:* Currently my ISP is blocking some incoming traffic, the problem has been resolved for now, but if there are more problems, please let me know.
 
