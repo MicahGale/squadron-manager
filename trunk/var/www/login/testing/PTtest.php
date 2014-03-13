@@ -71,40 +71,47 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
     $capid = cleanInputInt($_REQUEST['capid'],6,"Capid");
     $tester= cleanInputInt($_POST['tester'], 6, 'Tester Capid',true);
     $buffer=new member($capid,1,$ident);
-    $requirements=$buffer->retrieveCPFTrequire($ident);  //get the requirements from
-    $actual=array();  //parse the input as an array
-    for($i=0;$i<count($header);$i++) {  //parse it together
-        $buffer=$header[$i]['TEST_CODE'];   //buffer the results
-        if($buffer!='MR')
-            $actual[$buffer]= cleanInputInt($_POST[$buffer],strlen($_POST[$buffer]),"CPFT entrance".$buffer);
-        else 
-            $actual[$buffer]=  parseMinutes (cleanInputString ($_POST[$buffer],5,"Mile run",true));
-    }
-    echo "execute";
-    if(verifyCPFT($ident, $requirements, $actual)||(isset($_POST['waiver']))) {
-        echo "more";
-        $query="INSERT INTO CPFT_ENTRANCE(CAPID,ACHIEV_CODE, TEST_TYPE,SCORE)
-            VALUES('$capid','".$_SESSION['achiev']."',?,?)";
-        $insert= prepare_statement($ident, $query);
-        $header=$_SESSION['header'];
-        for($i=0;$i<count($header);$i++) {
-            bind($insert,"sd", array($header[$i]['TEST_CODE'],$actual[$i] ));
-            execute($insert);
+    $_SESSION['achiev']=  cleanInputString($_REQUEST['achiev'],2,'Achievement',false);
+    $query="SELECT CAPID FROM REQUIREMENTS_PASSED WHERE REQUIREMENT_TYPE='PT' AND CAPID='$capid' AND ACHIEV_CODE='".$_SESSION['achiev']."'";
+    if(numRows(Query($query, $ident))==0) {
+        $requirements=$buffer->retrieveCPFTrequire($ident);  //get the requirements from
+        $_SESSION['date']=  parse_date_input($_POST);
+        $actual=array();  //parse the input as an array
+        for($i=0;$i<count($header);$i++) {  //parse it together
+            $buff=$header[$i]['TEST_CODE'];   //buffer the results
+            if($_POST[$buff]!==0&&$_POST[$buff]!=="") {
+                if($buff!='MR')
+                    $actual[$buff]= cleanInputInt($_POST[$buff],strlen($_POST[$buff]),"CPFT entrance".$buff);
+                else 
+                    $actual[$buff]=  parseMinutes (cleanInputString ($_POST[$buff],5,"Mile run",true));
+            }
         }
-        $_SESSION['achiev']=  cleanInputString($_SESSION['achiev'], 5,'achievement', false);
-        $buffer->init(2, $ident); //get the text set
-        if(isset($_POST['waiver'])&&$_POST['waiver']=='waive')
-            $waive="TRUE";
-        else
-            $waive="FALSE";
-        $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIRE_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICE, WAIVER,TESTER)
-            VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."',false,'$waive','$tester')";
-        Query($query, $ident);
-        unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['capid'],$_SESSION['tester']);
-        header("refresh:0;url=/login/testing/PTtest.php");
-        exit;
+        if(verifyCPFT($ident, $requirements, $actual)||(isset($_POST['waiver']))) {
+            $query="INSERT INTO CPFT_ENTRANCE(CAPID,ACHIEV_CODE, TEST_TYPE,SCORE)
+                VALUES('$capid','".$_SESSION['achiev']."',?,?)";
+            $insert= prepare_statement($ident, $query);
+            $header=$_SESSION['header'];
+            for($i=0;$i<count($header);$i++) {
+                $buff=$header[$i]['TEST_CODE'];
+                if(isset($actual[$buff])&&$actual[$buff]!==0&&$actual[$buff]!=="") {
+                    bind($insert,"sd", array($buff,$actual[$buff] ));
+                    execute($insert);
+                }
+            }
+            $buffer->init(2, $ident); //get the text set
+            if(isset($_POST['waiver'])&&$_POST['waiver']=='waive')
+                $waive="TRUE";
+            else
+                $waive="FALSE";
+            $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICES, WAIVER,TESTER)
+                VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."','".$_SESSION['date']->format(PHP_TO_MYSQL_FORMAT)."',false,'$waive','$tester')";
+            Query($query, $ident);
+            unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['capid'],$_SESSION['tester']);
+            header("refresh:0;url=/login/testing/PTtest.php");
+            exit;
+        }
+        unset($_SESSION['csv']);   //clear the csv parsed data
     }
-    unset($_SESSION['csv']);   //clear the csv parsed data
 }
 if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
     $tester=  cleanInputInt($_POST['tester'], 6, 'Tester capid');

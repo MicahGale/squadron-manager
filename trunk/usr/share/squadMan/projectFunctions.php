@@ -7,9 +7,9 @@
  * other pages.
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
- * @copyright (c) 2013, Micah Gale
+ * @copyright (c) 2014, Micah Gale
  */
-/* Copyright 2013 Micah Gale
+/* Copyright 2014 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -556,17 +556,17 @@ function close_stmt(mysqli_stmt $stmt) {
  * @param String $input the raw Input
  * @param Int $length the absolue length or maximum lenght the number must be, depending on $exact 
  * @param String $fieldName the name of the input field used for logging
- * @param bool true for $length to be exact false for $length to be the max length
+ * @param bool $exact true for $length to be exact false for $length to be the max length
  * @return float The Input Number parsed and cleaned as a floating point 
  */
 function cleanInputInt($input, $length, $fieldName,$exact=true) {
     $link = mysqli_connect();
     $clean = escapeshellcmd(htmlspecialchars(mysqli_real_escape_string($link,$input), ENT_QUOTES | 'ENT_HTML5', 'UTF-8'));
-    if (strlen($clean)!= $length&&$exact||  strlen($clean)>$length&&!$exact || !is_numeric($clean) || $clean != $input) {
+    if ((strlen($clean)!= $length&&$exact)||  (strlen($clean)>$length&&!$exact) || !is_numeric($clean) || $clean != $input) {
         $time = auditLog( $_SERVER['REMOTE_ADDR'], "SI");
         auditDump($time, $fieldName, $clean);
         echo "<font color=\"red\">$fieldName is not a valid number it must be $length digits long.</font><br>";
-        if (strlen($clean) > $length || !is_numeric($clean)) {          //nulls if wrong type
+        if (strlen($clean) > $length ||(strlen($clean)!=$length&&$exact)|| !is_numeric($clean)) {          //nulls if wrong type
             $clean = null;
         }
     }
@@ -752,7 +752,7 @@ function session_secure_start($capid=null) {
                     $ident=connect('ViewNext');
                     session_predict_path($ident,$capid);   //predict the path that users will use
                     close($ident);
-                    $_SESSION['last']='https://'.$_SERVER['SERVER_NAME'].'/login/index.php';
+                    $_SESSION['last']=array('https://'.$_SERVER['SERVER_NAME'].'/login/index.php');
                     $_SESSION['request']['agent']=$_SERVER['HTTP_USER_AGENT'];
                     $_SESSION['request']['accept']=$_SERVER['HTTP_ACCEPT']; 
                     $_SESSION['request']['lang_char']=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
@@ -1418,7 +1418,6 @@ function parsePercent($append, array $inputs, $passing) {
  * @return true iff they passed, false if otherwise
  */
 function verifyCPFT($ident, array $requirements, array $actual) {
-    var_dump($requirements);
     $query ="SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=TRUE";  //gets the tests that are running
     $running =  allResults(Query($query, $ident));
     $query = "SELECT TEST_CODE FROM CPFT_TEST_TYPES WHERE IS_RUNNING=FALSE"; //gets non-running events
@@ -1470,6 +1469,8 @@ function minutesFromDecimal($input) {
  */
 function parseMinutes($input) {
     $exploded=  explode(":", $input);
+    if(count($exploded)==1)
+        return $exploded[0];
     $minute=$exploded[0];
     $seconds=$exploded[1];
     return $minute+$seconds/60;
@@ -2556,7 +2557,6 @@ class member {
         for($i=0;$i<count($require);$i++) {  //reorganizes the info and return it
             $return[$require[$i]['TEST_TYPE']]=  floatval($require[$i]['REQUIREMENT']);
         }
-        var_dump($return);
         return $return;
     }
     function get_age($ident, DateTime $date=null) {
@@ -2677,7 +2677,7 @@ class member {
      */
     function hash_password($pass,$salt) {
         $to_hash=$salt.$pass.$this->capid;
-        return hash("sha512",$to_hash);
+        return base64_encode(hash("sha512",$to_hash,true));
     }
     /**
      * Verifies the user provided the right password
