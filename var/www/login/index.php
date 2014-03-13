@@ -21,9 +21,9 @@
  $salt=$passes['salt'];
  $ident=  connect('ViewNext');
 if(array_key_exists("CAPID", $_POST)&&  array_key_exists("password", $_POST)) {
-    $capid=  cleanInputInt($_POST['CAPID'],6,"CAPID",false);  //clean inputs
+    $capid=  cleanInputInt($_POST['CAPID'],6,"CAPID",true);  //clean inputs
     $password = $_POST['password'];                        //don't clean the password, because of the hash
-    if($capid!=null&&$capid!='') {   //logins in if not a banned user, not null, and not empty
+    if($capid!==null&&$capid!=='') {   //logins in if not a banned user, not null, and not empty
         $unlocked = true;                     //says if account is locked
         if(!checkAccountLocks($capid)) {       //if account is locked stop and say it's locked
             $unlocked=false;
