@@ -7,11 +7,12 @@
 include('projectFunctions.php');
 if(isset($_GET['capid'])) {
     $passes=  parse_ini_file(PSSWD_INI);
+    $ident=  connect("login");
     $salt= $passes['salt'];
-    echo hash_password("Password!", $salt);
+    $member= new member($_POST['capid'],1,$ident);
+    echo $member->hash_password("Password!", $salt);
 }
-function hash_password($pass,$salt) {
-        $to_hash=$salt.$pass.$_GET['capid'];
-        return hash("sha512",$to_hash);
-    }
+//$file=  fopen('/dev/urandom','r');
+//echo base64_encode(fread($file, 32));
+//fclose($file);
  ?>
