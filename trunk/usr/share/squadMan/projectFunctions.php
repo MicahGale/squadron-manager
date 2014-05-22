@@ -30,10 +30,6 @@
  * TODO create installer
  * TODO visitor page
  */
-/*Unix specific functions
- * cleanUploadFile-path delimeter /
- * 
- */
 /*
  *Function to change to port to different DBMS
  * CleanInputInt-sql escape function
@@ -652,7 +648,7 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
     $allowed_ext=end($buffer);  //get the allowed type
     $hash= md5_file($file['tmp_name']);
     $now=new DateTime();
-    $locat=$saveDir.'/'.$hash.'_'.$now->format(EVENT_CODE_DATE).".".$ext;
+    $locat=$saveDir.DIRECTORY_SEPARATOR.$hash.'_'.$now->format(EVENT_CODE_DATE).".".$ext;
     if(!move_uploaded_file($file['tmp_name'],$locat)) { //try to move the file to the location                      // if wasn't uploade
         $error=  auditLog($_SERVER['REMOTE_ADDR'],'FA');
         auditDump($error, 'reffer to', $time);
