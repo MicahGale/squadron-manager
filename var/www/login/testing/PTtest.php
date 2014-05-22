@@ -30,7 +30,7 @@
  * @package Squadron-manager
  * @copyright (c) 2013, Micah Gale
  */
-/*  Copyright 2013 Micah Gale
+/*  Copyright 2014 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -72,46 +72,43 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
     $tester= cleanInputInt($_POST['tester'], 6, 'Tester Capid',true);
     $buffer=new member($capid,1,$ident);
     $_SESSION['achiev']=  cleanInputString($_REQUEST['achiev'],2,'Achievement',false);
-    $query="SELECT CAPID FROM REQUIREMENTS_PASSED WHERE REQUIREMENT_TYPE='PT' AND CAPID='$capid' AND ACHIEV_CODE='".$_SESSION['achiev']."'";
-    if(numRows(Query($query, $ident))==0) {
-        $requirements=$buffer->retrieveCPFTrequire($ident);  //get the requirements from
-        $_SESSION['date']=  parse_date_input($_POST);
-        $actual=array();  //parse the input as an array
-        for($i=0;$i<count($header);$i++) {  //parse it together
-            $buff=$header[$i]['TEST_CODE'];   //buffer the results
-            if($_POST[$buff]!==0&&$_POST[$buff]!=="") {
-                if($buff!='MR')
-                    $actual[$buff]= cleanInputInt($_POST[$buff],strlen($_POST[$buff]),"CPFT entrance".$buff);
-                else 
-                    $actual[$buff]=  parseMinutes (cleanInputString ($_POST[$buff],5,"Mile run",true));
-            }
+    $requirements=$buffer->retrieveCPFTrequire($ident);  //get the requirements from
+    $_SESSION['date']=  parse_date_input($_POST);
+    $actual=array();  //parse the input as an array
+    for($i=0;$i<count($header);$i++) {  //parse it together
+        $buff=$header[$i]['TEST_CODE'];   //buffer the results
+        if($_POST[$buff]!==0&&$_POST[$buff]!=="") {
+            if($buff!='MR')
+                $actual[$buff]= cleanInputInt($_POST[$buff],strlen($_POST[$buff]),"CPFT entrance".$buff);
+            else 
+                $actual[$buff]=  parseMinutes (cleanInputString ($_POST[$buff],5,"Mile run",true));
         }
-        if(verifyCPFT($ident, $requirements, $actual)||(isset($_POST['waiver']))) {
-            $query="INSERT INTO CPFT_ENTRANCE(CAPID,ACHIEV_CODE, TEST_TYPE,SCORE)
-                VALUES('$capid','".$_SESSION['achiev']."',?,?)";
-            $insert= prepare_statement($ident, $query);
-            $header=$_SESSION['header'];
-            for($i=0;$i<count($header);$i++) {
-                $buff=$header[$i]['TEST_CODE'];
-                if(isset($actual[$buff])&&$actual[$buff]!==0&&$actual[$buff]!=="") {
-                    bind($insert,"sd", array($buff,$actual[$buff] ));
-                    execute($insert);
-                }
-            }
-            $buffer->init(2, $ident); //get the text set
-            if(isset($_POST['waiver'])&&$_POST['waiver']=='waive')
-                $waive="TRUE";
-            else
-                $waive="FALSE";
-            $query = "INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICES, WAIVER,TESTER)
-                VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."','".$_SESSION['date']->format(PHP_TO_MYSQL_FORMAT)."',false,'$waive','$tester')";
-            Query($query, $ident);
-            unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['capid'],$_SESSION['tester']);
-            header("refresh:0;url=/login/testing/PTtest.php");
-            exit;
-        }
-        unset($_SESSION['csv']);   //clear the csv parsed data
     }
+    if(verifyCPFT($ident, $requirements, $actual)||(isset($_POST['waiver']))) {
+        $query="REPLACE CPFT_ENTRANCE(CAPID,ACHIEV_CODE, TEST_TYPE,SCORE)
+            VALUES('$capid','".$_SESSION['achiev']."',?,?)";
+        $insert= prepare_statement($ident, $query);
+        $header=$_SESSION['header'];
+        for($i=0;$i<count($header);$i++) {
+            $buff=$header[$i]['TEST_CODE'];
+            if(isset($actual[$buff])&&$actual[$buff]!==0&&$actual[$buff]!=="") {
+                bind($insert,"sd", array($buff,$actual[$buff] ));
+                execute($insert);
+            }
+        }
+        $buffer->init(2, $ident); //get the text set
+        if(isset($_POST['waiver'])&&$_POST['waiver']=='waive')
+            $waive="TRUE";
+        else
+            $waive="FALSE";
+        $query = "REPLACE INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, ON_ESERVICES, WAIVER,TESTER)
+            VALUES('$capid','".$_SESSION['achiev']."','PT','".$buffer->get_text()."','".$_SESSION['date']->format(PHP_TO_MYSQL_FORMAT)."',false,'$waive','$tester')";
+        Query($query, $ident);
+        unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['capid'],$_SESSION['tester']);
+        header("refresh:0;url=/login/testing/PTtest.php");
+        exit;
+    }
+    unset($_SESSION['csv']);   //clear the csv parsed data
 }
 if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
     $tester=  cleanInputInt($_POST['tester'], 6, 'Tester capid');
@@ -203,7 +200,7 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
             ?>
         <p><a href="/login/testing/PTtest.php?multi=0">Enter individual CPFT test</a></p>
         <p><a href="/login/testing/PTtest.php?multi=1">View CPFT testing sign-up</a></p>
-        <p><a href="/login/testing/ptCSV.php" target="_blank">Download CSV file of CPFT testing sign-up</a>    <a href="/help/CPFTcsv.php" target="_blank">Help for CSV</a></p>
+        <p><a href="/login/testing/ptCSV.php" target="_blank">Download CSV file of CPFT testing sign-up</a> <a href="/help/CPFTcsv.php" target="_blank">?</a></p>
         <p><a href="/login/testing/PTtest.php?multi=1&upload=0">Upload a CSV file of Testing_results</a></p>
         <?php
         } else if(isset($_GET['capid'])||(isset($_GET['multi'])&&$_GET['multi']==0)) {
@@ -351,51 +348,53 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
             </tr>
             <?
             $capid=array();
-            foreach($_SESSION['csv'] as $key=>$buffer) {    //gets the info for sorting
-                if($key!="date") {                           //if it isn't the date then go on
-                    $last_name[$key]=$buffer['member']->getName_Last();
-                    $first_name[$key]=$buffer['member']->getName_first();
-                    $capid[$key]=$buffer['member']->getCapid();
-                }
-            }
-            array_multisort($last_name, SORT_STRING,$first_name, SORT_STRING, $capid, SORT_NUMERIC);  //sort it
-            foreach($capid as $id) {
-                echo "<tr><td class=\"table\">";
-                $buffer=$_SESSION['csv'][$id];
-                echo $buffer['member']->link_report().'</td><td class="table">';
-                echo $buffer['member']->get_gender().'</td><td class="table">';
-                echo $buffer['age']."</td>";
-                if(isset($buffer['standards']))
-                    $requirements=$buffer['standards'];
-                else
-                    $requirements=$buffer['member']->retrieveCPFTrequire ($ident);
-                for($i=0;$i<count($_SESSION['header']);$i++) {
-                    $code=$header[$i]['TEST_CODE'];
-                    echo '<td class="table"><input type="text" size="1" maxlength="5" name="'.$code.$id.'"';
-                    if (isset($buffer['actual'][$code])) {
-                        if($code=='MR')
-                            echo ' value="'.minutesFromDecimal ($buffer['actual'][$code]).'"';
-                        else 
-                            echo ' value="'.$buffer['actual'][$code].'"';
-                    }
-                    echo " />";
-                    if(isset($requirements[$code])) {
-                        if($code!='MR')
-                            echo $requirements[$code]."</td>";
-                        else 
-                            echo minutesFromDecimal ($requirements[$code])."</td>";
+            if(isset($_SESSION['csv'])){
+                foreach($_SESSION['csv'] as $key=>$buffer) {    //gets the info for sorting
+                    if($key!="date") {                           //if it isn't the date then go on
+                        $last_name[$key]=$buffer['member']->getName_Last();
+                        $first_name[$key]=$buffer['member']->getName_first();
+                        $capid[$key]=$buffer['member']->getCapid();
                     }
                 }
-                echo '<td class="table"><input type="checkbox" name="waive[]" value="'.$id.'"';
-                if(isset($buffer['waive'])&&$buffer['waive']===true)
-                    echo " checked ";
-                echo ' /></td><td class="table"><label for="pass">Pass</label><input type="radio" name="'.$id.'" value="pass" id="pass"';
-                if(isset($buffer['waive'])&& $buffer['pass']===true)
-                    echo ' checked ';
-                echo ' /><br><label for="fail">Fail</label><input type="radio" name="'.$id.'" value="fail" id="fail"';
-                if(!isset($buffer['waive'])||$buffer['pass']===false)
-                    echo ' checked ';
-                echo " /></td></tr>\n";
+                array_multisort($last_name, SORT_STRING,$first_name, SORT_STRING, $capid, SORT_NUMERIC);  //sort it
+                foreach($capid as $id) {
+                    echo "<tr><td class=\"table\">";
+                    $buffer=$_SESSION['csv'][$id];
+                    echo $buffer['member']->link_report().'</td><td class="table">';
+                    echo $buffer['member']->get_gender().'</td><td class="table">';
+                    echo $buffer['age']."</td>";
+                    if(isset($buffer['standards']))
+                        $requirements=$buffer['standards'];
+                    else
+                        $requirements=$buffer['member']->retrieveCPFTrequire ($ident);
+                    for($i=0;$i<count($_SESSION['header']);$i++) {
+                        $code=$header[$i]['TEST_CODE'];
+                        echo '<td class="table"><input type="text" size="1" maxlength="5" name="'.$code.$id.'"';
+                        if (isset($buffer['actual'][$code])) {
+                            if($code=='MR')
+                                echo ' value="'.minutesFromDecimal ($buffer['actual'][$code]).'"';
+                            else 
+                                echo ' value="'.$buffer['actual'][$code].'"';
+                        }
+                        echo " />";
+                        if(isset($requirements[$code])) {
+                            if($code!='MR')
+                                echo $requirements[$code]."</td>";
+                            else 
+                                echo minutesFromDecimal ($requirements[$code])."</td>";
+                        }
+                    }
+                    echo '<td class="table"><input type="checkbox" name="waive[]" value="'.$id.'"';
+                    if(isset($buffer['waive'])&&$buffer['waive']===true)
+                        echo " checked ";
+                    echo ' /></td><td class="table"><label for="pass">Pass</label><input type="radio" name="'.$id.'" value="pass" id="pass"';
+                    if(isset($buffer['waive'])&& $buffer['pass']===true)
+                        echo ' checked ';
+                    echo ' /><br><label for="fail">Fail</label><input type="radio" name="'.$id.'" value="fail" id="fail"';
+                    if(!isset($buffer['waive'])||$buffer['pass']===false)
+                        echo ' checked ';
+                    echo " /></td></tr>\n";
+                }
             }
             ?>
             </table><br>

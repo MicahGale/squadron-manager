@@ -782,6 +782,7 @@ function session_secure_start($capid=null) {
             $error_total+=0.5;    //if not the same content accepted
         if($_SERVER['HTTP_ACCEPT_ENCODING']!=$_SESSION['request']['encoding'])
             $error_total+=0.5;
+        
         if($error_total >=1||$_SESSION['ip_addr']!=$_SERVER['REMOTE_ADDR']||!in_array($_SERVER['SCRIPT_NAME'],$_SESSION['predicted'])||
             $_SESSION['request']['agent']!=$_SERVER['HTTP_USER_AGENT']||
             $_SESSION['request']['lang_char']!=$_SERVER['HTTP_ACCEPT_LANGUAGE']) { //if it's the right ip continue

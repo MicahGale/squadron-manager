@@ -4,7 +4,7 @@
  * 
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
- * @copyright (c) 2013, Micah Gale
+ * @copyright (c) 2014, Micah Gale
  * 
  * $_GET
  * page- the page of results to view
@@ -37,7 +37,7 @@
  * ip- the ip address to search for
  * notif- whether or not to show only new 
  */
-/* Copyright 2013 Micah Gale
+/* Copyright 2014 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -292,8 +292,13 @@ if(!isset($_GET['time'])) {
                 echo '<td class="table">'.$result[$i]['FIELD_NAME']."</td>";
                 if(in_array($result[$i]['FIELD_NAME'],$capids)) {
                     $capid=$result[$i]['FIELD_VALUE'];
-                    $member=new member($capid,1,$ident);
-                    echo '<td class="table">'.$member->link_report(true).'</td>';
+                    echo '<td class="table">';
+                    if(strlen($capid)==6) {
+                        $member=new member($capid,1,$ident);
+                        echo $member->link_report(true);
+                    } else
+                        echo $capid;
+                    echo '</td>';
                 } else 
                     echo '<td class="table">'.$result[$i]['FIELD_VALUE']."</td></tr>\n";
             }

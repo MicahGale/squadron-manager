@@ -1,5 +1,5 @@
 <?php
-/* * Copyright 2013 Micah Gale
+/* * Copyright 2014 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -54,7 +54,8 @@ if(isset($_POST['password'])) { //if has password given
         <title>resign-in for security</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico"/>
-        <script type="text/javascript" src="/java_script/CAPS_LOCKS.js"></script>
+        <link rel="stylesheet" type="text/css" href="/main.css"/>
+        <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
     </head>
     <body>
         <?php
