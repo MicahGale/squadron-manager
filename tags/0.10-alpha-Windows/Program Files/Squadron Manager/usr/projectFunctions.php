@@ -79,8 +79,8 @@ if($input!==false) {  //if the file was parsed then get the inputs
 } else {
     define("PHP_DATE_FORMAT","d M y");  
     define("PHP_TIMESTAMP_FORMAT",PHP_DATE_FORMAT." H:i:s");  //the datetime format
-    define('CSV_SAVE_PATH',"/var/upload/csv");  //the constant for where csv files go
-    define('PROFILE_PATH',"/var/upload/profile");  //the path to the profile pictures stored outside document root
+    define('CSV_SAVE_PATH',"C:/Squadron_Manager/csv");  //the constant for where csv files go
+    define('PROFILE_PATH',"C:/Squadron_Manager/profile");  //the path to the profile pictures stored outside document root
     define("BAD_LOGIN_WAIT",5);
     date_default_timezone_set("America/Denver");
     /**
