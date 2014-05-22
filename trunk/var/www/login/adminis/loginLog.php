@@ -7,7 +7,7 @@
  * 
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
- * @copyright (c) 2013, Micah Gale
+ * @copyright (c) 2014, Micah Gale
  * $_GET
  * lock-view the account lock outs
  * page- the page of the results to see
@@ -20,7 +20,7 @@
  * ip - th ip address
  * login- the failed logins
  */
-/* Copyright 2013 Micah Gale
+/* Copyright 2014 Micah Gale
  *
  * This file is a part of Squadron Manager
  *
@@ -190,9 +190,11 @@ if(isset($_POST['filter'])) {
                                     echo '<td class="table">'.$date->format(PHP_TIMESTAMP_FORMAT).'</td>';
                                 } else 
                                     echo '<td class="table"></td>';
-                                $member=new member($result[$i]['CAPID'],1,$ident);
+                                unset($member);
+                                if(strlen($result[$i]['CAPID'])==6)
+                                    $member=new member($result[$i]['CAPID'],1,$ident);
                                 echo '<td class="table">';
-                                if($member->exists()) {
+                                if(isset($member)&&$member->exists()) {
                                     $name = $member->getCapid().", ".$member->getName_first()." ".$member->getName_Last();
                                     echo'<a target="_blank" href="/login/member/report.php?capid='.$member->getCapid().'">'.$name.'</a></td>';
                                 } else  {

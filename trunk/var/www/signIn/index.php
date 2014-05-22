@@ -16,6 +16,18 @@
  *
  * 
  */
+include("projectFunctions.php");
+$ident=Connect('Sign-in');
+session_start();
+if(isset($_GET['CAPID'])) {
+    $capid= cleanInputInt($_GET['CAPID'],6, "Capid");
+    $member = new member($capid,2,$ident);
+} else  {
+    $capid=null;
+}
+if(isset($member)&&$member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
+    $_SESSION["member"]=$member;
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -28,28 +40,19 @@
     <body>
 <?php
 include("header.php");
-include("projectFunctions.php");
-$ident=Connect('Sign-in');
-if(isset($_GET['CAPID'])) {
-    $capid= cleanInputInt($_GET['CAPID'],6, "Capid");
-    $member = new member($capid,2,$ident);
-} else  {
-    $capid=null;
-}
 if(isset($member)&&$member->badInput) {
     echo " please search again
         <form action=\"../signIn\" method=\"get\">
                         <input type =\"text\" name=\"CAPID\" size=\"5\"/>
                         <input type=\"submit\" value =\"Search\"/>
                     </form>";
-    break;
+    exit;
 }    
     if(isset($member)&&$member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
         echo"<div styl=\"font-weight:bold\">We found this member from the entered CAPID:</div><br><br>\n";
         echo "<table class=\"table\"><tr class=\"table\"><th class=\"table\">CAPID</th><th class=\"table\">Last Name</th><th class=\"table\">First Name</th><th class=\"table\">Grade</th></tr>\n";
         echo "<tr class=\"table\"><td class=\"table\">".$member->getCapid()."</td><td class=\"table\">".$member->getName_Last()."</td><td class=\"table\">".$member->getName_first()."</td><td>".$member->getGrade($ident,'signin/index.php')."</td></tr></table><br>";  
         $member->testSign_up($ident, "finishSignin.php","signin/index.php");
-        session_start();
         $_SESSION["member"]=$member;
     } else if(isset($member)&&$member->check_terminated($ident)) {
         echo '<span class="F">Your membership is terminated, and you cannot log in.</span>';
