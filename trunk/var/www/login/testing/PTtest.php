@@ -110,16 +110,19 @@ if(isset($_POST['search'])||isset($_POST['searchT'])) {  //if searched then save
     }
     unset($_SESSION['csv']);   //clear the csv parsed data
 }
-if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
+if(isset($_POST['save'],$_GET['multi'])&&$_GET['multi']==1) {
     $tester=  cleanInputInt($_POST['tester'], 6, 'Tester capid');
     $query="INSERT INTO CPFT_ENTRANCE(CAPID, ACHIEV_CODE,TEST_TYPE, SCORE)
             VALUES(?,?,?,?)";
     $score_insert=  prepare_statement($ident, $query);
+    $query="SELECT CAPID FROM REQUIREMENTS_PASSED WHERE CAPID=? AND ACHIEV_CODE=? AND REQUIREMENT_TYPE='PT'";
+    $check=  prepare_statement($ident, $query);
     $query="INSERT INTO REQUIREMENTS_PASSED(CAPID, ACHIEV_CODE, REQUIREMENT_TYPE, TEXT_SET, PASSED_DATE, WAIVER,TESTER)
         VALUES(?,?,'PT',?,?,?,'$tester')";
     $log= prepare_statement($ident, $query);
     $query="DELETE FROM TESTING_SIGN_UP WHERE REQUIRE_TYPE='PT' AND CAPID=?";
-    $delete = prepare_statement($ident, $query);
+    $deleter=connect("delete");
+    $delete = prepare_statement($deleter, $query);
     $header=$_SESSION['header'];
     foreach($_SESSION['csv'] as $key=>$buffer) {    //cycle trhough results
         if($key!='date') {
@@ -128,14 +131,16 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
                 $passed=false;
                 for($i=0;$i<count($header);$i++) {   //parse all the input
                     $buffer=$header[$i]['TEST_CODE'];
-                    if($buffer!='MR') {    //if it isn't the mile run parse it as a number
-                        $actual[$buffer]=  cleanInputInt($_POST[$buffer.$capid],  strlen($_POST[$buffer.$capid]), "Test input for ".$buffer);
-                    } else {
-                        $parsed=  cleanInputString($_POST[$buffer.$capid],5,"Test input for ".$buffer,false);
-                        if(is_numeric($parsed))
-                            $actual[$buffer]=$parsed;
-                        else
-                            $actual[$buffer]=  parseMinutes ($parsed);
+                    if($_POST[$buffer.$capid]!=""&&$_POST[$buffer.$capid]!=0) {
+                        if($buffer!='MR') {    //if it isn't the mile run parse it as a number
+                            $actual[$buffer]=  cleanInputInt($_POST[$buffer.$capid],  strlen($_POST[$buffer.$capid]), "Test input for ".$buffer);
+                        } else {
+                            $parsed=  cleanInputString($_POST[$buffer.$capid],5,"Test input for ".$buffer,false);
+                            if(is_numeric($parsed))
+                                $actual[$buffer]=$parsed;
+                            else
+                                $actual[$buffer]=  parseMinutes ($parsed);
+                        }
                     }
                 }
                 if(isset($_POST['waive'])&&!in_array($capid,$_POST['waive'])) {  //if wasn't waived then don't worry
@@ -158,14 +163,30 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
                     if(!isset($date)||$date===null)
                         $date=new DateTime;
                     $member=$_SESSION['csv'][$capid]['member'];
-                    bind($log, 'issss', array($capid,$member->get_next_achiev($ident),'ALL',$date->format(PHP_TO_MYSQL_FORMAT),$waived));
-                    execute($log);
+                    bind($check,'is',array($capid,$member->get_next_achiev($ident)));
+                    if(numRows(execute($check))==0) {
+                        bind($log, 'issss', array($capid,$member->get_next_achiev($ident),'ALL',$date->format(PHP_TO_MYSQL_FORMAT),$waived));
+                        execute($log);
+                        $update=false;
+                    } else {
+                        $update=true;
+                        $query="UPDATE REQUIREMENTS_PASSED SET PASSED_DATE='".$date->format(PHP_TO_MYSQL_FORMAT)."', TESTER='$tester'"
+                                . " WHERE CAPID='$capid' AND ACHIEV_CODE='".$member->get_next_achiev($ident)."' AND REQUIREMENT_TYPE='PT'";
+                        Query($query, $ident);   //update the rows
+                    }
                     for($i=0;$i<count($header);$i++) {  //log all the scores they got
                         $buffer=$header[$i]['TEST_CODE'];
-                        $score=$actual[$buffer];
+                        if(isset($actual[$buffer]))
+                            $score=$actual[$buffer];
                         if(!(!isset($score)||$score===null||$score==""||$score==0)) {
-                            bind($score_insert,"issd",array($capid,$member->get_next_achiev($ident),$buffer,$score));
-                            execute($score_insert);                          //log all the scores
+                            if(!$update) {
+                                bind($score_insert,"issd",array($capid,$member->get_next_achiev($ident),$buffer,$score));
+                                execute($score_insert);                          //log all the scores
+                            } else {
+                                $query="UPDATE CPFT_ENTRANCE SET SCORE='$score'"
+                                        . "WHERE CAPID='$capid' AND ACHIEV_CODE='".$member->get_next_achiev($ident)."' AND TEST_TYPE='$buffer'";
+                                Query($query, $ident);
+                            }
                         }
                     }
                     bind($delete, 's',array($capid));
@@ -177,6 +198,8 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
     close_stmt($log);
     close_stmt($delete);
     close_stmt($score_insert);
+    close_stmt($check);
+    close($deleter);
     unset($_SESSION['date'],$_SESSION['CPFT'],$_SESSION['header'],$_SESSION['achiev'],$_SESSION['csv']);
     header("refresh:0;url=/login/testing/PTtest.php");
     exit;
@@ -200,8 +223,8 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
             ?>
         <p><a href="/login/testing/PTtest.php?multi=0">Enter individual CPFT test</a></p>
         <p><a href="/login/testing/PTtest.php?multi=1">View CPFT testing sign-up</a></p>
-        <p><a href="/login/testing/ptCSV.php" target="_blank">Download CSV file of CPFT testing sign-up</a> <a href="/help/CPFTcsv.php" target="_blank">?</a></p>
-        <p><a href="/login/testing/PTtest.php?multi=1&upload=0">Upload a CSV file of Testing_results</a></p>
+        <p><a href="/login/testing/ptCSV.php">Download CSV file of CPFT testing sign-up</a> <a href="/help/CPFTcsv.php" target="_blank">?</a></p>
+        <p><a href="/login/testing/PTtest.php?multi=1&upload=0">Upload a CSV file of Testing results</a></p>
         <?php
         } else if(isset($_GET['capid'])||(isset($_GET['multi'])&&$_GET['multi']==0)) {
             echo '<form method="post">';
@@ -265,11 +288,11 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
             enterDate(true,null,new DateTime());
             ?>
             <br><br><label for="file">Upload CSV:</label>
-            <input type="file" name="file" id="file" accept="text/csv"/><br>
+            <input type="file" name="file" id="file" accept=".CSV"/><br>
             <input type="submit" value="upload"/>
             <?php
         } else if(isset($_FILES['file'])) {
-            $locat = cleanUploadFile('file',5*1024,CSV_SAVE_PATH, 'text/csv');
+            $locat = cleanUploadFile('file',5*1024/*5KB*/,CSV_SAVE_PATH, 'text/csv');
             if($locat!==false&&($handle=fopen($locat,'r'))!==false) {              //opens the file
                 $date=  parse_date_input($_POST);               //get the test date
                 $parse=array();
@@ -298,7 +321,9 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
                             }
                             $parse[$capid]['actual']=array();
                             for($i=0;$i<count($columns);$i++) {   //parse the test results
-                                $parse[$capid]['actual'][$columns[$i]]=  cleanInputInt($row[$i+2], strlen($row[$i+2]),"Test input for:".$capid." for: ".$columns[$i]);  //parses the info
+                                if($row[$i+2]!==""&&$row[$i+2]!==0) {
+                                    $parse[$capid]['actual'][$columns[$i]]=  cleanInputInt($row[$i+2], strlen($row[$i+2]),"Test input for: ".$capid." for: ".$columns[$i]);  //parses the info
+                                }
                             }
                             if(isset($row[$i+2])&&str_replace(" ","",$row[$i+2])!=="") {  //if the waiver was checked then 
                                 $parse[$capid]['waive']=true;
@@ -319,7 +344,6 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
         }
         if(isset($_GET['multi'])&&$_GET['multi']==1&&((isset($_GET['upload'])&&$_GET['upload']==1)||!isset($_GET['upload']))) {
             
-            echo '<form method="post">';
             $query ="SELECT A.CAPID, FLOOR(DATEDIFF(CURDATE(),A.DATE_OF_BIRTH)/365.25) AS AGE
                 FROM MEMBER A, TESTING_SIGN_UP B
                Where B.CAPID=A.CAPID
@@ -336,7 +360,11 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
             }
             ?>
             <table><tr><td style="text-align: center">
-            <input type="submit" name="save" value="save"/><br>
+                        <form method="get" action="/login/testing/ptCSV.php">
+                            <button type="submit">Download CSV</button>
+                        </form>
+                        <form method="post">
+                        <input type="submit" name="save" value="save"/><br>
             Tester:<input type="text" name="tester" value="<?php echo $tester;?>" size="3" maxlength="6"/><br><br>
         <table class="table"><tr><th class="table">Name</th><th class="table">Gender</th><th class="table">Age</th>
             <?php
@@ -360,7 +388,7 @@ if(isset($_POST['save'])&&isset($_GET['multi'])&&$_GET['multi']==1) {
                 foreach($capid as $id) {
                     echo "<tr><td class=\"table\">";
                     $buffer=$_SESSION['csv'][$id];
-                    echo $buffer['member']->link_report().'</td><td class="table">';
+                    echo $buffer['member']->link_report(true).'</td><td class="table">';
                     echo $buffer['member']->get_gender().'</td><td class="table">';
                     echo $buffer['age']."</td>";
                     if(isset($buffer['standards']))
