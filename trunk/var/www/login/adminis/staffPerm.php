@@ -115,23 +115,23 @@ if(isset($_POST['save'])) {  //save the permissions
                         for($i=0;$i<count($buffer);$i++) {              //strip out the layers of the onion
                             array_push($staff_pos, $buffer[$i]['CODE']);
                         }
+                        $member_type=$_SESSION['staffer']->get_member_type();
+                        $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' AND MEMBER_TYPE='$member_type' ORDER BY STAFF_NAME";
+                        $results=allResults(Query($query, $ident));
+                        echo "<tr>";
+                        for($i=0;$i<count($results);$i++) {
+                            if(($i+1)%3==1)  //if 1 over a multiple of 3 
+                                echo "<tr>";
+                            echo '<td><input type="checkbox"';
+                            if(isset($staff_pos)&&  in_array($results[$i]['STAFF_CODE'], $staff_pos)) 
+                                    echo ' checked="checked"';
+                            echo ' name="pos[]" value="'.$results[$i]['STAFF_CODE'].'"/>'.$results[$i]['STAFF_NAME']."</td>";
+                           if(($i+1)%3==0) //if mutliple of 3
+                                echo "</tr>\n";
+                        }
+                        if($i%3!=0)
+                            echo "</tr>";
                     }
-                    $member_type=$_SESSION['staffer']->get_member_type();
-                    $query="SELECT STAFF_NAME, STAFF_CODE FROM STAFF_POSITIONS WHERE STAFF_CODE<>'AL' AND MEMBER_TYPE='$member_type' ORDER BY STAFF_NAME";
-                    $results=allResults(Query($query, $ident));
-                    echo "<tr>";
-                    for($i=0;$i<count($results);$i++) {
-                        if(($i+1)%3==1)  //if 1 over a multiple of 3 
-                            echo "<tr>";
-                        echo '<td><input type="checkbox"';
-                        if(isset($staff_pos)&&  in_array($results[$i]['STAFF_CODE'], $staff_pos)) 
-                                echo ' checked="checked"';
-                        echo ' name="pos[]" value="'.$results[$i]['STAFF_CODE'].'"/>'.$results[$i]['STAFF_NAME']."</td>";
-                       if(($i+1)%3==0) //if mutliple of 3
-                            echo "</tr>\n";
-                    }
-                    if($i%3!=0)
-                        echo "</tr>";
                     ?>
                 </table>
             <h2>Specific Permissions:</h2>
@@ -154,29 +154,30 @@ if(isset($_POST['save'])) {  //save the permissions
                     for($i=0;$i<count($special);$i++) {
                         $special[$i]=$special[$i]['TASK_CODE'];
                     }
-                }
-                echo "<tr>";
-                for($i=0;$i<count($results);$i++) {
-                    $disabled=false;
-                    if(($i+1)%3==1)  //if 1 over a multiple of 3 
-                        echo "<tr>";
-                    echo '<td><input type="checkbox"';
-                    if(isset($staff_pos_perm)&&in_array($results[$i]['TASK_CODE'], $special))
-                            echo ' checked="checked"';
-                    if(isset($staff_pos)&&in_array($results[$i]['TASK_CODE'], $staff_pos_perm)) { 
-                            echo ' checked="checked"';
+                
+                    echo "<tr>";
+                    for($i=0;$i<count($results);$i++) {
+                        $disabled=false;
+                        if(($i+1)%3==1)  //if 1 over a multiple of 3 
+                            echo "<tr>";
+                        echo '<td><input type="checkbox"';
+                        if(isset($staff_pos_perm)&&in_array($results[$i]['TASK_CODE'], $special))
+                                echo ' checked="checked"';
+                        if(isset($staff_pos)&&in_array($results[$i]['TASK_CODE'], $staff_pos_perm)) { 
+                                echo ' checked="checked"';
+                                $disabled=true;
+                        }
+                        if($results[$i]['UNGRANTABLE'])
                             $disabled=true;
+                        if($disabled)
+                            echo ' disabled="disabled"';
+                        echo ' name="perm[]" value="'.$results[$i]['TASK_CODE'].'"/>'.$results[$i]['TASK_NAME']."</td>";
+                       if(($i+1)%3==0) //if mutliple of 3
+                            echo "</tr>\n";
                     }
-                    if($results[$i]['UNGRANTABLE'])
-                        $disabled=true;
-                    if($disabled)
-                        echo ' disabled="disabled"';
-                    echo ' name="perm[]" value="'.$results[$i]['TASK_CODE'].'"/>'.$results[$i]['TASK_NAME']."</td>";
-                   if(($i+1)%3==0) //if mutliple of 3
+                    if($i%3!=0)
                         echo "</tr>\n";
                 }
-                if($i%3!=0)
-                    echo "</tr>\n";
                 ?>
             </table>
             <input type="submit" name="save" value="save"/>
