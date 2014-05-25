@@ -188,7 +188,9 @@ if(isset($_POST['filter'])) {
                                 if($result[$i]['LOG_OFF']!==null) {
                                     $date= new DateTime($result[$i]['LOG_OFF']);
                                     echo '<td class="table">'.$date->format(PHP_TIMESTAMP_FORMAT).'</td>';
-                                } else 
+                                } else if(!$result[$i]['SUCEEDED']) //if failed then show --- for log-off
+                                    echo '<td class="table">---</td>';
+                                else
                                     echo '<td class="table"></td>';
                                 unset($member);
                                 if(strlen($result[$i]['CAPID'])==6)
