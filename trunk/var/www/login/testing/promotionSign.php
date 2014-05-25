@@ -74,7 +74,7 @@ if(isset($_GET['lock'])) {
                                 if(isset($_POST['filter'])) {  //if set a filter then get it in
                                     $_SESSION['memberType']=cleanInputString($_POST['memberType'],1,"member filter",false);
                                 }
-                                dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType'],true);
+                                dropDownMenu("SELECT MEMBER_TYPE_CODE, MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'",'memberType', $ident,false,$_SESSION['memberType'],false);
                                 ?>
                                 <input type="submit" name="filter" value="Filter"/> <br><br>
                             <?php } ?>
