@@ -1329,9 +1329,10 @@ function parsePromoInput(mysqli $ident,array $input) {
     $update = prepare_statement($ident,"UPDATE REQUIREMENTS_PASSED
         SET PASSED_DATE=?, PERCENTAGE=?, TESTER=?
         WHERE CAPID=? AND ACHIEV_CODE=? AND REQUIREMENT_TYPE=?");
-    $deleteTest =  prepare_statement($ident,"DELETE FROM TESTING_SIGN_UP
+    $deleter=connect("delete");
+    $deleteTest =  prepare_statement($deleter,"DELETE FROM TESTING_SIGN_UP
         WHERE CAPID=? AND REQUIRE_TYPE=?");
-    $deleteRequest = prepare_statement($ident,"DELETE FROM PROMOTION_REQUEST
+    $deleteRequest = prepare_statement($deleter,"DELETE FROM PROMOTION_SIGN_UP
         WHERE CAPID=?");
     $signUps=$_SESSION['signUps'];
     $header=$_SESSION['header'];
@@ -1365,6 +1366,7 @@ function parsePromoInput(mysqli $ident,array $input) {
     close_stmt($insert);
     close_stmt($update);
     close_stmt($deleteTest);
+    close($deleter);
 }
 /**
  * Parses percentage input and cleans it.
@@ -2422,28 +2424,37 @@ class member {
                 if($has_percent)
                     $percent = parsePercent($append, $input, $this->promoRecord[$type]["percent"]); //parse the percentage
                 $date=  parse_date_input($input, $append);                 //parse the date
-                if(isset($input['tester'.$append]))
-                    $tester=  cleanInputInt($input["tester".$append],6, "Tester ID", true);
-                //if date isn't null and (percent isn't specified or if it is and is valid
-                if($date!=null&&($has_percent&&$percent!=false&&$this->promoRecord[$type]['percent']!==null||!$has_percent||$this->promoRecord[$type]['percent']===null)) {         //if date is valid and the percent is valid
-                    switch($this->promoRecord[$type][0]) {                     //switchfor choosing which prepared satement
-                        case "P":
-                            bind($update,"sdiiss",array($date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester,$this->capid,$achiev,$type));
-                            execute($update);
-                            break;
-                        case "I": //goes down to next case
-                        Case "F":
-                            bind($insert,"issssdi",array($this->capid,$achiev,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester));           //insert 
-                            execute($insert);
-                            $this->promoRecord[$type][0]='P';     //set it to passed to easily checked if passed all requirements
-                            if($this->promoRecord[$type][0]=='F') 
-                                break;  //break if they didn't sign up
-                            bind($delete,'is',array($this->capid,$type));
-                            execute($delete);            //execute and delete the sign-up
-                            break;
+                if(isset($input['tester'.$append])&&$input['tester'.$append]!=0&&$input['tester'.$append]!=null) {
+                    $ident=  connect('login');
+                    $tester= new member($input["tester".$append],1,$ident);
+                    close($ident);
+                }
+                //if date isn't null and (percent isn't specified or if it is and is valid and (tester is valid or is not specified
+                if(!isset($tester)||(isset($tester)&&$tester->exists())) { //check that it is a valid tester
+                    if($date!=null&&(($has_percent&&$percent!=false&&$this->promoRecord[$type]['percent']!==null)||!$has_percent||$this->promoRecord[$type]['percent']===null)) {         //if date is valid and the percent is valid
+                        switch($this->promoRecord[$type][0]) {                     //switchfor choosing which prepared satement
+                            case "P":
+                                bind($update,"sdiiss",array($date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester->getCapid(),$this->capid,$achiev,$type));
+                                execute($update);
+                                break;
+                            case "I": //goes down to next case
+                            Case "F":
+                                bind($insert,"issssdi",array($this->capid,$achiev,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester));           //insert 
+                                execute($insert);
+                                $this->promoRecord[$type][0]='P';     //set it to passed to easily checked if passed all requirements
+                                if($this->promoRecord[$type][0]=='F') 
+                                    break;  //break if they didn't sign up
+                                bind($delete,'is',array($this->capid,$type));
+                                execute($delete);            //execute and delete the sign-up
+                                break;
+                        }
                     }
+                } else {  //if the tester is invalid yell at people!
+                    echo '<span class="F">The tester CAPID:'.$tester->getCapid()." is invalid.</span>";
                 }
             }
+            $tester=null;
+            unset($tester);
         }
     }
     /**
