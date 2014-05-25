@@ -36,7 +36,14 @@ if(isset($_POST['password'])) { //if has password given
      if($member->check_password($ident, $password, $salt)&&!$member->check_terminated($ident)) {  //checks the password
          auditLog($_SERVER['REMOTE_ADDR'],'RS');
          $_SESSION['resignin']=null;
-         unset($_SESSION['resignin']);  //say signed in fine
+         unset($_SESSION['resignin'],$_SESSION['attempts']);  //say signed in fine
+         //say what the last page was, so /login/home.php doesn't freak out that it's a different section
+         $_SESSION['last']=array("https://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'],"https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME']);
+         //fill in the request information that was cleared don't want another freak out
+         $_SESSION['request']['agent']=$_SERVER['HTTP_USER_AGENT'];
+         $_SESSION['request']['accept']=$_SERVER['HTTP_ACCEPT']; 
+         $_SESSION['request']['lang_char']=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
+         $_SESSION['request']['encoding']=$_SERVER['HTTP_ACCEPT_ENCODING'];
          header("refresh:0; url=/login/home.php");
          exit;
     } else {

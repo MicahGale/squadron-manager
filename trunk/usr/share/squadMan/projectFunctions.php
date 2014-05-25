@@ -714,7 +714,7 @@ function cleanUploadFile($index, $maxSize, $saveDir,$MIME_TYPE) {
  */
 function session_secure_start($capid=null) {
     session_start();                     //starts the session
-    if(isset($_SESSION['resignin'])) {
+    if(isset($_SESSION['resignin'])) {  //limits amount of requests before killing session
         if($_SESSION['resignin']<1) {
             $_SESSION['resignin']++;
             session_resign_in (true);
@@ -748,7 +748,7 @@ function session_secure_start($capid=null) {
                     $ident=connect('ViewNext');
                     session_predict_path($ident,$capid);   //predict the path that users will use
                     close($ident);
-                    $_SESSION['last']=array('https://'.$_SERVER['SERVER_NAME'].'/login/index.php');
+                    $_SESSION['last']=array("https://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'],"https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME']);
                     $_SESSION['request']['agent']=$_SERVER['HTTP_USER_AGENT'];
                     $_SESSION['request']['accept']=$_SERVER['HTTP_ACCEPT']; 
                     $_SESSION['request']['lang_char']=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
