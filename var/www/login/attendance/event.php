@@ -124,7 +124,7 @@ $ident=  connect('login');
         if(!isset($_GET['print']))
             include('squadManFooter.php');
         else
-            include('footer.php');
+            include('report_footer.php');
         ?>
     </body>
 </html>
