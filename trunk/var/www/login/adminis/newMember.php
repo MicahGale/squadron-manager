@@ -114,6 +114,7 @@ if(isset($success)&&$success) {
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css">
+        <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
         <title>Create a staff Member</title>
     </head>
     <body>
@@ -135,7 +136,7 @@ if(isset($success)&&$success) {
             else
                 $capid=null;
             newMember($ident,"/login/adminis/newMember.php",$capid);
-            echo '<input type="submit" value="Continue"/></form>';
+            echo '</form>';
         } else if($_GET['phase']==2) {
             ?>
             <table><tr><td>
@@ -177,9 +178,10 @@ if(isset($success)&&$success) {
                             echo "</ul>\n";
                         }
                         ?>
-                        <input type="password" size="10" maxlength="256" name="new"/><br>
+                        <input type="password" size="10" maxlength="256" name="new" onkeypress="check_caps(event)"/><br>
                         confirm<br>
-                        <input type="password" name="repeat" size="10" maxlength="256"/><br>
+                        <span class="warning" id="warn"></span><br>
+                        <input type="password" name="repeat" size="10" maxlength="256" onkeypress="check_caps(event)"/><br>
                 </td></tr>
                 <tr><td colspan="2">
                         <h2>Select Staff Positions</h2>

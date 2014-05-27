@@ -15,7 +15,7 @@
  * L*capid*- the legal confirmation checkbox
  * R+ the above- the same thing as above, except for placing requests for deletion of records
  * $_SESSION
- * request- an array of members to be requested
+ * requests- an array of members to be requested
  * delete- members to be completely deleted.
  */
 /* Copyright 2013 Micah Gale
@@ -53,13 +53,11 @@ if(isset($_POST['delete'])) { //get the input and prep it
         FROM MEMBER WHERE CAPID NOT IN (SELECT DELETE_MEMBER FROM DELETE_REQUESTS)
         and DATEDIFF(CURDATE(),DATE_ADD(DATE_TERMINATED, INTERVAL 5 YEAR))>=0";
     $results=  allResults(Query($query, $ident));
-    $_SESSION['request']=array();
+    $_SESSION['requests']=array();
     for($i=0;$i<count($results);$i++) {  //get requests for deletes
         $capid=$results[$i]['CAPID'];
-        echo $capid;
         if(isset($_POST['R'.$capid])&&$_POST['R'.$capid]=="on"&&isset($_POST['RL'.$capid])&&$_POST['RL'.$capid]=="on") {
-            echo $capid;
-            array_push($_SESSION['request'],$capid);
+            array_push($_SESSION['requests'],$capid);
         }
     }
 }
@@ -75,7 +73,10 @@ if(isset($_POST['delete'])) { //get the input and prep it
         <title>Delete Member Records</title>
     </head>
     <body>
+        <pre>
         <?php
+        print_r($_SESSION);
+        echo "</pre>";
         require("squadManHeader.php");
         ?>
         <h1>Delete Member Records</h1>
@@ -142,7 +143,7 @@ if(isset($_POST['delete'])) { //get the input and prep it
             ?>
             Please login Again to Confirm your Identity.<br>
             <form action="finishRecordDel.php" method="post">
-                CAPID: <input type="number" name="capid" value="<?php echo $_SESSION['member']->getCapid();?>" disabled="disabled" size="5"/><br>
+                CAPID: <input type="text" name="capid" value="<?php echo $_SESSION['member']->getCapid();?>" disabled="disabled" size="5"/><br>
                 Password:<input type="password" name="password" autocomplete="off" size="5" onkeypress="check_caps(event);"/><span id="warn" class="F"></span><br>
                 <input type="submit" name="login" value="login"/>
             </form>
@@ -152,4 +153,3 @@ if(isset($_POST['delete'])) { //get the input and prep it
         ?>
     </body>
 </html>
-u

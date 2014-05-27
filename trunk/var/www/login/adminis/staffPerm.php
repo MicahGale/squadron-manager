@@ -44,8 +44,10 @@ $ident = connect('login');
 session_secure_start();
 if(isset($_GET['capid'])) {
     $capid=  cleanInputInt($_GET['capid'],6, "Capid");
-    $staffer=new member($capid,2,$ident);
-    $_SESSION['staffer']=$staffer;
+    if($capid!=$_SESSION['member']->getCapid()) {
+        $staffer=new member($capid,2,$ident);
+        $_SESSION['staffer']=$staffer;
+    }
 } else
     $capid=null;
 if(isset($_POST['find'])) {
@@ -60,11 +62,13 @@ if(isset($_POST['search'])) {
 if(isset($_POST['save'])) {  //save the permissions
     $query="DELETE FROM STAFF_POSITIONS_HELD 
         WHERE CAPID='".$_SESSION['staffer']->getCapid()."'";
-    Query($query, $ident);              //deletes the staff psoitions
+    $deleter=  connect("delete");
+    Query($query, $deleter);              //deletes the staff psoitions
     $_SESSION['staffer']->insert_staff_position($_POST['pos'], $ident);  //insert the staff positions
     $query="DELETE FROM SPECIAL_PERMISSION
         WHERE CAPID='".$_SESSION['staffer']->getCapid()."'";  //delete special permissions
-    Query($query, $ident);
+    Query($query, $deleter);
+    close($deleter);
     if(isset($_POST['perm'])) {
             $query= 'SELECT TASK_CODE FROM TASKS
                 WHERE UNGRANTABLE=1';            //checks that these permissions can be be granted

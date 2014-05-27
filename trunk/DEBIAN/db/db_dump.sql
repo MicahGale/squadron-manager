@@ -321,10 +321,11 @@ DROP TABLE IF EXISTS `DELETE_REQUESTS`;
 CREATE TABLE `DELETE_REQUESTS` (
   `REQUESTER` int(11) NOT NULL,
   `REQUEST_DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `REQUEST_NANO`  decimal(6,6) NOT NULL,
   `CLEAR_AUDIT` tinyint(1) NOT NULL DEFAULT '0',
   `CLEAR_LOGIN` tinyint(1) NOT NULL DEFAULT '0',
-  `DELETE_MEMBER` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`REQUESTER`,`REQUEST_DATE`,`DELETE_MEMBER`),
+  `DELETE_MEMBER` int(11)  NULL DEFAULT null,
+  PRIMARY KEY (`REQUESTER`,`REQUEST_DATE`,`REQUEST_NANO`),
   KEY `FK_DELETE_LOGS_DELETEE` (`DELETE_MEMBER`),
   CONSTRAINT `FK_DELETE_LOGS_REQUESTER` FOREIGN KEY (`REQUESTER`) REFERENCES `MEMBER` (`CAPID`),
   CONSTRAINT `FK_DELETE_LOGS_DELETEE` FOREIGN KEY (`DELETE_MEMBER`) REFERENCES `MEMBER` (`CAPID`)
@@ -742,7 +743,7 @@ CREATE TABLE `NEXT_VISIT` (
 
 LOCK TABLES `NEXT_VISIT` WRITE;
 /*!40000 ALTER TABLE `NEXT_VISIT` DISABLE KEYS */;
-INSERT INTO `NEXT_VISIT` VALUES ('ADL','member/report.php'),('CLO','adminis/deleteIt.php'),('CLO','member/research.php'),('DDE','member/report.php'),('DME','adminis/finishRecordDel.php'),('EVR','member/report.php'),('LLO','member/report.php'),('MEA','member/finalApprove.php'),('MSE','member/report.php'),('PSE','member/report.php'),('PTT','testing/ptCSV.php'),('SPM','member/report.php'),('TSE','member/report.php'),('PTT','member/report.php');
+INSERT INTO `NEXT_VISIT` VALUES ('ADL','member/report.php'),('CLO','adminis/deleteIt.php'),('CLO','member/report.php'),('DDE','member/report.php'),('DME','adminis/finishRecordDel.php'),('EVR','member/report.php'),('LLO','member/report.php'),('MEA','member/finalApprove.php'),('MSE','member/report.php'),('PSE','member/report.php'),('PTT','testing/ptCSV.php'),('SPM','member/report.php'),('TSE','member/report.php'),('PTT','member/report.php'),('DME','member/report.php');
 /*!40000 ALTER TABLE `NEXT_VISIT` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1208,7 +1209,7 @@ CREATE TABLE `SUBEVENT_TYPE` (
 
 LOCK TABLES `SUBEVENT_TYPE` WRITE;
 /*!40000 ALTER TABLE `SUBEVENT_TYPE` DISABLE KEYS */;
-INSERT INTO `SUBEVENT_TYPE` VALUES ('AE','Aerospace Education'),('CD','Character Development'),('ES','Emergency Services'),('SAF','Safety');
+INSERT INTO `SUBEVENT_TYPE` VALUES ('AE','Aerospace Education'),('CD','Character Development'),('ES','Emergency Services'),('SAF','Safety'),('CG','Honor Guard'),('CG','Color Guard'),('CP','Cyber Patriot'),('DC','Drill and Cermenoies'),('PT','Physical Training');
 /*!40000 ALTER TABLE `SUBEVENT_TYPE` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1319,7 +1320,7 @@ CREATE TABLE `TEXT_SETS` (
 
 LOCK TABLES `TEXT_SETS` WRITE;
 /*!40000 ALTER TABLE `TEXT_SETS` DISABLE KEYS */;
-INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets')('L2L','Learn to Lead');
+INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets')('L2L','Learn to Lead')('PD','Proffessional Development');
 /*!40000 ALTER TABLE `TEXT_SETS` ENABLE KEYS */;
 UNLOCK TABLES;
 

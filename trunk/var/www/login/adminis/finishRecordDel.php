@@ -47,15 +47,17 @@ $staffer=$_SESSION['member'];
         <?php
         if($staffer->check_password($ident,$_POST['password'],$salt)) {   //check that they logged in correctly then do the stuff
             $delete=  connect("delete");    //get a user who can delete data
-            if(isset($_SESSION['request'])) {
-                $stmt= prepare_statement($ident,"INSERT INTO DELETE_REQUESTS(REQUESTER, REQUEST_DATE, DELETE_MEMBER)
-                    VALUES('".$staffer->getCapid()."',NOW(),?)");
-                for($i=0;$i<count($_SESSION['request']);$i++) {  //insert requests
-                    bind($stmt,"i",array($_SESSION['request'][$i]));
+            if(isset($_SESSION['requests'])) {
+                $stmt= prepare_statement($ident,"INSERT INTO DELETE_REQUESTS(REQUESTER, REQUEST_DATE,REQUEST_NANO, DELETE_MEMBER)
+                    VALUES('".$staffer->getCapid()."',NOW(),?,?)");
+                for($i=0;$i<count($_SESSION['requests']);$i++) {  //insert requests
+                    $time=microtime(true);
+                    $time=$time-intval($time); //get the decimal of the time
+                    bind($stmt,"di",array($time,$_SESSION['requests'][$i]));
                     execute($stmt);              //insert the requests
                 }
                 close_stmt($stmt);
-                echo "<p>Successfully entered your ".count($_SESSION['request'])." request(s) to delete records</p>";
+                echo "<p>Successfully entered your ".count($_SESSION['requests'])." request(s) to delete records</p>";
             }
             if(isset($_SESSION['delete'])) {
                 $delete_tables=array("ATTENDANCE",'CPFT_ENTRANCE','DISCIPLINE_LOG','EMERGENCY_CONTACT',
@@ -89,7 +91,7 @@ $staffer=$_SESSION['member'];
                     $time=  auditLog($_SERVER['REMOTE_ADDR'], 'DR');
                     auditDump($time, "Deleted Member", $disapearer);
                 }
-                echo "<p> $number_rows records have been successfully deleted</p>";
+                echo "<p>".count($_SESSION['delete'])." records and $number_rows data points have been successfully deleted</p>";
                 if(count($fail)>0) {  //if members' records stayed in
                     echo "<p>The following members couldn't be deleted because they were involved in other member's records:<br>\n";
                     for($i=0;$i<count($fail);$i++) {
@@ -99,9 +101,9 @@ $staffer=$_SESSION['member'];
                     echo "</p>";
                 }
             }
-            $_SESSION['request']=null;
+            $_SESSION['requests']=null;
             $_SESSION['delete']=null;
-            unset($_SESSION['request'],$_SESSION['delete']);
+            unset($_SESSION['requests'],$_SESSION['delete']);
             close($delete);                 //close the connection
         } else {  //try to login again
             sleep(BAD_LOGIN_WAIT); //sleep if wrong password

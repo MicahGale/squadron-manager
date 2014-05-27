@@ -3,8 +3,7 @@
  *Request the system logs to be cleared
  * 
  * Doesn't actually do anything that is handed off to another page, this just processes
- * the input, and requires them to resign-in.
- * other pages.
+ * the input, and requires them to resign-in, then directs them to /login/adminis/deleteIt.php
  * @package Squadron-Manager
  * @license http://www.gnu.org/licenses/gpl.txt GNU GPL V3
  * @copyright (c) 2013, Micah Gale
@@ -82,7 +81,7 @@ if(isset($_POST['request'])) {  //if requested then prepare
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
         <link rel="stylesheet" type="text/css" href="/main.css">
-        <script type="text/javascript" src="/CAPS_LOCK.js"></script>
+        <script type="text/javascript" src="/java_script/CAPS_LOCK.js"></script>
         <title>Clear System Logs</title>
     </head>
     <body>
@@ -148,7 +147,7 @@ if(isset($_POST['request'])) {  //if requested then prepare
                 }
                 ?>
                 <input type="hidden" name="request"/>
-                <input type="button" name="request" value="request" onclick="confirm_task('confirm');"/>
+                <button type="submit" name="request" value="request" onclick="confirm_task('confirm');">Request</button>
             </form>
         <?php
         } else {
@@ -161,6 +160,7 @@ if(isset($_POST['request'])) {  //if requested then prepare
                 ?>
                 Capid: <input type="text" size="3" disabled="disabled" value="<?php echo $_SESSION['member']->getCapid(); ?>"/><br>
                 Password: <input type="password" name="password" size="5" autocomplete="off" onkeypress="check_caps(event)"/><span id="warn" class="F"></span><br>
+                <span class="warning" id="warn"></span>
                 <input type="submit" name="login" value="login"/>
             </form>
             <?php

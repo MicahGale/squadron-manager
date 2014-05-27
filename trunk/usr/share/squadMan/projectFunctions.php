@@ -232,7 +232,7 @@ function newMember($identifier, $page,$capid=null) {                            
     echo "<br>Member Type";
     dropDownMenu("SELECT MEMBER_TYPE_CODE,MEMBER_TYPE_NAME FROM MEMBERSHIP_TYPES WHERE MEMBER_TYPE_CODE<>'A'", "member", $identifier, false);  //creates drop down menu for membership types
     echo "<br>Textbook Set";
-    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier, false,null,true);  //creates drop down menu for text sets
+    dropDownMenu("SELECT TEXT_SET_CODE,TEXT_SET_NAME FROM TEXT_SETS WHERE TEXT_SET_CODE <> 'ALL' ORDER BY TEXT_SET_NAME", 'text', $identifier);  //creates drop down menu for text sets
     echo "<br>Unit Charter Number:";
     dropDownMenu("SELECT CHARTER_NUM, CHARTER_NUM FROM CAP_UNIT", 'unit', $identifier, true,result(Query("SELECT CHARTER_NUM FROM CAP_UNIT WHERE DEFAULT_UNIT=TRUE", $identifier),0,'CHARTER_NUM'),0,'CHARTER_NUM');  //creates drop down menu for text sets
     echo "<br>Date Joined CAP:";
@@ -2769,7 +2769,10 @@ class member {
      * @return string the member's membership type
      */
     function get_member_type() {
-        return $this->memberType;
+        if(is_object($this->memberType))
+            return $this->memberType->getCode();
+        else
+            return $this->memberType;
     }
     /**
      * Checks if there is a promotion halt due to a failed promotion board

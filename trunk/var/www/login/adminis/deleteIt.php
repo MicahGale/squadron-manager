@@ -42,41 +42,44 @@ if(!$_SESSION['authenticated']) {                 //if not authenticated leave i
     $result=  allResults(Query($query, $ident));
     $success=true;
     if(count($result)==0) {            //if there's no request create a request
-        $stmt=  prepare_statement($ident, "INSERT INTO DELETE_REQUESTS(REQUESTER, REQUEST_DATE, CLEAR_AUDIT, CLEAR_LOGIN)
-            VALUES('".$_SESSION['member']->getCapid()."',CURRENT_TIMESTAMP(),?,?)");
+        $stmt=  prepare_statement($ident, "INSERT INTO DELETE_REQUESTS(REQUESTER, REQUEST_DATE,REQUEST_NANO, CLEAR_AUDIT, CLEAR_LOGIN)
+            VALUES('".$_SESSION['member']->getCapid()."',CURRENT_TIMESTAMP(),?,?,?)");
         if($_SESSION['audit'])
-            $audit="true";
+            $audit=1;
         else
-            $audit="false";
+            $audit=0;
         if($_SESSION['login_clear'])
-            $login="true";
+            $login=1;
         else
-            $login="false";
-        bind($stmt,"ss",array($audit, $login));
+            $login=0;
+        $time=  microtime(true);
+        $time= $time-intval($time); //truncate the time so it's only the decimal
+        bind($stmt,"dii",array($time,$audit, $login));
         if(!execute($stmt))
             $success=false;
         close_stmt($stmt);
     } else  {  //if not first then actually clear the log
         $requester=$result[0]['REQUESTER'];
+        $deleter=  connect("delete");
         if($_SESSION['audit']) {
             $query1="DELETE FROM AUDIT_DUMP"; //delete the audit dump
             $query2="DELETE FROM AUDIT_LOG";  //clear the log
-            if(!Query($query1, $ident))
+            if(!Query($query1, $deleter))
                     $success=false;
-            if(Query($query2, $ident))    //actually clear them
+            if(!Query($query2, $deleter))    //actually clear them
                     $success=false;
             $query="DELETE FROM DELETE_REQUESTS
                 WHERE CLEAR_AUDIT=TRUE";
-            if(Query($query, $ident))  //delete the request
+            if(!Query($query, $deleter))  //delete the request
                     $success=false;
         } 
         if($_SESSION['login_clear']) {
             $query='DELETE FROM LOGIN_LOG';
-            if(!Query($query, $ident))         //delete the records
+            if(!Query($query, $deleter))         //delete the records
                     $success=false;
-            $query= 'DELETE FROM LOGIN_LOG WHERE 
+            $query= 'DELETE FROM DELETE_REQUESTS WHERE 
                 CLEAR_LOGIN=TRUE';
-            if(!Query($query, $ident))         //delete the request
+            if(!Query($query, $deleter))         //delete the request
                     $success=false;
         }
         $time=  auditLog($_SERVER['REMOTE_ADDR'],'DR');
@@ -86,8 +89,9 @@ if(!$_SESSION['authenticated']) {                 //if not authenticated leave i
         if($_SESSION['login_clear'])
             $deleted.="Login log";
         auditDump($time, "deleted",$deleted);
-        auditDump($time,'requester',$requester);
+        auditDump($time,'Initiator',$requester);
     }
+    unset($_SESSION['audit'],$_SESSION['login_clear']);
 }
 ?>
 <!DOCTYPE html>
