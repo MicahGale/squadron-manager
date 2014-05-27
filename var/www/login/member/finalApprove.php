@@ -31,14 +31,13 @@ session_secure_start();
         $ident = Connect('login');
         include('squadManHeader.php');
         $added = true;
-        $members=null;
-        settype($members,"array");
+        $members=array();
         if($_POST['submit']=='approve selected') {
             $size = count($_POST['approve']);
             $number = count($_SESSION['members']);
             $buffer = null;
             settype($buffer,"array");
-            for($i=0;$i<$number;$i++) {   //cycles to restructure index array
+            for($i=0;$i<$number;$i++) {   //cycles to restructure index array, organize by capids
                 $buffer[$_SESSION['members'][$i]->getcapid()] =$_SESSION['members'][$i];
             }
             for($i=0;$i<$size;$i++) {                   //creates stacked array of members being approved

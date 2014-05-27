@@ -81,6 +81,8 @@ $ident=  connect('login');
             } else if(count($result)==1)                      //if only 1 then display it 
                 echo $result[0]['SUBEVENT_NAME'];
             echo "<br><br>\n";
+            if(isset($_GET['print']))
+                echo '<a class="hidden" onclick="window.print(); return false;" href="#">Click here to print</a>';
             ?>
         <table><tr><td style="text-align:center">
             <h3>Attendance</h3></td></tr><tr><td><table style="width:100%" class="table">
@@ -90,13 +92,13 @@ $ident=  connect('login');
                     ORDER BY NAME_LAST, NAME_FIRST";
             $result=  allResults(Query($query, $ident));
             $size=count($result);
-            $length=intval($size/3);
+            $length=intval($size/3);   //get the length of each column
             $remainder=$size%3;      //get the remainder
-            $max=$length-1;
+            $max=$length-1;     //how many in the final row?
             if($remainder>=1) {
                 $max++;
             }
-            $start_2=$max+1;
+            $start_2=$max+1;   //get the starts and stops for each column
             $end_2=$start_2+$length-1;
             if($remainder==2) {
                 $end_2++;

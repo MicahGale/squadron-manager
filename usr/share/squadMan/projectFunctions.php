@@ -1217,7 +1217,7 @@ function promotionAprove($ident,$memberType,$approve=false) {
         //0=>member requesting 1=>requesting for
         $signUps[$i]= array(new member($results[$i]['CAPID'],3, $ident),$results[$i]['ACHIEV_CODE']);
         $signUps[$i][2]=$signUps[$i][0]->getPromotionInfo($signUps[$i][1], $ident,$results[$i]['NAME']);       //get the promo info and number incomplete
-        $signUps[$i][3]=$results[$i]['APPROVED'];                   //store if they have been approved
+        $signUps[$i][3]=(bool)$results[$i]['APPROVED'];                   //store if they have been approved
     }
     usort($signUps,'compareSignUp');  //reorder array based on who is most incomplete list them first
     $results=null;  //delete useless array that results, reparsed, is now useless
@@ -1234,7 +1234,7 @@ function promotionAprove($ident,$memberType,$approve=false) {
     for($i=0;$i<count($header);$i++) {  //displays the headers
         echo "<th class=\"table\">".$header[$i]['TYPE_NAME']."</th>";  //show header for each thinger
     }
-    if(!$approve)
+    if($approve)
         echo "<th class=\"table\">Approved</th></tr>\n";   //display approval header
     for($i=0;$i<count($signUps);$i++) {  //cycle trhough member sign-up
         echo "<tr class=\"table\">";
@@ -1244,7 +1244,7 @@ function promotionAprove($ident,$memberType,$approve=false) {
             $approved=$signUps[$i][3];
         else
             $approved=null;
-        $signUps[$i][0]->displayPromoRequest($header,true,true,null,false,$approve);
+        $signUps[$i][0]->displayPromoRequest($header,true,true,$approved,false,$approve);
     }
     $_SESSION['signUps']=$signUps;
     $_SESSION['header']=$header;
@@ -2015,8 +2015,7 @@ class member {
         }
     }
     public function saveUpdates($ident) {
-        $query = "UPDATE MEMBER
-            SET CAPID='" . $this->capid . "',
+        $query = "UPDATE MEMBER SET
             NAME_LAST='" . $this->name_last . "',
             NAME_FIRST='" . $this->name_first . "',
             GENDER='" . $this->gender . "',
@@ -2329,7 +2328,7 @@ class member {
      * @param array $header  the array of the requirement_types from the header section
      * @param boolean $disPlayDates weather or not to display the dates for promotions
      * @param boolean $canEdit   weather or not they can change the information or if read-only
-     * @param boolean $approved weather or not the promotion is approved
+     * @param boolean $approved weather or not the promotion is approved if null the approve field will not be displayed
      * @param boolean $showPromo whether or not to show as a whole promotion report, false will show name in the row, true won't
      */
     function displayPromoRequest(array $header, $disPlayDates=false, $canEdit=false ,$approved=null,$showPromo=false) {
@@ -2387,15 +2386,15 @@ class member {
             }
             
         }   //display yes bubble if allowed to edit info
-        if($canEdit&&is_numeric($approved)) {
+        if($canEdit&&  is_bool($approved)) {
             echo '<td><input type="radio" name="'.$this->getCapid().'" value="yes"';
-            if($approved==1) 
+            if($approved) 
                 echo ' checked/>';
             else echo '/>';
             echo "Yes<br>";
             //display no bubble
             echo '<input type="radio" name="'.$this->getCapid().'" value="no"';
-            if($approved==0)
+            if(!$approved)
                 echo ' checked/>';
             else echo '/>';
             echo "No </td></tr>\n";
@@ -2423,6 +2422,8 @@ class member {
                 $has_percent=isset($this->promoRecord[$type]['percent']);
                 if($has_percent)
                     $percent = parsePercent($append, $input, $this->promoRecord[$type]["percent"]); //parse the percentage
+                else 
+                    $percent=null;
                 $date=  parse_date_input($input, $append);                 //parse the date
                 if(isset($input['tester'.$append])&&$input['tester'.$append]!=0&&$input['tester'.$append]!=null) {
                     $ident=  connect('login');
@@ -2439,7 +2440,7 @@ class member {
                                 break;
                             case "I": //goes down to next case
                             Case "F":
-                                bind($insert,"issssdi",array($this->capid,$achiev,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester));           //insert 
+                                bind($insert,"issssdi",array($this->capid,$achiev,$type,$this->text_set,$date->format(PHP_TO_MYSQL_FORMAT),$percent,$tester->getcapid()));           //insert 
                                 execute($insert);
                                 $this->promoRecord[$type][0]='P';     //set it to passed to easily checked if passed all requirements
                                 if($this->promoRecord[$type][0]=='F') 

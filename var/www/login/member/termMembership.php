@@ -35,7 +35,7 @@ if(isset($_GET['capid'])) {
 $term=array();
 if(isset($_POST['term'])) { // if terminating a single member
     if(isset($capid)) {
-        $query="UPDATE MEMBER SET DATE_TERMINATED=CURDATE() AND PASS_HASH=NULL
+        $query="UPDATE MEMBER SET DATE_TERMINATED=CURDATE(), PASS_HASH=NULL
             WHERE CAPID='$capid'";
         Query($query, $ident);   //give them termination
         array_push($term,$capid);
@@ -110,14 +110,14 @@ if(count($term)>0) { //if members were terminated then delete their permissions
                 ?>
             </table>
             <input type="hidden" name="mass" value="save Changes"/>
-            <input type="button" name="mass" value="Save Changes" onclick="confirm_task('confirm');"/><br><br>
-            <a href="/login/member/search.php?redirect=/login/adminis/termMembership.php">Or search for a member</a><br><br>
+            <button type="submit" name="mass"onclick="confirm_task('confirm');">Save Changes</button> <br><br>
+            <a href="/login/member/search.php?redirect=/login/member/termMembership.php">Or search for a member</a><br><br>
             <?php
             if(isset($capid)) {
                 $member = new member($capid,1,$ident);
                 echo $member->link_report(true);
                 echo '<input type="hidden" name="term" value="hi"/>';
-                echo '<input type="button" name="term" value="Do you want to terminate this member?" onclick="confirm_task(\'confirm\')"/>';
+                echo '<button type="submit" name="term" onclick="confirm_task(\'confirm\')"/>Do you want to terminate this member?</button>';
             }
             ?>
         </form>
