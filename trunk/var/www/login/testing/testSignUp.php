@@ -123,9 +123,9 @@ $ident=  connect('login');
                             }
                             $query="DELETE FROM TESTING_SIGN_UP 
                                 WHERE CAPID=? 
-                                AND ACHIEV_CODE=? 
                                 AND REQUIRE_TYPE=?";
-                            $stmt= prepare_statement($ident, $query);
+                            $deleter=connect('delete');
+                            $stmt= prepare_statement($deleter, $query);
                             if(isset($_POST['remove'])) {
                                 for($i=0;$i<count($_POST['remove']);$i++) {      //get request to delete testing sign up
                                     array_push($toRemove, $_POST['remove'][$i]);   //push it onto the array
@@ -133,13 +133,13 @@ $ident=  connect('login');
                             }
                             foreach ($toRemove as $buffer) {
                                 $capid=$results[$buffer]['CAPID'];
-                                $achiev = $results[$buffer]['ACHIEV_CODE'];
                                 $type = $results[$buffer]['REQUIRE_TYPE'];
-                                bind($stmt,"iss", array($capid,$achiev,$type));   //bind the field so it can be deleted
+                                bind($stmt,"is", array($capid,$type));   //bind the field so it can be deleted
                                 if(!execute($stmt))
                                     $success=false;               //if failed then document it
                             }
                             close_stmt($stmt);
+                            close($deleter);
                         }
                         if(isset($_POST['filter'])) {
                             if($_POST['filterTypes']!="null") {

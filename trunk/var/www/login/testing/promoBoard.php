@@ -21,6 +21,8 @@
  * save- save it
  * searchM- search for the member
  * searchP- search for the board president
+ * $_SESSION
+ * enter- the saved capid for entering a new promotion board is saved when the president capid is searched
  */
 /* Copyright 2013 Micah Gale
  *
@@ -52,12 +54,14 @@ if(isset($_GET['date'])) {
     $input=  cleanInputString($_GET['date'],10, "date",false);
     $date=new DateTime($input);
     $next =$date->add(new DateInterval("P56D")); 
+    $date->sub(new DateInterval("P56D"));
 } else {
     $date= new DateTime();
-    $next =$date->add(new DateInterval("P56D")); 
+    $next =null; 
 }
 if(isset($_GET['capid'])&&$_GET['field']=='pres') {
     $pres= cleanInputInt($_GET['capid'],6, "President");
+    $capid=$_SESSION['enter'];
 } else {
     $pres= $_SESSION['member']->getCapid();
 }
@@ -69,27 +73,37 @@ if(isset($_GET['field'])&&isset($_POST['save'])) {   //parses the input for a ne
         $approved=0;
     $board_date=  parse_date_input($_POST,'date');
     $next_date=  parse_date_input($_POST, 'next');
+    if(!is_null($next_date))  //if the date is null don't format it
+        $next_date=$next_date->format(PHP_TO_MYSQL_FORMAT);
+    else 
+        $next_date="NULL";
     $pres=  cleanInputInt($_POST['pres'],6, "President Capid");
     if(!isset($_GET['date'])) {
-        $query="INSERT PROMOTION_BOARD(CAPID,BOARD_DATE,APPROVED,BOARD_PRESIDENT, NEXT_SCHEDULED)
-            VALUES('$capid','".$board_date->format(PHP_TO_MYSQL_FORMAT)."','$pres','".$next_date->format(PHP_TO_MYSQL_FORMAT)."'";
+        $query="INSERT into PROMOTION_BOARD(CAPID,BOARD_DATE,APPROVED,BOARD_PRESIDENT, NEXT_SCHEDULED)
+            VALUES('$capid','".$board_date->format(PHP_TO_MYSQL_FORMAT)."','$approved','$pres','$next_date')";
         Query($query, $ident);
+        $deleter=connect('delete');
         $query="DELETE FROM TESTING_SIGN_UP
             WHERE CAPID='$capid' AND REQUIRE_TYPE='PB'";
-        Query($query, $ident);
+        Query($query, $deleter);
+        close($deleter);
     } else {
-        $query="UPDATE PROMOTION_BOARD SET CAPID='$capid', BOARD_DATE='".$board_date->format(PHP_TO_MYSQL_FORMAT)."',
-            BOARD_PRESIDENT='$pres', NEXT_SCHEDULED='".$next_date->format(PHP_TO_MYSQL_FORMAT)."'
-                WHERE CAPID='".cleanInputInt($_GET['capid'],6,"Get Capid")."'
+        $query="UPDATE PROMOTION_BOARD SET BOARD_DATE='".$board_date->format(PHP_TO_MYSQL_FORMAT)."',
+            BOARD_PRESIDENT='$pres', NEXT_SCHEDULED='$next_date',
+                APPROVED='$approved'
+                WHERE CAPID='$capid'
                 AND BOARD_DATE='".$date->format(PHP_TO_MYSQL_FORMAT)."'";
         Query($query, $ident);
     }
+    unset($_SESSION['enter']);
+    header("refresh:0;url=/login/testing/promoBoard.php");
 }
 if(isset($_POST['searchM'])) {
     header("refresh:0;url=/login/member/search.ph?field=search&redirect=/login/testing/promoBoard.php");
     exit;
 }
-if(isset($_POST['searchP'])) {
+if(isset($_POST['searchP'])) {  //if searching for the president
+    $_SESSION['enter']=$capid;
     header("refresh:0;url=/login/member/search.php?field=pres&redirect=/login/testing/promoBoard.php");
     exit;
 }
@@ -105,22 +119,27 @@ if(isset($_POST['searchP'])) {
     <body>
         <?php
         require("squadManHeader.php");
-        if(isset($_GET['capid'])&&$_GET['field']=="enter"&&!isset($_GET['date'])) {  //edit a current board
+        if(isset($_GET['capid'])&&$_GET['field']=="enter"&&isset($_GET['date'])) {  //edit a current board
             $query="SELECT APPROVED, NEXT_SCHEDULED, BOARD_PRESIDENT
                 FROM PROMOTION_BOARD WHERE CAPID='$capid' AND BOARD_DATE='".$date->format(PHP_TO_MYSQL_FORMAT)."'";
             $results=  allResults(Query($query, $ident));
-            $approved=$results[0]['APPROVED'];
-            $next= new DateTime($results[0]['NEXT_SCHEDULED']);
-            $pres= $results[0]['BOARD_PRESIDENT'];
+            if(count($results)>0) {
+                $approved=$results[0]['APPROVED'];
+                if($results[0]['NEXT_SCHEDULED']!=="0000-00-00")
+                    $next= new DateTime($results[0]['NEXT_SCHEDULED']);
+                else
+                    $next=null;
+                $pres= $results[0]['BOARD_PRESIDENT'];
+            }
         }
-        if(isset($_GET['capid'])&&$_GET['field']=="enter") {   //if entering a baord
+        if((isset($_GET['capid'])&&$_GET['field']=="enter")||isset($_SESSION['enter'])) {   //if entering a baord
             ?>
             <h2>Enter a Promotion Board</h2>
             <form method="post">
                 <p>Enter boarded member: <input type="text" size="5" name="capid" value="<?php echo $capid;?>"/>Or: <input type="submit" name="searchM" value="Search for a Member"/></p>
                 <p>Date of the Board:<?php enterDate(true,"date", $date); ?></p>
-                <p>Board President <input type="text" size="5" name="pres" value="<?php echo $pres;?>"/>Or: <input type="submit" name="searchP" value="Search for Member"/></p>
-                <p>Approved for Promotion: <input type="radio" name="approve" value="yes" <?php if($approved) echo 'selected="selected"'; ?>/>Yes <input type="radio" name="approve" value="no" <?php if(!$approved) echo 'selected="selected"'; ?> />No </p>
+                <p>Board President <input type="text" size="5" name="pres" value="<?php if(isset($pres)) echo $pres;?>"/>Or: <input type="submit" name="searchP" value="Search for Member"/></p>
+                <p>Approved for Promotion: <input type="radio" name="approve" value="yes" <?php if(isset($approved)&&$approved)echo 'checked="checked"'; ?>/>Yes <input type="radio" name="approve" value="no" <?php if(isset($approved)&&!$approved) echo 'checked="checked"'; ?> />No </p>
                 <p>If not approved when is the next board scheduled?: <?php enterDate(true,"next", $next);?><br>
                 NOTE: IAW CAPR52-16 5-2(e) The next board must be scheduled within 60 days of the last promotion board.</p>
                 <p><input type="submit" name="save" value="save"/></p>
@@ -156,8 +175,13 @@ if(isset($_POST['searchP'])) {
             ?>
             <h2>Manage Promotion Boards</h2>
             <a href="/login/testing/promoBoard.php?field=enter">Enter a Promotion Board</a><br>
-            <form action="/login/member/search.php?redirect=/login/testing/promoBoard.php&field=search" method="post">
-                Search for a member: <input type="text" name="input" size="5"/><input type="submit" name="search" value="search"/><br>
+        <form action="/login/member/search.php?redirect=/login/testing/promoBoard.php&field=<?php if(isset($_GET['field'])&&$_GET['field']=="enter")echo "enter"; else echo "search";?>" method="post">
+                Search for a member <?php
+                if(isset($_GET['field'])&&$_GET['field']=="enter") 
+                    echo "to enter a promotion board";   //tells if searching for record or to enter
+                else
+                    echo "to view record";
+                ?>: <input type="text" name="input" size="5"/><input type="submit" name="search" value="search"/><br>
             </form>
             <h3>Promotion Board Requests</h3>
             <table class="table">
@@ -171,16 +195,16 @@ if(isset($_POST['searchP'])) {
                     ABS(DATEDIFF(CURDATE(),NEXT_SCHEDULED))<=14";
                 $disproved=  allResults(Query($query, $ident));
                 for($i=0;$i<count($disproved);$i++) {  //display the disproved requests
-                    $member=new member($disproved[$i]['CAPID']);
+                    $member=new member($disproved[$i]['CAPID'],1,$ident);
                     echo '<tr class="table"><td class="table">'.$member->link_report(true)."</td>";
-                    echo '<tr class="table"><a href="/login/testing/promoBoard.php?field=enter&capid='.$member->getCapid().'>Enter Board</a></td><td class="table"></td>';
+                    echo '<td class="table"><a href="/login/testing/promoBoard.php?field=enter&capid='.$member->getCapid().'">Enter Board</a></td><td class="table"></td>';
                     $date= new DateTime($disproved[$i]['NEXT_SCHEDULED']);
                     echo '<td class="table">'.$date->format(PHP_DATE_FORMAT)."</td></tr>\n";
                 }
                 for($i=0;$i<count($sign_up);$i++) {
                     $member=new member($sign_up[$i]['CAPID']);
                     echo '<tr class="table"><td class="table">'.$member->link_report(true)."</td>";
-                    echo '<tr class="table"><a href="/login/testing/promoBoard.php?field=enter&capid='.$member->getCapid().'>Enter Board</a></td>';
+                    echo '<tr class="table"><a href="/login/testing/promoBoard.php?field=enter&capid='.$member->getCapid().'">Enter Board</a></td>';
                     $date= new DateTime($sign_up[$i]['NEXT_SCHEDULED']);
                     echo '<td class="table">'.$date->format(PHP_DATE_FORMAT)."</td><td class=\"table\"></td></tr>\n";
                 } 

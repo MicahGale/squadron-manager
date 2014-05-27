@@ -49,6 +49,7 @@ if(isset($_GET['lock'])) {
 } else {
   $_SESSION['approve']=true;  
 }
+var_dump($_SESSION['approve']);
 ?>
 <!DOCTYPE html>
 <html>

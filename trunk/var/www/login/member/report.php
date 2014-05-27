@@ -38,33 +38,35 @@ session_secure_start();
                     <?php
                     if(isset($_GET['capid'])) {          //if has capid parameter
                         $member = new member($_GET['capid'],4,$ident);  //init member
-                        echo "<strong>Membership Report for:</strong> ";            //shows header
-                        echo $member->getCapid()."- ".$member->getName_Last().", ".$member->getName_first()."<br><br>";
-                        if($member->check_terminated($ident))
-                            echo '<div style="color:red font-weight:bold">Member is terminated</div><br>';
-                        echo "<a href=\"".$member->getPicture()."\"><img src=\"".$member->getPicture()."\" width=\"200\" height=\"275\" style=\"border:1px solid black\"/></a><br><br>";
-                        ?>
-                        <table border="1" cellpadding="0">
-                            <tr><th>Membership Type</th><th>Grade</th><th>Home Unit</th><th>Textbook Set</th><th>Gender</th><th>Date Joined CAP</th><th>Date Terminated</th><th>Date of Birth</th></tr>
-                        <?php 
-                        $member->general_info($ident);
-                        ?>
-                        </table>
-                    <br>
-                    <?php
-                        $member->display_Contact($ident, false);
-                        echo "<br><br>";
-                        $member->promotionReport($ident,false,true);
-                        echo "<br><br>";
-                        $member->attendance_report($ident,false);
-                        echo "<br><br>";
-                        $member->promo_board_report($ident,false);
-                        echo "<br><br>";
-//                        $member->discipline_report($ident, false);
-//                        echo "<br><br>";
-//                        $member->staff_position($ident, false);
-//                        new chain_of_command($ident,$member->getCapid());
+                        if($member->exists()) { //if they actually exist though
+                            echo "<strong>Membership Report for:</strong> ";            //shows header
+                            echo $member->getCapid()."- ".$member->getName_Last().", ".$member->getName_first()."<br><br>";
+                            if($member->check_terminated($ident))
+                                echo '<div style="color:red font-weight:bold">Member is terminated</div><br>';
+                            echo "<a href=\"".$member->getPicture()."\"><img src=\"".$member->getPicture()."\" width=\"200\" height=\"275\" style=\"border:1px solid black\"/></a><br><br>";
+                            ?>
+                            <table border="1" cellpadding="0">
+                                <tr><th>Membership Type</th><th>Grade</th><th>Home Unit</th><th>Textbook Set</th><th>Gender</th><th>Date Joined CAP</th><th>Date Terminated</th><th>Date of Birth</th></tr>
+                            <?php 
+                            $member->general_info($ident);
+                            ?>
+                            </table>
+                        <br>
+                        <?php
+                            $member->display_Contact($ident, false);
+                            echo "<br><br>";
+                            $member->promotionReport($ident,false,true);
+                            echo "<br><br>";
+                            $member->attendance_report($ident,false);
+                            echo "<br><br>";
+                            $member->promo_board_report($ident,false);
+                            echo "<br><br>";
+    //                        $member->discipline_report($ident, false);
+    //                        echo "<br><br>";
+    //                        $member->staff_position($ident, false);
+    //                        new chain_of_command($ident,$member->getCapid());
                     }
+                }
                     ?>
                 </td>
             </tr>

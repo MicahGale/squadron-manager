@@ -52,6 +52,8 @@ function checkPath() {                      //keep redirect path and clean it up
     $redirect=  cleanInputString($_GET['redirect'], 128,'redirect page', false,false);
     $redirect_no_login=  substr($redirect, strpos($redirect,"/", 1));
     $pages= session_predict_path($ident,null, $redirect_no_login);
+//    print_r($pages);
+//    print_r($redirect);
     if(!in_array($redirect, $pages)) {                    //if wasn't in safe paths
         header("refresh:0;url=/login/home.php");
         die();

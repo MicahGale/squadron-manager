@@ -34,13 +34,13 @@ require("projectFunctions.php");
 $ident = connect('login');
 session_secure_start();
 if(isset($_POST['search'])) {
-    header('refresh:0; url=/login/member/search.php?redirect=/login/member/cadetOath.php');
+    header('refresh:0; url=/login/member/search.php?redirect=/login/testing/cadetOath.php');
     exit;
 }
 $oath=false;
 $groom=false;
 if(isset($_REQUEST['capid'])) {
-    $capid= cleanInputInt($_GET['capid'],6, "Capid");
+    $capid= cleanInputInt($_REQUEST['capid'],6, "Capid");
     $member= new member($capid,1,$ident);
     $next_achiev=$member->get_next_achiev($ident);  //get the next achievement
     $text= $member->get_text();
@@ -62,7 +62,7 @@ if(isset($_REQUEST['capid'])) {
 if(isset($_POST['save'])) {
      $date = parse_date_input($_POST);       //get the inputs
     $stmt=  prepare_statement($ident, "INSERT INTO REQUIREMENTS_PASSED(CAPID,ACHIEV_CODE, TEXT_SET,PASSED_DATE, TESTER, REQUIREMENT_TYPE)
-        VALUES('$capid','$next_achiev','$text','".$date->format(PHP_DATE_FORMAT)."','".$_SESSION['member']->getCapid()."',?)");
+        VALUES('$capid','$next_achiev','$text','".$date->format(PHP_TO_MYSQL_FORMAT)."','".$_SESSION['member']->getCapid()."',?)");
     for($i=0;$i<count($_POST['passed']);$i++) {
         bind($stmt, 's',array(cleanInputString($_POST['passed'][$i], 5,"Requirement type",false)));
         execute($stmt);    //insert requirements

@@ -743,7 +743,7 @@ CREATE TABLE `NEXT_VISIT` (
 
 LOCK TABLES `NEXT_VISIT` WRITE;
 /*!40000 ALTER TABLE `NEXT_VISIT` DISABLE KEYS */;
-INSERT INTO `NEXT_VISIT` VALUES ('ADL','member/report.php'),('CLO','adminis/deleteIt.php'),('CLO','member/report.php'),('DDE','member/report.php'),('DME','adminis/finishRecordDel.php'),('EVR','member/report.php'),('LLO','member/report.php'),('MEA','member/finalApprove.php'),('MSE','member/report.php'),('PSE','member/report.php'),('PTT','testing/ptCSV.php'),('SPM','member/report.php'),('TSE','member/report.php'),('PTT','member/report.php'),('DME','member/report.php');
+INSERT INTO `NEXT_VISIT` VALUES ('ADL','member/report.php'),('EST','member/report.php'),('PRB','member/report.php'),('CLO','adminis/deleteIt.php'),('CLO','member/report.php'),('DDE','member/report.php'),('DME','adminis/finishRecordDel.php'),('EVR','member/report.php'),('LLO','member/report.php'),('MEA','member/finalApprove.php'),('MSE','member/report.php'),('PSE','member/report.php'),('PTT','testing/ptCSV.php'),('SPM','member/report.php'),('TSE','member/report.php'),('PTT','member/report.php'),('DME','member/report.php');
 /*!40000 ALTER TABLE `NEXT_VISIT` ENABLE KEYS */;
 UNLOCK TABLES;
 
