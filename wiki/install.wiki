@@ -56,8 +56,8 @@ If this does not work please do the [install#Manual_Install Manual install]
 
 In Ubuntu you can run:
 {{{
-sudo apt-get install taskel 
-sudo taskel lamp-server
+sudo apt-get install tasksel 
+sudo tasksel lamp-server
 sudo apt-get install PHP5-mysqlnd
 }}}
 You should then remove taskel after installing the LAMP
