@@ -6,15 +6,15 @@
 [#Automatic_Debian_Install Jump to Automatic Linux Installation] <br>
 [#Windows Jump to Automatic Windows Installation]
 
-This Guide will walk you through the process of installing Squadron Manger, and how to securely configure it. It is divided into four main sections: The requirements needed to install Squadron Manager, how to install the needed Software, how to configure the software for Squadron Manager, installing Squadron Manager, and finally how to securely configure the Software and Hardware. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
+This Guide will walk you through the process of installing Squadron Mange. This will cover how to prepare and install this system on multiple systems, both automatically and manually. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
 
 The major steps for the installation will be:
   # Install required Software
   # Configure Apache and MySQL
-  # Customize the website
   # Install the Database and website for Squadron Manager
-  # Secure the Server
   # Add Users, and use Squadron Manager
+  # Customize the website
+  # Secure the Server
 
 *Legal Note:* _Squadron Manager is free software licensed under the GNU General Public License version 3. You may redistribute and/or modify it under the terms of the GNU General Public License version 3 as published by the Free Software Foundation. _
 
@@ -28,31 +28,39 @@ This computer must:
   * Have At least 1GB of RAM is recommended
   * Have 1-10gb of free hard drive space is recommended
 
-=Installing=
+=Software Requirements=
 You will need to install: 
   * A http sever- [http://httpd.apache.org/ Apache] is recommended.
   * A Database Server (DBMS) [http://dev.mysql.com/downloads/mysql/ MySQL] is currently the only one supported
   * [http://us.php.net/ PHP]
   * The PHP mysql native driver (PHP5-mysqlnd)
   * [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Squadron manger]
-==Download File==
-==Linux==
-To do this in Linux you just need to install the LAMP(Linux Apache MySQL PHP) package, and PHP5-mysqlnd, and Squadron Manager. You can either do this automatically using a debian file, or manually.
 
-===Automatic Debian Install===
+=Linux=
+Squadron Manager was built on a Linux system (Ubuntu), so it will be most stable running on Linux, although Windows is still supported. This guide works best on a Debian/Ubuntu based system, but can be easily used on other systems. If you have a Debian System follow the guidelines below, otherwise jump to the [#Generic_Linux Generic Linux Section]
+
+==Automatic Debian Install==
 *Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distrubition's package management  software. 
 
-Download the most current Debian file from the [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64.deb. You can just install this package, and it should install all the required software and install the basic configurations. 
-software.
+  * First you need to set-up a static IP address for the server. [http://www.wikihow.com/Assign-an-IP-Address-on-a-Linux-Computer This article] provides a pretty good walk-through. If you need more help please ask for it in the Google Groups.
+  * Install the required programs with the commands below. This will install the LAMP server as well the database driver that is need.
+{{{
+sudo apt-get install tasksel
+sudo tasksel lamp-server
+sudo apt-get install PHP5-mysqlnd
+}}}
 
-To install the package download the .deb onto the computer. Then in terminal you will need to navigate to where it is and run:
+  * Download the most current Debian file from the [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64.deb. 
+
+  * In terminal you will need to navigate to where it is and install it using dpkg:
 {{{
 sudo dpkg -i squadMan_Version_x64_x86_Debian.deb
 }}}
 
+  * Follow the on-screen instructions to complete the process. Please note you will need access to a web-browser during this process, either on the computer, or another computer connected to the same network. For more information walking through the installation please see [Installation_walk The Installation walk through]
 If this does not work please do the [install#Manual_Install Manual install]
 
-===Manual Install===
+==Generic Linux==
 
 In Ubuntu you can run:
 {{{
