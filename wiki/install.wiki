@@ -69,8 +69,17 @@ This is how to install the generic linux package on any Linux/Unix system. If th
 
   * Next you will need to install [#Software_Requirements the required software]. This will vary from distribution to distribution, so it's difficult to have one guide for this. The best way would be to Google how to install a LAMP server on your distribution as well as how to install PHP5-mysqlnd (PHP mysql native driver). Or you can ask how in the user group.
 
-  * Now you will need to download the proper package to install from [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64-generic.tar.gz. 
+  * Now you will need to download the proper package to install from [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64-generic.tar.gz. Then extract the tar ball to use it. You should extract to some place that is out of the way such ~/squadMan` or ` /tmp/squadMan`
+{{{
+tar -xzvf foo_bar.tar.gz -C /path/To/Extraction
+}}} 
 
+  * Now navigate to where you extracted it (`/path/to/Extraction`) and run install.sh as root. Follow the on-screen instructions through this process. For more information on this please see [Installation_walk The Installation walk-through]
+{{{
+sudo bash install.sh
+}}}
+
+  * Install is now complete! just delete the install files and the tar ball since you don't need them anymore. Also make sure you have a secure configuration, and customize your implementation.
 =Windows=
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over a remote desktop.
 
