@@ -160,7 +160,6 @@ function auditDump($time, $fieldName, $fieldValue) {
  * @param boolean $success True if they were able to login false if they're login failed
  */
 function logLogin($capid, $success) {
-    $capid= cleanInputInt($capid,6,'capid');
     $time = date(SQL_INSERT_DATE_TIME);
     $ident=connect( 'Logger');
     $ip = $_SERVER['REMOTE_ADDR'];
@@ -180,7 +179,6 @@ function logLogin($capid, $success) {
  * @return boolean true if there is no lock false if there is a lock
  */
 function checkAccountLocks($capid) {
-    $capid=  cleanInputInt($capid,6,'CAPID');
     $ident = connect('ViewNext');   //logon to view account locks
     $results = Query("SELECT VALID_UNTIL FROM ACCOUNT_LOCKS
                         WHERE CAPID='$capid'", $ident);  //get account locks
