@@ -3,8 +3,8 @@
 <wiki:toc max_depth="3" />
 = Introduction =
 
-[#Automatic_Debian_Install Jump to Automatic Linux Installation] <br>
-[#Windows Jump to Automatic Windows Installation]
+[#Linux Jump to Linux Install] <br>
+[#Manual_Install Jump to Automatic Windows Installation]
 
 This Guide will walk you through the process of installing Squadron Mange. This will cover how to prepare and install this system on multiple systems, both automatically and manually. If you any troubles you can get help through the [http://groups.google.com/group/squadron-manager-users User Google Group]
 
@@ -40,14 +40,15 @@ You will need to install:
 Squadron Manager was built on a Linux system (Ubuntu), so it will be most stable running on Linux, although Windows is still supported. This guide works best on a Debian/Ubuntu based system, but can be easily used on other systems. If you have a Debian System follow the guidelines below, otherwise jump to the [#Generic_Linux Generic Linux Section]
 
 ==Automatic Debian Install==
-*Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distrubition's package management  software. 
+*Note:* This method only works for Ubuntu and Debian, but the package can be converted to another Distribution using [http://rpmfind.net/linux/rpm2html/search.php?query=alien Alien], and that distribution’s package management  software. 
 
   * First you need to set-up a static IP address for the server. [http://www.wikihow.com/Assign-an-IP-Address-on-a-Linux-Computer This article] provides a pretty good walk-through. If you need more help please ask for it in the Google Groups.
-  * Install the required programs with the commands below. This will install the LAMP server as well the database driver that is need.
+  * Install the required programs with the commands below. This will install the LAMP server as well the database driver that is need. Also make sure to select a secure password for the Mysql root account, and remember that password, you will need it later.
 {{{
 sudo apt-get install tasksel
 sudo tasksel lamp-server
 sudo apt-get install PHP5-mysqlnd
+sudo apt-get remove tasksel
 }}}
 
   * Download the most current Debian file from the [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64.deb. 
@@ -62,27 +63,21 @@ If this does not work please do the [install#Manual_Install Manual install]
 
 ==Generic Linux==
 
-In Ubuntu you can run:
-{{{
-sudo apt-get install tasksel 
-sudo tasksel lamp-server
-sudo apt-get install PHP5-mysqlnd
-}}}
-You should then remove taskel after installing the LAMP
-{{{
-sudo apt-get remove taskel
-}}}
-If you have a different distribution either Google how to do the installation on your distribution, or ask it in the [http://groups.google.com/group/squadron-manager-users Users' Google Group]. Remember you will need to install the Apache2 server, PHP5, PHP5-mysqlnd, and the MySql server.
+This is how to install the generic linux package on any Linux/Unix system. If these steps fail please go to the [Manual_Install Manual Install]. 
 
-Finally you will need to [install#Setup_https Setup https], and either install the [install#Automatic_Debian_Install Debian File] or [install#Manually_Depackage_Squadron_Manager Manually Install Squadron Manager]
+  * First set up a static IP address. [http://www.wikihow.com/Assign-an-IP-Address-on-a-Linux-Computer This article should be very helpful]
 
-==Windows==
+  * Next you will need to install [#Software_Requirements the required software]. This will vary from distribution to distribution, so it's difficult to have one guide for this. The best way would be to Google how to install a LAMP server on your distribution as well as how to install PHP5-mysqlnd (PHP mysql native driver). Or you can ask how in the user group.
+
+  * Now you will need to download the proper package to install from [https://drive.google.com/#folders/0B-3DXkTNAIwmVEs0MTdrdjVsdGM Google Drive]. It will be squadMan`_*`version`*_`x86_x64-generic.tar.gz. 
+
+=Windows=
 You will need to install a WAMP, to do this follow [http://www.wikihow.com/Install-WAMP these instructions], but *_DO NOT_* install PHPMyadmin for security purposes, all database management should be done directly on the Server or over a remote desktop.
 
 Next download the most recent windows installer from the [https://drive.google.com/#folders/0B-3DXkTNAIwmZU5XSmF3WExILXM Google Drive], it will be squadMan`_*`version`*_`x86_x64_windows.msi, and run it
 =Setup https=
 
-=Manually Depackage Squadron Manager=
+=Manual Install=
 For this you will need to download the Linux or Windows generic tar ball or zip file from the [https://drive.google.com/folderview?id=0B-3DXkTNAIwmT2pNbVkyRU9heFU&usp=sharing Google Drive]. These will be SquadMan_version_x86_x64_linux.tar.gz and squadMan_version_x86_x64_windows.zip respectively. These will be almost identical, they only differ in a few lines of code, so from now on they will be referred to as the same, as they set up the same way. Once the Download is complete extract the contents somewhere you have easy access to, and follow these steps:
   # Go to the install folder, and run db_dump.sql in terminal or command prompt with the command `mysql -u root -p db_dump.sql` You will be then prompted for the mysql root password, enter it, and mysql with then run the file, setting up the database for Squadron Manager.
   # Install the website. There are two sites, one http one that redirects all requests to the https, and the actual https. In the archive var/www contains the actual site and var/www-redirect contains the redirect site. Copy var/www to where you would like on Linux /var/www is suggested, and for Windows C:\www do the same with var/www-redirect but instead /var/www-redirect and C:\www-redirect are recommended.
