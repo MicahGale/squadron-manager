@@ -1,10 +1,6 @@
 #summary Procedures for Beta testing
 #labels Phase-Support
 
-= IP Address: [https://97.121.40.252:8090] =
-
-*NOTE:* Currently my ISP is blocking some incoming traffic, the problem has been resolved for now, but if there are more problems, please let me know.
-
 =Beta Testing=
 Squadron-Manager 0.10 beta is here, and ready to be beta tested. To help with the testing go to the IP-address above. The address may change from time to time, if the link is broken check back in a few hours, or e-mail me at [mailto:micah.gale@gmail.com micah.gale@gmail.com]. Please note that I am using a self-signed certificate so your browser will give you an error, just ignore it, and please do not enter personal information.
 
