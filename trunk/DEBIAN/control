@@ -1,10 +1,11 @@
 Package: Squadron-Manager
-Version: 0.10beta
-Section: PHP
+Version: 0.10
+Section: Web Servers
 Priority: extra
 Architecture: any
-Installed-Size: 
-Depends: apache2, php5 (>=5.0.0), mysql-server (>=5.0)
+Installed-Size: 1438
+Pre-Depends: mysql-server(>=5.0)
+Depends: apache2 (>=2.4.7), php5 (>=5.0.0), openssl (>=1.0.1f), PHP5-mysqlnd
 Maintainer: Micah Gale <micah.gale@gmail.com>
 Description: Squadron-Manger is a website for Digitalizing CAP records.
  Squadron-Manager is a website based on PHP and MySQL that will digitally manage

@@ -27,7 +27,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="/patch.ico">
-        <meta http-equiv="refresh" content="0; ulr=https://<?php echo $_SERVER['SERVER_NAME'];?>/">
+        <meta http-equiv="refresh" content="0; url=https://<?php echo $_SERVER['SERVER_NAME'];?>/">
         <title>Redirect</title>
     </head>
 </html>

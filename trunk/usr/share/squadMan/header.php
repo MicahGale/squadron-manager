@@ -22,7 +22,7 @@ $fields= parse_ini_file('/etc/squadMan/squadMan.ini');
 <table id="head" style="width:1100px">    
     <tr>
         <td style="width:210px"><a href="/">
-        <img src="/patch.png"></a></td>
+        <img alt="Squadron Logo" height="210" width="210" src="/patch.png"></a></td>
         <td>
             <table style="width:100%">
                 <tr><td style="text-align:center; vertical-align: top"><h1>
