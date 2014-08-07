@@ -31,7 +31,7 @@
         include("projectFunctions.php");
          $ident=Connect('Sign-in');
          session_start();       //connect to db and continue session
-         $newUnit = new unit($_POST["charter"],$_POST["region"],$_POST["wing"]);
+         $newUnit = new unit($_POST["charter"],$ident,$_POST["region"],$_POST["wing"],$_POST['name']);
          $newUnit->insert_unit($ident,"<strong>New Unit Successfully added</strong><br>\n");
          $newMember=$_SESSION["member"];
          $newMember->unit_set($newUnit);
