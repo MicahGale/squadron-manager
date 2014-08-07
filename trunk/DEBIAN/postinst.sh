@@ -197,3 +197,4 @@ esac
 #now let's enter this information!
 php -f /tmp/squadMan/createPassword.php -- $capid $staff_pos "$password"
 echo "install was successfull"
+rm -r /tmp/squadMan

@@ -274,6 +274,7 @@ function newUnit($identifier, $page) {
     echo "<br>Please enter the new unit's information below:<br>\n";
     echo"<form action=\"$page\" method=\"post\">\n";
     echo"Charter Number(i.e. RMR-ID-073)<input type=\"text\" name=\"charter\" size=\"5\"/>";
+    echo '<br>Unit Name (i.e. Boise Composite Squadron)<input type="text" name="name" size="5"/>';
     echo "<br>\nRegion:";
     dropDownMenu("SELECT REGION_CODE,REGION_NAME FROM REGION", "region", $identifier, false);
     echo"<br>\nWing:";
@@ -2795,7 +2796,8 @@ class unit {
     private $charter_num;
     private $region;
     private $wing;
-    function __construct($charter_num, $ident, $region = null, $wing = null) {
+    private $name;
+    function __construct($charter_num, $ident, $region = null, $wing = null, $name=null) {
         if ($region == null || $wing == null) {
             $this->charter_num = cleanInputString($charter_num, 10, "Unit charter Number", false);
             $results = Query("SELECT REGION, WING FROM CAP_UNIT WHERE CHARTER_NUM='$this->charter_num'", $ident);
@@ -2805,14 +2807,15 @@ class unit {
             $this->charter_num = cleanInputString($charter_num, 10, "charter Number", false);
             $this->region = cleanInputString($region, 3, "Region code", false);
             $this->wing = cleanInputString($wing, 2, "Wing code", false);
+            $this->name= cleanInputString($name,35,"Squadron Name",false);
         }
     }
     function getCharter() {
         return $this->charter_num;
     }
     function insert_unit($ident, $message) {
-        return Query("INSERT INTO CAP_UNIT (CHARTER_NUM,REGION,WING)
-VALUES('" . $this->charter_num . "','" . $this->region . "','" . $this->wing . ")", $ident, $message);
+        return Query("INSERT INTO CAP_UNIT (CHARTER_NUM,REGION,WING, SQUAD_NAME)
+VALUES('" . $this->charter_num . "','" . $this->region . "','" . $this->wing . "','".$this->name."')", $ident, $message);
     }
 }
 class memberType {
