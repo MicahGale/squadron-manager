@@ -1,0 +1,61 @@
+/* 
+    Document   : main
+    Created on : Jan 12, 2013, 3:02:04 PM
+    Author     : micah
+    Description:
+        Purpose of the stylesheet follows.
+*/
+body {color:black;}
+ .P {
+    color:green;
+}
+ .F {
+    color:red;
+}
+ .I {
+    color: orange;
+}
+tr:nth-of-type(even).table {
+    background-color:  	#E0E0E0;
+}
+.table {
+    font-size:12px;
+    vertical-align:top;
+    text-align: center;
+    border:1px solid black;
+    border-collapse: collapse;
+    padding: 2px;
+}
+th.table {
+    font-size: 12px;
+    border:1px solid black;
+}
+a.pres0 {                /*The precidances for the notification system*/
+    color: #CC0000;
+}
+a.pres1 {
+    color:#FF6600;
+}
+a.pres2 {
+    color:#FFCC00;
+}
+a.pres3 {
+    color:blue
+}
+.warning {
+    color: red;
+}
+.center {
+    text-align: center;
+}
+ul.tasks {
+    margin-left: 5px;
+    padding-left: 0
+}
+li.tasks {
+    margin-left:10px
+}
+.center {
+    margin-left:auto;
+    margin-right:auto;
+}
