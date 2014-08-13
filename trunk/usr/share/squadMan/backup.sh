@@ -40,3 +40,4 @@ FULL_LIFE="1Y"
 ######Environmental variables#####
 ##the password for encrypting the data
 export PASSWORD="password"
+

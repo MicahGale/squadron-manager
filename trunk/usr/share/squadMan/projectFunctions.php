@@ -1596,14 +1596,17 @@ class member {
         }
     }
     public function insertMember($ident) {
-        $date_current=$this->Date_of_Join;
+        $date_current=new datetime($this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT));
+        var_dump($date_current);
         $now=new DateTime();
         while($date_current->format('U')-$now->format('U')<0) {  //while the date current is less than right now
             $date_current->add(new DateInterval('P1Y'));  //add 1 year until past right now
         }
+        var_dump($this->Date_of_Join);
         $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED, DATE_CURRENT)
             VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."',
                 '".$this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."','".$date_current->format(PHP_TO_MYSQL_FORMAT)."')";
+        ECHO $query;
         return Query($query, $ident);
     }
     public function insertEmergency($ident) {

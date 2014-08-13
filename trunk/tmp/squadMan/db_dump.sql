@@ -16,7 +16,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---cpf
+-- 
 -- Table structure for table `ACCOUNT_LOCKS`
 --
 CREATE DATABASE IF NOT EXISTS SQUADRON_MANAGER;
@@ -569,7 +569,7 @@ CREATE TABLE `GRADE` (
 
 LOCK TABLES `GRADE` WRITE;
 /*!40000 ALTER TABLE `GRADE` DISABLE KEYS */;
-INSERT INTO `GRADE` VALUES ('1st_Lt','S','First Lieutenant'),('SM','S','Senior Member'),('2d_Lt','S','Second Lieutenant'),('Brig_Gen','S','Brigadier General'),('C/1st Lt','C','C/1st Lieutenant'),('C/2d Lt','C','C/2nd Lieutenant'),('C/A1C','C','Airman 1st Class'),('C/AB','C','Airman Basic'),('C/Amn','C','Airman'),('C/Capt','C','C/Captain'),('C/CMSgt','C','C/Chief Master Sergeant'),('C/Col','C','C/Colonel'),('C/Lt Col','C','C/Lieutenant Colonel'),('C/Maj','C','C/Major'),('C/MSgt','C','C/Master Sergeant'),('C/SMSgt','C','C/Senior Master Sergeant'),('C/SrA','C','Senior Airman'),('C/SSgt','C','C/Staff Sergeant'),('C/TSgt','C','C/Technical Sergeant'),('Capt','S','Captain'),('CMSgt','S','Chief Master Sergeant'),('Col','S','Colonel'),('FO','S','Flight Officer'),('Lt_Col','S','Lieutenant Colonel'),('Maj','S','Major'),('Maj_Gen','S','Major General'),('MSgt','S','Master Sergeant'),('SFO','S','Senior Flight Officer'),('SM','S','Senior Member'),('SMSgt','S','Senior Master Sergeant'),('SSgt','S','Staff Sergeant'),('TFO','S','Technical Flight Officer'),('TSgt','S','Technical Sergeant');
+INSERT INTO `GRADE` VALUES ('1st_Lt','S','First Lieutenant'),('2d_Lt','S','Second Lieutenant'),('Brig_Gen','S','Brigadier General'),('C/1st Lt','C','C/1st Lieutenant'),('C/2d Lt','C','C/2nd Lieutenant'),('C/A1C','C','Airman 1st Class'),('C/AB','C','Airman Basic'),('C/Amn','C','Airman'),('C/Capt','C','C/Captain'),('C/CMSgt','C','C/Chief Master Sergeant'),('C/Col','C','C/Colonel'),('C/Lt Col','C','C/Lieutenant Colonel'),('C/Maj','C','C/Major'),('C/MSgt','C','C/Master Sergeant'),('C/SMSgt','C','C/Senior Master Sergeant'),('C/SrA','C','Senior Airman'),('C/SSgt','C','C/Staff Sergeant'),('C/TSgt','C','C/Technical Sergeant'),('Capt','S','Captain'),('CMSgt','S','Chief Master Sergeant'),('Col','S','Colonel'),('FO','S','Flight Officer'),('Lt_Col','S','Lieutenant Colonel'),('Maj','S','Major'),('Maj_Gen','S','Major General'),('MSgt','S','Master Sergeant'),('SFO','S','Senior Flight Officer'),('SM','S','Senior Member'),('SMSgt','S','Senior Master Sergeant'),('SSgt','S','Staff Sergeant'),('TFO','S','Technical Flight Officer'),('TSgt','S','Technical Sergeant');
 /*!40000 ALTER TABLE `GRADE` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1323,7 +1323,7 @@ CREATE TABLE `TEXT_SETS` (
 
 LOCK TABLES `TEXT_SETS` WRITE;
 /*!40000 ALTER TABLE `TEXT_SETS` DISABLE KEYS */;
-INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets')('L2L','Learn to Lead'),('PD','Proffessional Development');
+INSERT INTO `TEXT_SETS` VALUES ('ALL','All text sets'),('L2L','Learn to Lead'),('PD','Professional Development');
 /*!40000 ALTER TABLE `TEXT_SETS` ENABLE KEYS */;
 UNLOCK TABLES;
 
