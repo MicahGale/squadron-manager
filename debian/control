@@ -1,0 +1,20 @@
+Source: squadron-manager
+Version: 0.10
+Section: Web Servers
+Priority: extra
+Installed-Size: 1438
+Maintainer: Micah Gale <micah.gale@gmail.com>
+
+Package: Squadron-Manager
+Architecture: all
+Pre-Depends: mysql-server(>=5.0)
+Depends: apache2 (>=2.4.7), 
+        php5-common (>=5.5.0), 
+        PHP5-mysqlnd
+Description: squadron-manger is a website for Digitalizing CAP records.
+ Squadron-Manager is a website based on PHP and MySQL that will digitally manage
+ Civil Air Patrol records at the Squadron Level. It is meant to run only on an intra-net
+ server. It is able to handle member sign-in, testing requests, testing, and promotion
+ management. Squadron-Manger creates an easy to use system that combines all the information
+ for the current task onto one screen.
+Homepage: <https://code.google.com/p/squadron-manager>
