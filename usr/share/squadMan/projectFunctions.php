@@ -25,12 +25,6 @@
  * if not it is available at <http://www.gnu.org/licenses/gpl.txt>. 
  */
 /*
- * **********************FOR v. 0.10*****************************
- * TODO finish populating db
- * TODO create installer
- * TODO visitor page
- */
-/*
  *Function to change to port to different DBMS
  * CleanInputInt-sql escape function
  * CleanInputString -''
@@ -1597,12 +1591,10 @@ class member {
     }
     public function insertMember($ident) {
         $date_current=new datetime($this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT));
-        var_dump($date_current);
         $now=new DateTime();
         while($date_current->format('U')-$now->format('U')<0) {  //while the date current is less than right now
             $date_current->add(new DateInterval('P1Y'));  //add 1 year until past right now
         }
-        var_dump($this->Date_of_Join);
         $query = "INSERT INTO MEMBER (CAPID,NAME_LAST,NAME_FIRST,GENDER,DATE_OF_BIRTH,ACHIEVEMENT,MEMBER_TYPE,TEXTBOOK_SET,HOME_UNIT,DATE_JOINED, DATE_CURRENT)
             VALUES('$this->capid','$this->name_last','$this->name_first','$this->gender','" .$this->DoB->format(PHP_TO_MYSQL_FORMAT) ."','".$this->achievement."','" . $this->memberType->getCode(). "','".$this->text_set."',
                 '".$this->unit->getCharter() . "','".$this->Date_of_Join->format(PHP_TO_MYSQL_FORMAT)."','".$date_current->format(PHP_TO_MYSQL_FORMAT)."')";
@@ -2240,6 +2232,12 @@ class member {
         if($new_tab)
             $buffer.= ' target="_blank"';
         $buffer.='>'.$this->title().'</a>';
+        return $buffer;
+    }
+    public function short_title() {
+        $ident=connect('Sign-in');
+        $buffer=$this->getGrade($ident,false)." ".$this->name_last;
+        close($ident);
         return $buffer;
     }
     public function get_text() {

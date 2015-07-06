@@ -75,6 +75,15 @@ if(isset($_SESSION['home'])) {
                     <form action="signIn" method="get">
                         <input type ="text" name="CAPID" size="5"/>
                         <input type="submit" value ="Sign-In"/>
+                        <br><input type="checkbox" name="quickie" <?php if (array_key_exists("quick", $_GET)) { echo 'checked="checked"';} ?>/> Check for Quick Sign-in
+                        <?php
+                        if(isset($_GET['capid'])) {  //if returning from quick sign-in thank the person
+                            $ident=  connect("Sign-in");
+                           $member=new member($_GET['capid'],1,$ident);
+                           echo "<br>Thank you:".$member->short_title();
+                           close($ident);
+                        } 
+                        ?>
                     </form>
                     <br>
                 </td>

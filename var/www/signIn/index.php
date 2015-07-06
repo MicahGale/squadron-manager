@@ -19,14 +19,20 @@
 include("projectFunctions.php");
 $ident=Connect('Sign-in');
 session_start();
+$quickie=false;
 if(isset($_GET['CAPID'])) {
-    $capid= cleanInputInt($_GET['CAPID'],6, "Capid");
-    $member = new member($capid,2,$ident);
-} else  {
-    $capid=null;
-}
+    $member = new member($_GET['CAPID'],2,$ident);
+} 
 if(isset($member)&&$member->exists()&&!$member->check_terminated($ident)){                   //if a member exists displays member info
     $_SESSION["member"]=$member;
+}
+if(isset($_GET['quickie'])) { //if doing a quick sign-in get in in and get out
+    if($member->exists()&&!$member->check_terminated($ident)) { //some good checks
+        $member->sign_in($ident, "");  //test if properly signed in
+        $quickie=true;
+        header("refresh:0; url=/index.php?quick=on&capid=".$member->getCapid());
+        session_destroy();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -39,6 +45,12 @@ if(isset($member)&&$member->exists()&&!$member->check_terminated($ident)){      
     </head>
     <body>
 <?php
+if($quickie) {
+    ?>
+    if you haven't been redirected please <a href="/index.php?quick=on&capid=<?php echo $_GET['CAPID']; ?>">click here</a>
+    <?php
+    exit;
+}
 include("header.php");
 if(isset($member)&&$member->badInput) {
     echo " please search again
@@ -64,7 +76,7 @@ if(isset($member)&&$member->badInput) {
                         <input type =\"text\" name=\"CAPID\" size=\"5\"/>
                         <input type=\"submit\" value =\"Sign-In\"/>
                     </form><br><strong>Or add a new Member</strong>";
-        newMember($ident,'newMember.php',$capid);
+        newMember($ident,'newMember.php',$_GET['CAPID']);
     }
     
 ?>

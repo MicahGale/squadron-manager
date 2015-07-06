@@ -218,7 +218,7 @@ CREATE TABLE `CONTACT_RELATIONS` (
 
 LOCK TABLES `CONTACT_RELATIONS` WRITE;
 /*!40000 ALTER TABLE `CONTACT_RELATIONS` DISABLE KEYS */;
-INSERT INTO `CONTACT_RELATIONS` VALUES ('BR','Brother'),('FA','Father'),('GF','GrandFather'),('GM','GrandMother'),('MO','Mother'),('SI','Sister');
+INSERT INTO `CONTACT_RELATIONS` VALUES ('BR','Brother'),('FA','Father'),('GF','Grandfather'),('GM','Grandmother'),('MO','Mother'),('SI','Sister'),('LG','Legal Guardian'),('OT','Other');
 /*!40000 ALTER TABLE `CONTACT_RELATIONS` ENABLE KEYS */;
 UNLOCK TABLES;
 

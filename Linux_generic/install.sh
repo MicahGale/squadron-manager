@@ -36,6 +36,7 @@ a2dissite 000-default
 a2dissite default-ssl
 
 #enable the squadMan sites
+a2enmod ssl
 a2ensite squadMan-http
 a2ensite squadMan-ssl
 
